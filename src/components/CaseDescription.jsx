@@ -175,7 +175,7 @@ function CaseDescription({ crime, onAccept, onBack }) {
           margin: '12px 0'
         }}>====================================</div>
         <div className="title" style={{
-          fontFamily: "'VT323', monospace",
+          fontFamily: "'PxPlus IBM VGA8', monospace",
           fontSize: '32px',
           padding: '8px 0',
           color: '#00FF66'
@@ -236,7 +236,7 @@ function CaseDescription({ crime, onAccept, onBack }) {
                   background: 'none',
                   border: 'none',
                   color: selectedButton === 0 ? '#00FF66' : '#00CC55',
-                  fontFamily: "'IBM Plex Mono', monospace",
+                  fontFamily: "'PxPlus IBM VGA8', monospace",
                   fontSize: '16px',
                   cursor: 'pointer',
                   padding: '8px 0',
@@ -266,7 +266,7 @@ function CaseDescription({ crime, onAccept, onBack }) {
                   background: 'none',
                   border: 'none',
                   color: selectedButton === 1 ? '#00FF66' : '#00CC55',
-                  fontFamily: "'IBM Plex Mono', monospace",
+                  fontFamily: "'PxPlus IBM VGA8', monospace",
                   fontSize: '16px',
                   cursor: 'pointer',
                   padding: '8px 0',

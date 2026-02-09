@@ -12,13 +12,17 @@ function App() {
   const [isLoading, setIsLoading] = useState(true)
   const [investigationState, setInvestigationState] = useState({
     cluesDiscovered: 0,
+    cluesRevealed: [],
+    witnessesViewed: [],
     attempts: 0,
     hypothesis: {
       suspect: null,
       location: null,
       method: null
     },
-    streak: 0
+    streak: 0,
+    solved: false,
+    failed: false
   })
 
   useEffect(() => {
@@ -70,10 +74,7 @@ function App() {
     
     const newState = {
       ...investigationState,
-      cluesDiscovered: Math.min(
-        investigationState.cluesDiscovered + 1,
-        currentCrime.clues.length
-      )
+      cluesDiscovered: investigationState.cluesDiscovered + 1
     }
     setInvestigationState(newState)
     saveState(newState)
@@ -82,6 +83,14 @@ function App() {
   const makeAccusation = (suspect, location, method) => {
     if (!currentCrime) return false
     
+    const maxAttempts = 3
+    const currentAttempts = investigationState.attempts + 1
+    
+    // Check if already failed
+    if (investigationState.failed) {
+      return false
+    }
+    
     const isCorrect = 
       suspect === currentCrime.solution.suspect &&
       location === currentCrime.solution.location &&
@@ -89,10 +98,11 @@ function App() {
 
     const newState = {
       ...investigationState,
-      attempts: investigationState.attempts + 1,
+      attempts: currentAttempts,
       hypothesis: { suspect, location, method },
       solved: isCorrect,
-      streak: isCorrect ? investigationState.streak + 1 : 0
+      failed: !isCorrect && currentAttempts >= maxAttempts,
+      streak: isCorrect ? investigationState.streak + 1 : investigationState.streak
     }
     
     setInvestigationState(newState)
@@ -100,6 +110,11 @@ function App() {
     
     if (isCorrect) {
       setScreen('result')
+    } else if (currentAttempts >= maxAttempts) {
+      // Case failed, show failure screen
+      setTimeout(() => {
+        setScreen('result')
+      }, 3000)
     }
     
     return isCorrect

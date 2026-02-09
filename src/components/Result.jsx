@@ -15,13 +15,24 @@ function Result({ crime, state, onBack }) {
     return `[${filledBars}${emptyBars}]`
   }
 
-  const shareText = `CASO #${String(crime.id).slice(-3)} - RESOLVIDO
+  const cluesRevealed = state.cluesDiscovered || crime.clues.filter(c => c.revealed).length
+  const witnessesViewed = state.witnessesViewed || []
+  const witnessesCount = witnessesViewed.length || crime.witnesses?.length || 0
+  
+  const cluesBar = renderProgressBar(cluesRevealed, crime.clues.length)
+  const witnessesBar = witnessesCount > 0 ? `[${'█'.repeat(witnessesCount)}${'░'.repeat(3 - witnessesCount)}]` : '[░░░]'
+  
+  const attemptText = state.attempts === 1 ? '1ª tentativa' : 
+                      state.attempts === 2 ? '2ª tentativa' : 
+                      state.attempts === 3 ? '3ª tentativa' : 
+                      `${state.attempts}ª tentativa`
 
-PISTAS: ${renderAccuracyBar()}
-TENTATIVAS: ${state.attempts}
-SEQUENCIA: ${state.streak} ${state.streak === 1 ? 'DIA' : 'DIAS'}
+  const shareText = `CASO #${String(crime.id).slice(-3)}
 
-JOGUE EM:
+PISTAS: ${cluesBar}
+TESTEMUNHAS: ${witnessesBar}
+ACUSACAO: ${attemptText}
+
 https://selenecriminal.netlify.app/`
 
   const copyToClipboard = () => {
@@ -34,7 +45,9 @@ https://selenecriminal.netlify.app/`
     <div className="result">
       <div className="terminal-header">
         <div className="separator">====================================</div>
-        <div className="title flash-green">CASO RESOLVIDO</div>
+        <div className={`title ${state.solved ? 'flash-green' : 'error'}`}>
+          {state.solved ? 'CASO RESOLVIDO' : 'CASO ENCERRADO'}
+        </div>
         <div className="separator">====================================</div>
       </div>
 

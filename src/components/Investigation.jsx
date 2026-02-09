@@ -7,9 +7,56 @@ function Investigation({ crime, state, onDiscoverClue, onMakeAccusation, onBack 
   const [selectedLocation, setSelectedLocation] = useState(null)
   const [selectedMethod, setSelectedMethod] = useState(null)
   const [feedback, setFeedback] = useState(null)
+  const [showWitnesses, setShowWitnesses] = useState(false)
+  const [witnessesViewed, setWitnessesViewed] = useState([])
+  const [showSuspects, setShowSuspects] = useState(false)
 
-  const availableClues = crime.clues.slice(0, state.cluesDiscovered)
-  const canDiscoverMore = state.cluesDiscovered < crime.clues.length
+  // Get available clues that haven't been revealed yet
+  const availableClues = crime.clues.filter(clue => !clue.revealed)
+  const revealedClues = crime.clues.filter(clue => clue.revealed)
+  const canDiscoverMore = availableClues.length > 0
+  const maxAttempts = 3
+  const remainingAttempts = maxAttempts - state.attempts
+  const isFailed = remainingAttempts <= 0 && !state.solved
+
+  // Get suspects with records
+  const suspectsWithRecords = crime.suspectsWithRecords || crime.suspects.map(s => 
+    typeof s === 'object' ? s : { name: s, criminalRecord: 'Sem antecedentes' }
+  )
+
+  const handleDiscoverClue = (clueType) => {
+    const clue = crime.clues.find(c => c.type === clueType && !c.revealed)
+    if (clue) {
+      clue.revealed = true
+      onDiscoverClue()
+    }
+  }
+
+  const handleViewWitness = (witnessIndex) => {
+    if (!witnessesViewed.includes(witnessIndex)) {
+      setWitnessesViewed([...witnessesViewed, witnessIndex])
+    }
+  }
+
+  const getFeedbackMessage = (suspect, location, method) => {
+    const correctSuspect = suspect === crime.solution.suspect
+    const correctLocation = location === crime.solution.location
+    const correctMethod = method === crime.solution.method
+
+    const correctCount = [correctSuspect, correctLocation, correctMethod].filter(Boolean).length
+
+    if (correctCount === 3) {
+      return 'ACUSACAO CORRETA!'
+    } else if (correctCount === 2) {
+      if (!correctSuspect) return 'VOCE ESTA PERTO. REVISE O SUSPEITO.'
+      if (!correctLocation) return 'VOCE ESTA PERTO. REVISE O LOCAL.'
+      if (!correctMethod) return 'VOCE ESTA PERTO. REVISE O METODO.'
+    } else if (correctCount === 1) {
+      return 'ALGUMAS PARTES ESTAO CORRETAS. CONTINUE INVESTIGANDO.'
+    } else {
+      return 'ACUSACAO INCORRETA. REVISE TODAS AS OPCOES.'
+    }
+  }
 
   const handleAccusation = () => {
     if (!selectedSuspect || !selectedLocation || !selectedMethod) {
@@ -18,19 +65,30 @@ function Investigation({ crime, state, onDiscoverClue, onMakeAccusation, onBack 
       return
     }
 
+    if (remainingAttempts <= 0) {
+      setFeedback('TENTATIVAS ESGOTADAS. CASO ENCERRADO.')
+      setTimeout(() => setFeedback(null), 3000)
+      return
+    }
+
     const isCorrect = onMakeAccusation(selectedSuspect, selectedLocation, selectedMethod)
     
     if (!isCorrect) {
-      setFeedback('ACUSACAO INCORRETA')
-      setTimeout(() => setFeedback(null), 2000)
+      const feedbackMsg = getFeedbackMessage(selectedSuspect, selectedLocation, selectedMethod)
+      setFeedback(feedbackMsg)
+      setTimeout(() => setFeedback(null), 3000)
+      
+      if (remainingAttempts <= 1) {
+        setTimeout(() => {
+          setFeedback('CASO ENCERRADO. VOCE FALHOU.')
+        }, 3000)
+      }
     }
   }
 
-  const renderProgressBar = () => {
-    const total = crime.clues.length
-    const discovered = state.cluesDiscovered
-    const filled = '█'.repeat(discovered)
-    const empty = '░'.repeat(total - discovered)
+  const renderProgressBar = (current, total) => {
+    const filled = '█'.repeat(current)
+    const empty = '░'.repeat(total - current)
     return `[${filled}${empty}]`
   }
 
@@ -43,36 +101,138 @@ function Investigation({ crime, state, onDiscoverClue, onMakeAccusation, onBack 
       </div>
 
       <div className="terminal-content">
+        {/* Attempts counter */}
+        <div className="section-title">
+          TENTATIVAS: {state.attempts}/{maxAttempts} {remainingAttempts > 0 ? `(${remainingAttempts} RESTANTES)` : '(ESGOTADAS)'}
+        </div>
+
+        {isFailed && (
+          <div className="feedback error">
+            CASO ENCERRADO. VOCE FALHOU.
+          </div>
+        )}
+
+        <div className="separator">------------------------------------</div>
+
+        {/* Clues Section */}
         <div className="clues-section">
           <div className="section-title">
-            PISTAS DESCOBERTAS: {state.cluesDiscovered}/{crime.clues.length}
+            PISTAS DISPONIVEIS: {revealedClues.length}/{crime.clues.length}
           </div>
           <div className="progress-bar">
-            {renderProgressBar()}
+            {renderProgressBar(revealedClues.length, crime.clues.length)}
           </div>
 
           <div className="separator">------------------------------------</div>
 
-          {canDiscoverMore && (
-            <button 
-              className="terminal-button" 
-              onClick={onDiscoverClue}
-            >
-              &gt; ANALISAR NOVA PISTA
-            </button>
+          {canDiscoverMore && !isFailed && (
+            <div className="clue-selection">
+              <div className="form-label">ESCOLHA QUAL PISTA REVELAR:</div>
+              <div className="form-options">
+                {availableClues.map((clue, index) => (
+                  <button
+                    key={index}
+                    className="option-button"
+                    onClick={() => handleDiscoverClue(clue.type)}
+                  >
+                    &gt; {clue.type}
+                  </button>
+                ))}
+              </div>
+            </div>
           )}
 
-          <div className="clues-list">
-            {availableClues.map((clue, index) => (
-              <div key={index} className="clue-item">
-                <span className="clue-text">{clue.text}</span>
-              </div>
-            ))}
-          </div>
+          {revealedClues.length > 0 && (
+            <div className="clues-list">
+              <div className="section-title">PISTAS REVELADAS:</div>
+              {revealedClues.map((clue, index) => (
+                <div key={index} className="clue-item">
+                  <span className="clue-text">{clue.text}</span>
+                </div>
+              ))}
+            </div>
+          )}
         </div>
 
         <div className="separator">------------------------------------</div>
 
+        {/* Witnesses Section */}
+        <div className="witnesses-section">
+          <div className="section-title">
+            TESTEMUNHAS: {witnessesViewed.length}/{crime.witnesses.length}
+          </div>
+          <div className="progress-bar">
+            {renderProgressBar(witnessesViewed.length, crime.witnesses.length)}
+          </div>
+
+          <div className="separator">------------------------------------</div>
+
+          {!showWitnesses && witnessesViewed.length < crime.witnesses.length && !isFailed && (
+            <button 
+              className="terminal-button" 
+              onClick={() => setShowWitnesses(true)}
+            >
+              &gt; VER TESTEMUNHAS
+            </button>
+          )}
+
+          {showWitnesses && (
+            <div className="witnesses-list">
+              {crime.witnesses.map((witness, index) => (
+                <div key={index} className="witness-item">
+                  <div className="witness-header">
+                    <span className="witness-name">{witness.name}</span>
+                    {witnessesViewed.includes(index) && (
+                      <span className={`witness-status ${witness.isTruthful ? 'truthful' : 'false'}`}>
+                        {witness.isTruthful ? '[VERDADEIRA]' : '[PODE SER FALSA]'}
+                      </span>
+                    )}
+                  </div>
+                  {witnessesViewed.includes(index) ? (
+                    <div className="witness-statement">{witness.statement}</div>
+                  ) : (
+                    <button
+                      className="option-button"
+                      onClick={() => handleViewWitness(index)}
+                    >
+                      &gt; VER DEPOIMENTO
+                    </button>
+                  )}
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+
+        <div className="separator">------------------------------------</div>
+
+        {/* Suspects Database */}
+        <div className="suspects-section">
+          {!showSuspects ? (
+            <button 
+              className="terminal-button" 
+              onClick={() => setShowSuspects(true)}
+            >
+              &gt; BANCO DE DADOS DOS SUSPEITOS
+            </button>
+          ) : (
+            <div className="suspects-database">
+              <div className="section-title">BANCO DE DADOS DOS SUSPEITOS:</div>
+              {suspectsWithRecords.map((suspect, index) => (
+                <div key={index} className="suspect-record">
+                  <div className="suspect-name">{suspect.name}</div>
+                  <div className="suspect-record-text">
+                    HISTORICO: {suspect.criminalRecord}
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+
+        <div className="separator">------------------------------------</div>
+
+        {/* Hypothesis Section */}
         <div className="hypothesis-section">
           <div className="section-title">HIPOTESE ATUAL:</div>
           <div className="hypothesis-line">
@@ -88,25 +248,27 @@ function Investigation({ crime, state, onDiscoverClue, onMakeAccusation, onBack 
 
         <div className="separator">------------------------------------</div>
 
-        {!showAccusation ? (
+        {/* Accusation Form */}
+        {!showAccusation && !isFailed ? (
           <button 
             className="terminal-button"
             onClick={() => setShowAccusation(true)}
+            disabled={remainingAttempts <= 0}
           >
-            &gt; FAZER ACUSACAO
+            &gt; FAZER ACUSACAO ({remainingAttempts} TENTATIVA{remainingAttempts !== 1 ? 'S' : ''} RESTANTE{remainingAttempts !== 1 ? 'S' : ''})
           </button>
-        ) : (
+        ) : showAccusation && !isFailed ? (
           <div className="accusation-form">
             <div className="form-group">
               <div className="form-label">SUSPEITO:</div>
               <div className="form-options">
-                {crime.suspects.map((suspect) => (
+                {suspectsWithRecords.map((suspect) => (
                   <button
-                    key={suspect}
-                    className={`option-button ${selectedSuspect === suspect ? 'selected' : ''}`}
-                    onClick={() => setSelectedSuspect(suspect)}
+                    key={suspect.name}
+                    className={`option-button ${selectedSuspect === suspect.name ? 'selected' : ''}`}
+                    onClick={() => setSelectedSuspect(suspect.name)}
                   >
-                    &gt; {suspect}
+                    &gt; {suspect.name}
                   </button>
                 ))}
               </div>
@@ -145,7 +307,7 @@ function Investigation({ crime, state, onDiscoverClue, onMakeAccusation, onBack 
             <div className="separator">------------------------------------</div>
 
             {feedback && (
-              <div className={`feedback ${feedback.includes('INCORRETA') ? 'error' : ''}`}>
+              <div className={`feedback ${feedback.includes('CORRETA') ? 'success' : feedback.includes('PERTO') ? 'warning' : 'error'}`}>
                 {feedback}
               </div>
             )}
@@ -153,6 +315,7 @@ function Investigation({ crime, state, onDiscoverClue, onMakeAccusation, onBack 
             <button 
               className="terminal-button highlight"
               onClick={handleAccusation}
+              disabled={remainingAttempts <= 0}
             >
               &gt; CONFIRMAR ACUSACAO
             </button>
@@ -164,7 +327,7 @@ function Investigation({ crime, state, onDiscoverClue, onMakeAccusation, onBack 
               &gt; CANCELAR
             </button>
           </div>
-        )}
+        ) : null}
 
         <div className="separator">------------------------------------</div>
 

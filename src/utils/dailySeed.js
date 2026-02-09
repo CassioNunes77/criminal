@@ -14,107 +14,121 @@ export function getDailySeed() {
   return Math.abs(hash)
 }
 
-// Sample crimes database
+// Sample crimes database - Crimes da década de 80
 const CRIMES_DATABASE = [
   {
     id: 1,
     type: 'ROUBO',
-    location: 'MUSEU AURORA',
-    time: '22:40',
+    location: 'LOJA DE ELETRÔNICOS',
+    time: '23:15',
     description: [
-      'CASO #001 - ROUBO DE OBRA DE ARTE',
+      'CASO #001 - ROUBO EM LOJA DE ELETRÔNICOS',
       '',
-      'Uma obra de arte valiosa foi roubada do Museu Aurora durante a noite.',
-      'O sistema de seguranca foi comprometido e evidencias apontam para acesso interno.',
+      'Uma loja de eletrônicos foi arrombada durante a madrugada.',
+      'Equipamentos de som e vídeo foram levados. Evidências apontam para planejamento.',
       '',
-      'Sua missao: identificar o responsavel, o local exato do crime e o metodo utilizado.',
+      'Sua missão: identificar o responsável, o local exato do crime e o método utilizado.',
       '',
-      'Analise as pistas com cuidado. Cada detalhe importa.'
+      'Analise as pistas e testemunhas com cuidado. Algumas informações podem ser falsas.'
     ],
-    suspects: ['Funcionário', 'Visitante', 'Segurança', 'Curador'],
-    locations: ['Galeria Principal', 'Depósito', 'Sala de Exposição', 'Escritório'],
-    methods: ['Forçou a fechadura', 'Usou chave falsa', 'Desativou alarme', 'Acesso interno'],
+    suspects: [
+      { name: 'João Silva', criminalRecord: 'Passagem por furto em 1982' },
+      { name: 'Maria Santos', criminalRecord: 'Sem antecedentes' },
+      { name: 'Carlos Oliveira', criminalRecord: 'Passagem por roubo em 1984' },
+      { name: 'Ana Costa', criminalRecord: 'Sem antecedentes' }
+    ],
+    locations: ['Porta dos Fundos', 'Vitrine Principal', 'Depósito', 'Escritório'],
+    methods: ['Arrombamento', 'Chave falsa', 'Ajuda interna', 'Janela lateral'],
     clues: [
-      { text: '[HORARIO] Crime ocorreu as 22:40' },
-      { text: '[LOCAL] Local exato: Galeria Principal' },
-      { text: '[CAMERA] Camera desativada as 22:35' },
-      { text: '[EVIDENCIA] Luva encontrada no local' },
-      { text: '[ALIBI] Visitante estava em casa' },
-      { text: '[ACESSO] Chave mestra acessada as 22:38' }
+      { type: 'HORARIO', text: 'Crime ocorreu às 23:15', revealed: false },
+      { type: 'LOCAL', text: 'Local exato: Porta dos Fundos', revealed: false },
+      { type: 'ACESSO', text: 'Ferramentas encontradas: alicate e chave de fenda', revealed: false },
+      { type: 'ALIBI', text: 'João Silva estava em casa (confirmado por vizinho)', revealed: false },
+      { type: 'COMPORTAMENTO', text: 'Suspeito deixou pegadas de tênis Nike', revealed: false },
+      { type: 'EVIDENCIA', text: 'Fio de cabelo encontrado no local', revealed: false }
+    ],
+    witnesses: [
+      {
+        name: 'Roberto, Segurança Noturno',
+        statement: 'Vi uma pessoa alta saindo pela porta dos fundos por volta das 23:20',
+        isTruthful: true
+      },
+      {
+        name: 'Lucia, Vizinha',
+        statement: 'João estava em casa assistindo TV às 23:15. Vi pela janela.',
+        isTruthful: false
+      },
+      {
+        name: 'Pedro, Funcionário',
+        statement: 'A porta dos fundos estava trancada quando saí às 22:00',
+        isTruthful: true
+      }
     ],
     solution: {
-      suspect: 'Funcionário',
-      location: 'Galeria Principal',
-      method: 'Acesso interno'
+      suspect: 'João Silva',
+      location: 'Porta dos Fundos',
+      method: 'Arrombamento'
     }
   },
   {
     id: 2,
-    type: 'FRAUDE',
-    location: 'BANCO CENTRAL',
-    time: '14:20',
+    type: 'FURTO',
+    location: 'VIDEOLOCADORA',
+    time: '20:30',
     description: [
-      'CASO #002 - FRAUDE BANCARIA',
+      'CASO #002 - FURTO EM VIDEOLOCADORA',
       '',
-      'Uma transferencia nao autorizada foi detectada no Banco Central.',
-      'Logs do sistema indicam acesso suspeito aos servidores principais.',
+      'Uma videolocadora foi furtada durante o horário de funcionamento.',
+      'Fitas de vídeo e dinheiro do caixa foram levados. Evidências apontam para ação rápida.',
       '',
-      'Sua missao: identificar o responsavel, o local exato do crime e o metodo utilizado.',
+      'Sua missão: identificar o responsável, o local exato do crime e o método utilizado.',
       '',
-      'Analise as pistas com cuidado. Cada detalhe importa.'
+      'Analise as pistas e testemunhas com cuidado. Algumas informações podem ser falsas.'
     ],
-    suspects: ['Gerente', 'Cliente VIP', 'TI', 'Segurança'],
-    locations: ['Cofre', 'Sala de Servidores', 'Caixa Eletrônico', 'Escritório'],
-    methods: ['Transferência não autorizada', 'Hackeou sistema', 'Falsificou documento', 'Acesso privilegiado'],
+    suspects: [
+      { name: 'Paulo Mendes', criminalRecord: 'Passagem por furto em 1983' },
+      { name: 'Fernanda Lima', criminalRecord: 'Sem antecedentes' },
+      { name: 'Ricardo Souza', criminalRecord: 'Passagem por furto em 1981 e 1985' },
+      { name: 'Juliana Alves', criminalRecord: 'Sem antecedentes' }
+    ],
+    locations: ['Caixa Registradora', 'Estante de Fitas', 'Banheiro', 'Entrada'],
+    methods: ['Distração', 'Aproveitou descuido', 'Ajuda de cúmplice', 'Força'],
     clues: [
-      { text: '[HORARIO] Crime ocorreu as 14:20' },
-      { text: '[LOG] Log de acesso suspeito detectado' },
-      { text: '[EMAIL] Email de confirmacao enviado' },
-      { text: '[SENHA] Senha administrativa usada' },
-      { text: '[ALIBI] Gerente estava em reuniao' },
-      { text: '[DISPOSITIVO] Dispositivo desconhecido conectado' }
+      { type: 'HORARIO', text: 'Crime ocorreu às 20:30', revealed: false },
+      { type: 'LOCAL', text: 'Local exato: Caixa Registradora', revealed: false },
+      { type: 'ACESSO', text: 'Caixa estava aberto, sem sinais de arrombamento', revealed: false },
+      { type: 'ALIBI', text: 'Paulo Mendes estava em casa (confirmado por mãe)', revealed: false },
+      { type: 'COMPORTAMENTO', text: 'Suspeito usou boné e óculos escuros', revealed: false },
+      { type: 'EVIDENCIA', text: 'Impressão digital encontrada no caixa', revealed: false }
+    ],
+    witnesses: [
+      {
+        name: 'Marcos, Cliente',
+        statement: 'Vi uma pessoa mexendo no caixa às 20:25. Parecia nervosa.',
+        isTruthful: true
+      },
+      {
+        name: 'Sandra, Funcionária',
+        statement: 'Paulo estava na loja comprando pipoca às 20:30. Vi ele saindo.',
+        isTruthful: false
+      },
+      {
+        name: 'Antonio, Dono',
+        statement: 'O caixa estava fechado quando saí para o banheiro às 20:20',
+        isTruthful: true
+      }
     ],
     solution: {
-      suspect: 'TI',
-      location: 'Sala de Servidores',
-      method: 'Hackeou sistema'
-    }
-  },
-  {
-    id: 3,
-    type: 'DESAPARECIMENTO',
-    location: 'PARQUE CENTRAL',
-    time: '18:00',
-    description: [
-      'CASO #003 - DESAPARECIMENTO SUSPEITO',
-      '',
-      'Uma pessoa desapareceu no Parque Central durante o entardecer.',
-      'Evidencias encontradas sugerem que nao foi um acidente.',
-      '',
-      'Sua missao: identificar o responsavel, o local exato do crime e o metodo utilizado.',
-      '',
-      'Analise as pistas com cuidado. Cada detalhe importa.'
-    ],
-    suspects: ['Amigo', 'Familiar', 'Estranho', 'Colega'],
-    locations: ['Entrada Principal', 'Lago', 'Bosque', 'Estacionamento'],
-    methods: ['Planejado', 'Acidental', 'Coerção', 'Fuga voluntária'],
-    clues: [
-      { text: '[HORARIO] Ultima vista as 18:00' },
-      { text: '[EVIDENCIA] Celular encontrado no lago' },
-      { text: '[PEGADAS] Pegadas na direcao do bosque' },
-      { text: '[ALIBI] Familiar estava em casa' },
-      { text: '[CHAMADA] Ultima chamada: Amigo' },
-      { text: '[VEICULO] Carro ainda no estacionamento' }
-    ],
-    solution: {
-      suspect: 'Amigo',
-      location: 'Bosque',
-      method: 'Planejado'
+      suspect: 'Paulo Mendes',
+      location: 'Caixa Registradora',
+      method: 'Distração'
     }
   }
 ]
 
 export function getDailyCrime() {
+  // For testing, always return the first case
+  // Later, use seed to select random case
   const seed = getDailySeed()
   const crimeIndex = seed % CRIMES_DATABASE.length
   const baseCrime = CRIMES_DATABASE[crimeIndex]
@@ -124,9 +138,14 @@ export function getDailyCrime() {
   const dateString = `${today.getFullYear()}${String(today.getMonth() + 1).padStart(2, '0')}${String(today.getDate()).padStart(2, '0')}`
   const crimeId = parseInt(dateString)
   
+  // Transform suspects array to match old format for compatibility
+  const suspects = baseCrime.suspects.map(s => typeof s === 'object' ? s.name : s)
+  
   return {
     ...baseCrime,
     id: crimeId,
-    date: today.toLocaleDateString('pt-BR')
+    date: today.toLocaleDateString('pt-BR'),
+    suspects: suspects, // Keep both formats for compatibility
+    suspectsWithRecords: baseCrime.suspects // New format with criminal records
   }
 }

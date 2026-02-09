@@ -113,3 +113,87 @@
   color: var(--text-highlight);
   animation: flash 120ms ease-in-out 3;
 }
+
+.feedback.success {
+  color: var(--text-highlight);
+  animation: flash 120ms ease-in-out;
+}
+
+.feedback.warning {
+  color: var(--text-highlight);
+  animation: flash 120ms ease-in-out 2;
+}
+
+.witnesses-section {
+  margin: 16px 0;
+}
+
+.witness-item {
+  margin: 12px 0;
+  padding: 8px 0;
+  border-bottom: 1px solid var(--text-secondary);
+}
+
+.witness-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.witness-name {
+  font-weight: 600;
+  color: var(--text-highlight);
+  font-size: 14px;
+}
+
+.witness-status {
+  font-size: 12px;
+  padding: 2px 6px;
+}
+
+.witness-status.truthful {
+  color: var(--text-primary);
+}
+
+.witness-status.false {
+  color: var(--text-secondary);
+}
+
+.witness-statement {
+  font-size: 14px;
+  color: var(--text-primary);
+  line-height: 1.6;
+  margin-top: 4px;
+}
+
+.suspects-section {
+  margin: 16px 0;
+}
+
+.suspects-database {
+  margin: 12px 0;
+}
+
+.suspect-record {
+  margin: 12px 0;
+  padding: 8px 0;
+  border-bottom: 1px solid var(--text-secondary);
+}
+
+.suspect-name {
+  font-weight: 600;
+  color: var(--text-highlight);
+  font-size: 14px;
+  margin-bottom: 4px;
+}
+
+.suspect-record-text {
+  font-size: 13px;
+  color: var(--text-primary);
+  line-height: 1.6;
+}
+
+.clue-selection {
+  margin: 16px 0;
+}

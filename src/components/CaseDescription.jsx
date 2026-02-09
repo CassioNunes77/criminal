@@ -21,10 +21,9 @@ function CaseDescription({ crime, onAccept, onBack }) {
     // Handle keyboard navigation
     const handleKeyPress = (e) => {
       if (e.key === 'Enter') {
+        e.preventDefault()
         if (!descriptionComplete) {
-          e.preventDefault()
-          
-          // Cancel animation completely
+          // Cancel animation completely and show all text
           if (window.__cancelCaseAnimation) {
             window.__cancelCaseAnimation()
           }
@@ -35,21 +34,20 @@ function CaseDescription({ crime, onAccept, onBack }) {
           setCurrentLineIndex(allLines.length - 1)
           setDots('')
           setDescriptionComplete(true)
-          setSelectedButton(0)
+          setSelectedButton(0) // Select accept button by default
         } else if (descriptionComplete) {
-          e.preventDefault()
+          // Activate selected button
           if (selectedButton === 0) {
             onAccept()
           } else {
             onBack()
           }
         }
-      } else if (descriptionComplete) {
+      } else if (descriptionComplete && (e.key === 'ArrowDown' || e.key === 'ArrowUp')) {
+        e.preventDefault()
         if (e.key === 'ArrowDown') {
-          e.preventDefault()
           setSelectedButton(prev => (prev + 1) % 2) // Move down: 0 -> 1, 1 -> 0
         } else if (e.key === 'ArrowUp') {
-          e.preventDefault()
           setSelectedButton(prev => (prev - 1 + 2) % 2) // Move up: 1 -> 0, 0 -> 1
         }
       }

@@ -9,7 +9,7 @@
 .title {
   font-family: 'VT323', monospace;
   font-size: 32px;
-  text-align: center;
+  text-align: left;
   padding: 8px 0;
   color: var(--text-highlight);
 }
@@ -17,6 +17,7 @@
 @media (max-width: 768px) {
   .title {
     font-size: 24px;
+    text-align: center;
   }
 }
 
@@ -24,7 +25,13 @@
   color: var(--text-secondary);
   font-size: 14px;
   margin: 12px 0;
-  text-align: center;
+  text-align: left;
+}
+
+@media (max-width: 768px) {
+  .separator {
+    text-align: center;
+  }
 }
 
 .terminal-content {
@@ -44,14 +51,26 @@
 .crime-header {
   font-size: 18px;
   font-weight: 600;
-  text-align: center;
+  text-align: left;
   margin: 16px 0;
   color: var(--text-highlight);
 }
 
+@media (max-width: 768px) {
+  .crime-header {
+    text-align: center;
+  }
+}
+
 .crime-info {
   margin: 16px 0;
-  text-align: center;
+  text-align: left;
+}
+
+@media (max-width: 768px) {
+  .crime-info {
+    text-align: center;
+  }
 }
 
 .crime-type {

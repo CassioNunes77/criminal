@@ -158,13 +158,11 @@ function Home({ crime, streak, onStart }) {
           <div className="separator" style={{
             color: '#007A33',
             fontSize: '14px',
-            margin: '12px 0',
-            textAlign: 'center'
+            margin: '12px 0'
           }}>====================================</div>
           <div className="title" style={{
             fontFamily: "'VT323', monospace",
             fontSize: '32px',
-            textAlign: 'center',
             padding: '8px 0',
             color: '#00FF66'
           }}>
@@ -173,8 +171,7 @@ function Home({ crime, streak, onStart }) {
           <div className="separator" style={{
             color: '#007A33',
             fontSize: '14px',
-            margin: '12px 0',
-            textAlign: 'center'
+            margin: '12px 0'
           }}>====================================</div>
         </div>
 
@@ -183,12 +180,11 @@ function Home({ crime, streak, onStart }) {
           fontSize: '14px',
           marginTop: '20px'
         }}>
-          <div className="separator" style={{
-            color: '#007A33',
-            fontSize: '14px',
-            margin: '12px 0',
-            textAlign: 'center'
-          }}>------------------------------------</div>
+        <div className="separator" style={{
+          color: '#007A33',
+          fontSize: '14px',
+          margin: '12px 0'
+        }}>------------------------------------</div>
 
           <button 
             className="terminal-button" 
@@ -212,12 +208,11 @@ function Home({ crime, streak, onStart }) {
             &gt; VOLTAR
           </button>
 
-          <div className="separator" style={{
-            color: '#007A33',
-            fontSize: '14px',
-            margin: '12px 0',
-            textAlign: 'center'
-          }}>------------------------------------</div>
+        <div className="separator" style={{
+          color: '#007A33',
+          fontSize: '14px',
+          margin: '12px 0'
+        }}>------------------------------------</div>
 
           <div style={{
             whiteSpace: 'pre-wrap',
@@ -268,13 +263,11 @@ function Home({ crime, streak, onStart }) {
         <div className="separator" style={{
           color: '#007A33',
           fontSize: '14px',
-          margin: '12px 0',
-          textAlign: 'center'
+          margin: '12px 0'
         }}>====================================</div>
         <div className="title terminal-text" style={{
           fontFamily: "'VT323', monospace",
           fontSize: '32px',
-          textAlign: 'center',
           padding: '8px 0',
           color: '#00FF66',
           textShadow: '0 0 2px rgba(0, 255, 100, 0.4), 0 0 4px rgba(0, 255, 100, 0.15)'
@@ -287,8 +280,7 @@ function Home({ crime, streak, onStart }) {
         <div className="separator" style={{
           color: '#007A33',
           fontSize: '14px',
-          margin: '12px 0',
-          textAlign: 'center'
+          margin: '12px 0'
         }}>====================================</div>
       </div>
 
@@ -306,8 +298,7 @@ function Home({ crime, streak, onStart }) {
         <div className="separator" style={{
           color: '#007A33',
           fontSize: '14px',
-          margin: '12px 0',
-          textAlign: 'center'
+          margin: '12px 0'
         }}>------------------------------------</div>
 
         <button 

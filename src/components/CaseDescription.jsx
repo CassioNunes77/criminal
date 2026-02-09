@@ -105,13 +105,11 @@ function CaseDescription({ crime, onAccept }) {
         <div className="separator" style={{
           color: '#007A33',
           fontSize: '14px',
-          margin: '12px 0',
-          textAlign: 'center'
+          margin: '12px 0'
         }}>====================================</div>
         <div className="title" style={{
           fontFamily: "'VT323', monospace",
           fontSize: '32px',
-          textAlign: 'center',
           padding: '8px 0',
           color: '#00FF66'
         }}>
@@ -120,8 +118,7 @@ function CaseDescription({ crime, onAccept }) {
         <div className="separator" style={{
           color: '#007A33',
           fontSize: '14px',
-          margin: '12px 0',
-          textAlign: 'center'
+          margin: '12px 0'
         }}>====================================</div>
       </div>
 
@@ -167,8 +164,7 @@ function CaseDescription({ crime, onAccept }) {
               <div className="separator" style={{
                 color: '#007A33',
                 fontSize: '14px',
-                margin: '24px 0 12px 0',
-                textAlign: 'center'
+                margin: '24px 0 12px 0'
               }}>------------------------------------</div>
 
               <button 

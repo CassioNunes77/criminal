@@ -93,10 +93,16 @@
 .feedback {
   margin: 16px 0;
   padding: 12px;
-  text-align: center;
+  text-align: left;
   font-size: 16px;
   color: var(--text-highlight);
   animation: flash 120ms ease-in-out;
+}
+
+@media (max-width: 768px) {
+  .feedback {
+    text-align: center;
+  }
 }
 
 .feedback.error {

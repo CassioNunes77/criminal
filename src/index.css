@@ -114,3 +114,29 @@ body::before {
 ::-webkit-scrollbar-thumb:hover {
   background: var(--text-primary);
 }
+
+/* Desktop alignment - left align all elements */
+@media (min-width: 769px) {
+  .separator,
+  .title,
+  .crime-header,
+  .crime-info,
+  .result-section,
+  .share-feedback,
+  .feedback {
+    text-align: left !important;
+  }
+}
+
+/* Mobile alignment - center align */
+@media (max-width: 768px) {
+  .separator,
+  .title,
+  .crime-header,
+  .crime-info,
+  .result-section,
+  .share-feedback,
+  .feedback {
+    text-align: center;
+  }
+}

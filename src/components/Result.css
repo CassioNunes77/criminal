@@ -14,7 +14,13 @@
 
 .result-section {
   margin: 24px 0;
-  text-align: center;
+  text-align: left;
+}
+
+@media (max-width: 768px) {
+  .result-section {
+    text-align: center;
+  }
 }
 
 .accuracy-bar {
@@ -48,8 +54,14 @@
 .share-feedback {
   margin: 16px 0;
   padding: 12px;
-  text-align: center;
+  text-align: left;
   font-size: 14px;
   color: var(--text-highlight);
   animation: flash 120ms ease-in-out;
+}
+
+@media (max-width: 768px) {
+  .share-feedback {
+    text-align: center;
+  }
 }

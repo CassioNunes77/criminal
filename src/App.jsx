@@ -45,7 +45,7 @@ function App() {
             cluesDiscovered: parsed.cluesDiscovered || 0,
             cluesRevealed: parsed.cluesRevealed || [],
             witnessesViewed: parsed.witnessesViewed || [],
-            attempts: Math.max(0, Math.min(parsed.attempts || 0, 3)), // Ensure between 0 and 3
+            attempts: Math.max(0, Math.min(parsed.attempts || 0, 10)), // Ensure between 0 and 10
             hypothesis: parsed.hypothesis || {
               suspect: null,
               location: null,
@@ -114,7 +114,7 @@ function App() {
   const makeAccusation = (suspect, location, method) => {
     if (!currentCrime) return false
     
-    const maxAttempts = 3
+    const maxAttempts = 10
     const currentAttempts = investigationState.attempts + 1
     
     // Check if already failed

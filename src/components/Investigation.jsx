@@ -22,7 +22,7 @@ function Investigation({ crime, state, onDiscoverClue, onMakeAccusation, onViewC
   const availableClues = crime.clues.filter(clue => !clue.revealed)
   const revealedClues = crime.clues.filter(clue => clue.revealed)
   const canDiscoverMore = availableClues.length > 0
-  const maxAttempts = 3
+  const maxAttempts = 10
   const currentAttempts = Math.max(0, Math.min(state.attempts || 0, maxAttempts)) // Ensure valid range
   const remainingAttempts = Math.max(0, maxAttempts - currentAttempts)
   const isFailed = remainingAttempts <= 0 && !state.solved

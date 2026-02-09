@@ -173,8 +173,6 @@ function Investigation({ crime, state, onDiscoverClue, onMakeAccusation, onViewC
           </div>
         )}
 
-        <div className="separator">------------------------------------</div>
-
         {/* Clues Section */}
         <div className="clues-section">
           <div className="section-title">

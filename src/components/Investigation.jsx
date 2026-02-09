@@ -95,8 +95,11 @@ function Investigation({ crime, state, onDiscoverClue, onMakeAccusation, onViewC
   }
 
   const renderProgressBar = (current, total) => {
-    const filled = '█'.repeat(current)
-    const empty = '░'.repeat(total - current)
+    const safeCurrent = Math.max(0, Math.min(current || 0, total || 0))
+    const safeTotal = Math.max(0, total || 0)
+    const safeRemaining = Math.max(0, safeTotal - safeCurrent)
+    const filled = '█'.repeat(safeCurrent)
+    const empty = '░'.repeat(safeRemaining)
     return `[${filled}${empty}]`
   }
 

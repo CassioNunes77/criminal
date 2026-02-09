@@ -10,15 +10,19 @@ function Result({ crime, state, onBack }) {
   
   const renderCluesBar = () => {
     const total = crime.clues ? crime.clues.length : 6
-    const filled = '■'.repeat(cluesRevealed)
-    const empty = '□'.repeat(total - cluesRevealed)
+    const safeRevealed = Math.max(0, Math.min(cluesRevealed || 0, total))
+    const safeRemaining = Math.max(0, total - safeRevealed)
+    const filled = '■'.repeat(safeRevealed)
+    const empty = '□'.repeat(safeRemaining)
     return `[${filled}${empty}]`
   }
   
   const renderWitnessesBar = () => {
     const total = 3
-    const filled = '■'.repeat(witnessesCount)
-    const empty = '□'.repeat(total - witnessesCount)
+    const safeCount = Math.max(0, Math.min(witnessesCount || 0, total))
+    const safeRemaining = Math.max(0, total - safeCount)
+    const filled = '■'.repeat(safeCount)
+    const empty = '□'.repeat(safeRemaining)
     return `[${filled}${empty}]`
   }
   
@@ -28,9 +32,10 @@ function Result({ crime, state, onBack }) {
   const accuracy = crime.clues ? Math.round((cluesRevealed / crime.clues.length) * 100) : 0
 
   const renderAccuracyBar = () => {
-    const filled = Math.round(accuracy / 10)
-    const filledBars = '■'.repeat(filled)
-    const emptyBars = '□'.repeat(10 - filled)
+    const safeFilled = Math.max(0, Math.min(Math.round(accuracy / 10), 10))
+    const safeEmpty = Math.max(0, 10 - safeFilled)
+    const filledBars = '■'.repeat(safeFilled)
+    const emptyBars = '□'.repeat(safeEmpty)
     return `[${filledBars}${emptyBars}]`
   }
   

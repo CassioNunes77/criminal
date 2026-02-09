@@ -31,7 +31,7 @@ export class TypewriterSound {
     this.audioContext = null
     this.isEnabled = true
     this.lastPlayTime = 0
-    this.minInterval = 25 // Longer interval for softer, more natural effect
+    this.minInterval = 15 // Shorter interval for more responsive 80s terminal feel
   }
 
   init() {
@@ -52,61 +52,33 @@ export class TypewriterSound {
     this.lastPlayTime = now
 
     try {
-      // Create a very soft typing sound using white noise filtered
-      const bufferSize = this.audioContext.sampleRate * 0.02 // 20ms
-      const buffer = this.audioContext.createBuffer(1, bufferSize, this.audioContext.sampleRate)
-      const data = buffer.getChannelData(0)
-      
-      // Generate soft white noise
-      for (let i = 0; i < bufferSize; i++) {
-        data[i] = (Math.random() * 2 - 1) * 0.1 // Very quiet white noise
-      }
-      
-      const source = this.audioContext.createBufferSource()
+      // 80s terminal/computer beep sound - short, electronic, characteristic
+      const oscillator = this.audioContext.createOscillator()
       const gainNode = this.audioContext.createGain()
-      const filter = this.audioContext.createBiquadFilter()
       
-      // Low-pass filter for softer sound
-      filter.type = 'lowpass'
-      filter.frequency.value = 2000 // Cut high frequencies
-      filter.Q.value = 1
-      
-      source.buffer = buffer
-      source.connect(filter)
-      filter.connect(gainNode)
+      oscillator.connect(gainNode)
       gainNode.connect(this.audioContext.destination)
       
-      // Very subtle volume envelope
-      gainNode.gain.setValueAtTime(0.015, this.audioContext.currentTime)
-      gainNode.gain.exponentialRampToValueAtTime(0.001, this.audioContext.currentTime + 0.02)
+      // Classic 80s terminal beep frequency range (800-1200 Hz)
+      // Slight variation for realism
+      const baseFreq = 900 + Math.random() * 200
+      oscillator.frequency.setValueAtTime(baseFreq, this.audioContext.currentTime)
       
-      source.start(this.audioContext.currentTime)
-      source.stop(this.audioContext.currentTime + 0.02)
+      // Square wave for that classic digital/electronic sound
+      oscillator.type = 'square'
+      
+      // Quick attack and decay - characteristic terminal beep
+      gainNode.gain.setValueAtTime(0, this.audioContext.currentTime)
+      gainNode.gain.linearRampToValueAtTime(0.08, this.audioContext.currentTime + 0.002) // Quick attack
+      gainNode.gain.exponentialRampToValueAtTime(0.01, this.audioContext.currentTime + 0.015) // Fast decay
+      gainNode.gain.linearRampToValueAtTime(0, this.audioContext.currentTime + 0.025) // Quick fade
+      
+      oscillator.start(this.audioContext.currentTime)
+      oscillator.stop(this.audioContext.currentTime + 0.025)
     } catch (e) {
-      // Fallback to very soft sine wave if buffer creation fails
-      try {
-        const oscillator = this.audioContext.createOscillator()
-        const gainNode = this.audioContext.createGain()
-        
-        oscillator.connect(gainNode)
-        gainNode.connect(this.audioContext.destination)
-        
-        // Very soft, low frequency sine wave
-        const baseFreq = 200 + Math.random() * 50
-        oscillator.frequency.setValueAtTime(baseFreq, this.audioContext.currentTime)
-        oscillator.type = 'sine'
-        
-        // Extremely low volume
-        gainNode.gain.setValueAtTime(0.01, this.audioContext.currentTime)
-        gainNode.gain.exponentialRampToValueAtTime(0.001, this.audioContext.currentTime + 0.05)
-        
-        oscillator.start(this.audioContext.currentTime)
-        oscillator.stop(this.audioContext.currentTime + 0.05)
-      } catch (e2) {
-        // Silently fail if audio context is suspended
-        if (e2.name !== 'InvalidStateError') {
-          console.warn('Error playing sound:', e2)
-        }
+      // Silently fail if audio context is suspended
+      if (e.name !== 'InvalidStateError') {
+        console.warn('Error playing sound:', e)
       }
     }
   }

@@ -1,5 +1,6 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import './Home.css'
+import { TypewriterSound } from '../utils/typewriterSound'
 
 function Home({ crime, streak, onStart }) {
   const [displayedText, setDisplayedText] = useState('')
@@ -9,6 +10,7 @@ function Home({ crime, streak, onStart }) {
   const [currentLineIndex, setCurrentLineIndex] = useState(0)
   const [dots, setDots] = useState('')
   const [aboutComplete, setAboutComplete] = useState(false)
+  const typewriterSoundRef = useRef(null)
 
   useEffect(() => {
     const text = `NEXO TERMINAL v1.0`
@@ -27,6 +29,12 @@ function Home({ crime, streak, onStart }) {
   }, [])
 
   useEffect(() => {
+    // Initialize typewriter sound
+    if (!typewriterSoundRef.current) {
+      typewriterSoundRef.current = new TypewriterSound()
+      typewriterSoundRef.current.init()
+    }
+
     if (showAbout) {
       setAboutLines([])
       setCurrentLineIndex(0)
@@ -92,6 +100,11 @@ function Home({ crime, streak, onStart }) {
         }
 
         if (charIndex < currentLine.length) {
+          // Play typewriter sound for each character (except spaces)
+          if (currentLine[charIndex] !== ' ') {
+            typewriterSoundRef.current?.play()
+          }
+          
           setAboutLines(prev => {
             const newLines = [...prev]
             if (!newLines[lineIndex]) {

@@ -120,24 +120,30 @@ function CaseDescription({ crime, onAccept, onBack }) {
       }
   }, [crime])
 
+  const completeAnimation = () => {
+    if (!descriptionComplete) {
+      // Cancel animation completely and show all text
+      if (window.__cancelCaseAnimation) {
+        window.__cancelCaseAnimation()
+      }
+      
+      // Show all text immediately
+      const allLines = crime.description || []
+      setDescriptionLines(allLines)
+      setCurrentLineIndex(allLines.length - 1)
+      setDots('')
+      setDescriptionComplete(true)
+      setSelectedButton(0) // Select accept button by default
+    }
+  }
+
   // Keyboard navigation - separate useEffect like in Home.jsx
   useEffect(() => {
     const handleKeyPress = (e) => {
       if (e.key === 'Enter') {
         e.preventDefault()
         if (!descriptionComplete) {
-          // Cancel animation completely and show all text
-          if (window.__cancelCaseAnimation) {
-            window.__cancelCaseAnimation()
-          }
-          
-          // Show all text immediately
-          const allLines = crime.description || []
-          setDescriptionLines(allLines)
-          setCurrentLineIndex(allLines.length - 1)
-          setDots('')
-          setDescriptionComplete(true)
-          setSelectedButton(0) // Select accept button by default
+          completeAnimation()
         } else {
           // Description is complete - activate the selected button
           if (selectedButton === 0) {
@@ -163,11 +169,16 @@ function CaseDescription({ crime, onAccept, onBack }) {
   }, [descriptionComplete, selectedButton, onAccept, onBack, crime])
 
   return (
-    <div className="case-description" style={{
-      fontFamily: "'PxPlus IBM VGA8', monospace",
-      color: '#00CC55',
-      background: '#020403'
-    }}>
+    <div 
+      className="case-description" 
+      onClick={completeAnimation}
+      style={{
+        fontFamily: "'PxPlus IBM VGA8', monospace",
+        color: '#00CC55',
+        background: '#020403',
+        cursor: !descriptionComplete ? 'pointer' : 'default'
+      }}
+    >
       <div className="terminal-header">
         <div className="separator" style={{
           color: '#007A33',

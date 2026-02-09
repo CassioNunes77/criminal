@@ -335,7 +335,7 @@ function Home({ crime, streak, onStart }) {
             padding: '8px 0',
             color: '#00FF66'
           }}>
-            SOBRE O GAME
+            SOBRE
           </div>
           <div className="separator" style={{
             color: '#007A33',

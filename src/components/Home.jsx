@@ -50,8 +50,14 @@ function Home({ crime, streak, onStart }) {
     const handleKeyPress = (e) => {
       if (showAbout && e.key === 'Enter') {
         if (!aboutComplete) {
-          // Skip animation - show all text immediately
+          // Skip animation - show all text immediately and cancel all timeouts
           e.preventDefault()
+          
+          // Cancel animation completely
+          if (window.__cancelAboutAnimation) {
+            window.__cancelAboutAnimation()
+          }
+          
           const allLines = [
             'SYSTEM BOOT SEQUENCE INITIATED...',
             'ARQUIVO DE ACESSO RESTRITO CARREGADO....',
@@ -76,10 +82,6 @@ function Home({ crime, streak, onStart }) {
           setCurrentLineIndex(allLines.length - 1)
           setDots('')
           setAboutComplete(true)
-          // Clear any pending timeouts
-          if (typingTimeoutRef.current) {
-            clearTimeout(typingTimeoutRef.current)
-          }
         } else {
           // Go back to home
           setShowAbout(false)
@@ -136,9 +138,10 @@ function Home({ crime, streak, onStart }) {
       let charIndex = 0
       let dotsCount = 0
       let timeoutId = null
+      let isCancelled = false
 
       const showDots = () => {
-        if (aboutComplete) return // Stop if animation was skipped
+        if (isCancelled || aboutComplete) return // Stop if animation was cancelled
         if (dotsCount < 3) {
           setDots('.'.repeat(dotsCount + 1))
           dotsCount++
@@ -158,7 +161,7 @@ function Home({ crime, streak, onStart }) {
       }
 
       const typeLine = () => {
-        if (aboutComplete) return // Stop if animation was skipped
+        if (isCancelled || aboutComplete) return // Stop if animation was cancelled
         if (lineIndex >= lines.length) {
           setAboutComplete(true)
           return
@@ -197,18 +200,31 @@ function Home({ crime, streak, onStart }) {
       }
 
       typingTimeoutRef.current = setTimeout(() => {
-        setCurrentLineIndex(0)
-        typeLine()
+        if (!isCancelled) {
+          setCurrentLineIndex(0)
+          typeLine()
+        }
       }, 500)
 
-      return () => {
+      // Store cancellation function
+      const cancelAnimation = () => {
+        isCancelled = true
         if (typingTimeoutRef.current) {
           clearTimeout(typingTimeoutRef.current)
           typingTimeoutRef.current = null
         }
         if (timeoutId) {
           clearTimeout(timeoutId)
+          timeoutId = null
         }
+      }
+
+      // Expose cancel function for Enter key handler
+      window.__cancelAboutAnimation = cancelAnimation
+
+      return () => {
+        cancelAnimation()
+        delete window.__cancelAboutAnimation
       }
     } else {
       setAboutLines([])

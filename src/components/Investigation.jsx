@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import './Investigation.css'
 
 function Investigation({ crime, state, onDiscoverClue, onMakeAccusation, onBack }) {
@@ -10,6 +10,13 @@ function Investigation({ crime, state, onDiscoverClue, onMakeAccusation, onBack 
   const [showWitnesses, setShowWitnesses] = useState(false)
   const [witnessesViewed, setWitnessesViewed] = useState([])
   const [showSuspects, setShowSuspects] = useState(false)
+  const [selectedButtonIndex, setSelectedButtonIndex] = useState(0)
+  const [selectedClueIndex, setSelectedClueIndex] = useState(0)
+  const [selectedWitnessIndex, setSelectedWitnessIndex] = useState(0)
+  const [selectedSuspectIndex, setSelectedSuspectIndex] = useState(0)
+  const [selectedLocationIndex, setSelectedLocationIndex] = useState(0)
+  const [selectedMethodIndex, setSelectedMethodIndex] = useState(0)
+  const [currentSection, setCurrentSection] = useState('main') // main, clues, witnesses, suspects, accusation
 
   // Get available clues that haven't been revealed yet
   const availableClues = crime.clues.filter(clue => !clue.revealed)
@@ -92,6 +99,56 @@ function Investigation({ crime, state, onDiscoverClue, onMakeAccusation, onBack 
     return `[${filled}${empty}]`
   }
 
+  // Keyboard navigation
+  useEffect(() => {
+    const handleKeyPress = (e) => {
+      if (showAccusation) {
+        // Navigation within accusation form
+        if (e.key === 'Enter') {
+          e.preventDefault()
+          if (selectedSuspect && selectedLocation && selectedMethod && remainingAttempts > 0) {
+            handleAccusation()
+          }
+        } else if (e.key === 'Escape') {
+          e.preventDefault()
+          setShowAccusation(false)
+        }
+      } else {
+        // Main navigation - simple up/down for main buttons
+        const mainButtons = []
+        if (!showWitnesses && witnessesViewed.length < crime.witnesses.length && !isFailed) mainButtons.push('witnesses')
+        if (!showSuspects) mainButtons.push('suspects')
+        if (!isFailed && remainingAttempts > 0) mainButtons.push('accusation')
+        mainButtons.push('back')
+
+        if (e.key === 'ArrowDown') {
+          e.preventDefault()
+          setSelectedButtonIndex(prev => Math.min(prev + 1, mainButtons.length - 1))
+        } else if (e.key === 'ArrowUp') {
+          e.preventDefault()
+          setSelectedButtonIndex(prev => Math.max(prev - 1, 0))
+        } else if (e.key === 'Enter') {
+          e.preventDefault()
+          const action = mainButtons[selectedButtonIndex]
+          if (action === 'accusation' && remainingAttempts > 0) {
+            setShowAccusation(true)
+          } else if (action === 'witnesses') {
+            setShowWitnesses(true)
+          } else if (action === 'suspects') {
+            setShowSuspects(true)
+          } else if (action === 'back') {
+            onBack()
+          }
+        }
+      }
+    }
+
+    window.addEventListener('keydown', handleKeyPress)
+    return () => {
+      window.removeEventListener('keydown', handleKeyPress)
+    }
+  }, [showAccusation, selectedSuspect, selectedLocation, selectedMethod, canDiscoverMore, showWitnesses, showSuspects, isFailed, remainingAttempts, witnessesViewed.length, crime.witnesses.length, selectedButtonIndex, handleAccusation, onBack])
+
   return (
     <div className="investigation">
       <div className="terminal-header">
@@ -173,6 +230,19 @@ function Investigation({ crime, state, onDiscoverClue, onMakeAccusation, onBack 
               onClick={() => setShowWitnesses(true)}
             >
               &gt; VER TESTEMUNHAS
+              {(() => {
+                const mainButtons = []
+                if (!showWitnesses && witnessesViewed.length < crime.witnesses.length && !isFailed) mainButtons.push('witnesses')
+                if (!showSuspects) mainButtons.push('suspects')
+                if (!isFailed && remainingAttempts > 0) mainButtons.push('accusation')
+                return mainButtons.indexOf('witnesses') === selectedButtonIndex
+              })() && (
+                <span className="cursor-blink" style={{
+                  color: '#00FF66',
+                  animation: 'blink 1s step-end infinite',
+                  marginLeft: '4px'
+                }}>█</span>
+              )}
             </button>
           )}
 
@@ -214,6 +284,19 @@ function Investigation({ crime, state, onDiscoverClue, onMakeAccusation, onBack 
               onClick={() => setShowSuspects(true)}
             >
               &gt; BANCO DE DADOS DOS SUSPEITOS
+              {(() => {
+                const mainButtons = []
+                if (!showWitnesses && witnessesViewed.length < crime.witnesses.length && !isFailed) mainButtons.push('witnesses')
+                if (!showSuspects) mainButtons.push('suspects')
+                if (!isFailed && remainingAttempts > 0) mainButtons.push('accusation')
+                return mainButtons.indexOf('suspects') === selectedButtonIndex
+              })() && (
+                <span className="cursor-blink" style={{
+                  color: '#00FF66',
+                  animation: 'blink 1s step-end infinite',
+                  marginLeft: '4px'
+                }}>█</span>
+              )}
             </button>
           ) : (
             <div className="suspects-database">
@@ -252,10 +335,26 @@ function Investigation({ crime, state, onDiscoverClue, onMakeAccusation, onBack 
         {!showAccusation && !isFailed ? (
           <button 
             className="terminal-button"
-            onClick={() => setShowAccusation(true)}
-            disabled={remainingAttempts <= 0}
+            onClick={() => remainingAttempts > 0 && setShowAccusation(true)}
+            style={{
+              opacity: remainingAttempts <= 0 ? 0.5 : 1,
+              cursor: remainingAttempts <= 0 ? 'not-allowed' : 'pointer'
+            }}
           >
             &gt; FAZER ACUSACAO ({remainingAttempts} TENTATIVA{remainingAttempts !== 1 ? 'S' : ''} RESTANTE{remainingAttempts !== 1 ? 'S' : ''})
+            {(() => {
+              const mainButtons = []
+              if (!showWitnesses && witnessesViewed.length < crime.witnesses.length && !isFailed) mainButtons.push('witnesses')
+              if (!showSuspects) mainButtons.push('suspects')
+              if (!isFailed && remainingAttempts > 0) mainButtons.push('accusation')
+              return mainButtons.indexOf('accusation') === selectedButtonIndex
+            })() && (
+              <span className="cursor-blink" style={{
+                color: '#00FF66',
+                animation: 'blink 1s step-end infinite',
+                marginLeft: '4px'
+              }}>█</span>
+            )}
           </button>
         ) : showAccusation && !isFailed ? (
           <div className="accusation-form">
@@ -315,7 +414,10 @@ function Investigation({ crime, state, onDiscoverClue, onMakeAccusation, onBack 
             <button 
               className="terminal-button highlight"
               onClick={handleAccusation}
-              disabled={remainingAttempts <= 0}
+              style={{
+                opacity: remainingAttempts <= 0 ? 0.5 : 1,
+                cursor: remainingAttempts <= 0 ? 'not-allowed' : 'pointer'
+              }}
             >
               &gt; CONFIRMAR ACUSACAO
             </button>
@@ -336,6 +438,20 @@ function Investigation({ crime, state, onDiscoverClue, onMakeAccusation, onBack 
           onClick={onBack}
         >
           &gt; VOLTAR AO INICIO
+          {(() => {
+            const mainButtons = []
+            if (!showWitnesses && witnessesViewed.length < crime.witnesses.length && !isFailed) mainButtons.push('witnesses')
+            if (!showSuspects) mainButtons.push('suspects')
+            if (!isFailed && remainingAttempts > 0) mainButtons.push('accusation')
+            mainButtons.push('back')
+            return mainButtons.length - 1 === selectedButtonIndex
+          })() && (
+            <span className="cursor-blink" style={{
+              color: '#00FF66',
+              animation: 'blink 1s step-end infinite',
+              marginLeft: '4px'
+            }}>█</span>
+          )}
         </button>
       </div>
     </div>

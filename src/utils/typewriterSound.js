@@ -31,7 +31,7 @@ export class TypewriterSound {
     this.audioContext = null
     this.isEnabled = true
     this.lastPlayTime = 0
-    this.minInterval = 15 // Minimum milliseconds between sounds
+    this.minInterval = 20 // Slightly longer interval for softer effect
   }
 
   init() {
@@ -58,18 +58,19 @@ export class TypewriterSound {
       oscillator.connect(gainNode)
       gainNode.connect(this.audioContext.destination)
       
-      // Typewriter/terminal click sound - short, sharp
-      const baseFreq = 600 + Math.random() * 200 // Variation for realism
+      // Soft, subtle typewriter sound - lower frequency, smoother
+      const baseFreq = 300 + Math.random() * 100 // Lower, softer frequency
       oscillator.frequency.setValueAtTime(baseFreq, this.audioContext.currentTime)
-      oscillator.frequency.exponentialRampToValueAtTime(baseFreq * 0.5, this.audioContext.currentTime + 0.008)
+      oscillator.frequency.exponentialRampToValueAtTime(baseFreq * 0.7, this.audioContext.currentTime + 0.015)
       
-      oscillator.type = 'square'
+      oscillator.type = 'sine' // Softer than square wave
       
-      gainNode.gain.setValueAtTime(0.08, this.audioContext.currentTime)
-      gainNode.gain.exponentialRampToValueAtTime(0.01, this.audioContext.currentTime + 0.04)
+      // Much lower volume - very subtle
+      gainNode.gain.setValueAtTime(0.02, this.audioContext.currentTime)
+      gainNode.gain.exponentialRampToValueAtTime(0.001, this.audioContext.currentTime + 0.06)
       
       oscillator.start(this.audioContext.currentTime)
-      oscillator.stop(this.audioContext.currentTime + 0.04)
+      oscillator.stop(this.audioContext.currentTime + 0.06)
     } catch (e) {
       // Silently fail if audio context is suspended
       if (e.name !== 'InvalidStateError') {

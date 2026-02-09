@@ -164,7 +164,7 @@ function CaseDescription({ crime, onAccept, onBack }) {
 
   return (
     <div className="case-description" style={{
-      fontFamily: "'IBM Plex Mono', monospace",
+      fontFamily: "'PxPlus IBM VGA8', monospace",
       color: '#00CC55',
       background: '#020403'
     }}>
@@ -198,7 +198,7 @@ function CaseDescription({ crime, onAccept, onBack }) {
           whiteSpace: 'pre-wrap',
           wordWrap: 'break-word',
           color: '#00CC55',
-          fontFamily: "'IBM Plex Mono', monospace",
+          fontFamily: "'PxPlus IBM VGA8', monospace",
           minHeight: '200px',
           lineHeight: '1.8'
         }}>

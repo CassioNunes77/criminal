@@ -4,9 +4,28 @@ import './Result.css'
 function Result({ crime, state, onBack }) {
   const [showShare, setShowShare] = useState(false)
 
-  const accuracy = Math.round(
-    (state.cluesDiscovered / crime.clues.length) * 100
-  )
+  const cluesRevealed = state.cluesDiscovered || (crime.clues ? crime.clues.filter(c => c.revealed).length : 0)
+  const witnessesViewed = state.witnessesViewed || []
+  const witnessesCount = witnessesViewed.length || (crime.witnesses ? crime.witnesses.length : 0)
+  
+  const renderCluesBar = () => {
+    const total = crime.clues ? crime.clues.length : 6
+    const filled = '█'.repeat(cluesRevealed)
+    const empty = '░'.repeat(total - cluesRevealed)
+    return `[${filled}${empty}]`
+  }
+  
+  const renderWitnessesBar = () => {
+    const total = 3
+    const filled = '█'.repeat(witnessesCount)
+    const empty = '░'.repeat(total - witnessesCount)
+    return `[${filled}${empty}]`
+  }
+  
+  const cluesBar = renderCluesBar()
+  const witnessesBar = renderWitnessesBar()
+  
+  const accuracy = crime.clues ? Math.round((cluesRevealed / crime.clues.length) * 100) : 0
 
   const renderAccuracyBar = () => {
     const filled = Math.round(accuracy / 10)
@@ -14,13 +33,6 @@ function Result({ crime, state, onBack }) {
     const emptyBars = '□'.repeat(10 - filled)
     return `[${filledBars}${emptyBars}]`
   }
-
-  const cluesRevealed = state.cluesDiscovered || crime.clues.filter(c => c.revealed).length
-  const witnessesViewed = state.witnessesViewed || []
-  const witnessesCount = witnessesViewed.length || crime.witnesses?.length || 0
-  
-  const cluesBar = renderProgressBar(cluesRevealed, crime.clues.length)
-  const witnessesBar = witnessesCount > 0 ? `[${'█'.repeat(witnessesCount)}${'░'.repeat(3 - witnessesCount)}]` : '[░░░]'
   
   const attemptText = state.attempts === 1 ? '1ª tentativa' : 
                       state.attempts === 2 ? '2ª tentativa' : 

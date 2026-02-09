@@ -139,6 +139,7 @@ function App() {
           state={investigationState}
           onDiscoverClue={discoverClue}
           onMakeAccusation={makeAccusation}
+          onBack={() => setScreen('home')}
         />
       )}
       {screen === 'result' && (

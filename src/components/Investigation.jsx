@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import './Investigation.css'
 
-function Investigation({ crime, state, onDiscoverClue, onMakeAccusation }) {
+function Investigation({ crime, state, onDiscoverClue, onMakeAccusation, onBack }) {
   const [showAccusation, setShowAccusation] = useState(false)
   const [selectedSuspect, setSelectedSuspect] = useState(null)
   const [selectedLocation, setSelectedLocation] = useState(null)
@@ -165,6 +165,15 @@ function Investigation({ crime, state, onDiscoverClue, onMakeAccusation }) {
             </button>
           </div>
         )}
+
+        <div className="separator">------------------------------------</div>
+
+        <button 
+          className="terminal-button secondary"
+          onClick={onBack}
+        >
+          &gt; VOLTAR AO INICIO
+        </button>
       </div>
     </div>
   )

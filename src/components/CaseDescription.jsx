@@ -168,15 +168,33 @@ function CaseDescription({ crime, onAccept, onBack }) {
     }
   }, [descriptionComplete, selectedButton, onAccept, onBack, crime])
 
+  const handleClick = (e) => {
+    // Only complete animation if clicking on the container itself, not on buttons
+    if (!descriptionComplete && e.target === e.currentTarget) {
+      completeAnimation()
+    }
+  }
+
+  const handleTouchStart = (e) => {
+    // For mobile: complete animation on touch
+    if (!descriptionComplete) {
+      e.preventDefault()
+      completeAnimation()
+    }
+  }
+
   return (
     <div 
       className="case-description" 
-      onClick={completeAnimation}
+      onClick={handleClick}
+      onTouchStart={handleTouchStart}
       style={{
         fontFamily: "'PxPlus IBM VGA8', monospace",
         color: '#00CC55',
         background: '#020403',
-        cursor: !descriptionComplete ? 'pointer' : 'default'
+        cursor: !descriptionComplete ? 'pointer' : 'default',
+        minHeight: '100vh',
+        touchAction: 'manipulation'
       }}
     >
       <div className="terminal-header">
@@ -200,11 +218,18 @@ function CaseDescription({ crime, onAccept, onBack }) {
         }}>====================================</div>
       </div>
 
-      <div className="terminal-content" style={{
-        lineHeight: '1.8',
-        fontSize: '14px',
-        marginTop: '20px'
-      }}>
+      <div 
+        className="terminal-content" 
+        onClick={!descriptionComplete ? completeAnimation : undefined}
+        onTouchStart={!descriptionComplete ? handleTouchStart : undefined}
+        style={{
+          lineHeight: '1.8',
+          fontSize: '14px',
+          marginTop: '20px',
+          cursor: !descriptionComplete ? 'pointer' : 'default',
+          touchAction: 'manipulation'
+        }}
+      >
         <div style={{
           whiteSpace: 'pre-wrap',
           wordWrap: 'break-word',

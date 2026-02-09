@@ -422,7 +422,7 @@ function Home({ crime, streak, onStart }) {
     <div 
       className={`home ${crtGlitch ? 'crt-glitch' : ''} ${crtFlicker ? 'crt-flicker' : ''}`}
       style={{
-        fontFamily: "'IBM Plex Mono', monospace",
+        fontFamily: "'Courier New', 'Courier', 'Share Tech Mono', monospace",
         color: '#00CC55',
         background: '#020403',
         transform: crtDistortion > 0 ? `translateX(${Math.sin(Date.now() / 10) * crtDistortion}px)` : 'none',
@@ -433,14 +433,16 @@ function Home({ crime, streak, onStart }) {
         <div className="separator" style={{
           color: '#007A33',
           fontSize: '14px',
-          margin: '12px 0'
+          margin: '12px 0',
+          fontFamily: "'Courier New', 'Courier', 'Share Tech Mono', monospace"
         }}>====================================</div>
         <div className="title terminal-text" style={{
-          fontFamily: "'VT323', monospace",
+          fontFamily: "'Courier New', 'Courier', 'Share Tech Mono', monospace",
           fontSize: '32px',
           padding: '8px 0',
           color: '#00FF66',
-          textShadow: '0 0 2px rgba(0, 255, 100, 0.4), 0 0 4px rgba(0, 255, 100, 0.15)'
+          textShadow: '0 0 2px rgba(0, 255, 100, 0.4), 0 0 4px rgba(0, 255, 100, 0.15)',
+          letterSpacing: '0.5px'
         }}>
           {displayedText}
           {showCursor && <span className="cursor-blink" style={{
@@ -450,7 +452,8 @@ function Home({ crime, streak, onStart }) {
         <div className="separator" style={{
           color: '#007A33',
           fontSize: '14px',
-          margin: '12px 0'
+          margin: '12px 0',
+          fontFamily: "'Courier New', 'Courier', 'Share Tech Mono', monospace"
         }}>====================================</div>
       </div>
 
@@ -464,7 +467,7 @@ function Home({ crime, streak, onStart }) {
             background: 'none',
             border: 'none',
             color: selectedButton === 0 ? '#00FF66' : '#00CC55',
-            fontFamily: "'IBM Plex Mono', monospace",
+            fontFamily: "'Courier New', 'Courier', 'Share Tech Mono', monospace",
             fontSize: '16px',
             cursor: 'pointer',
             padding: '8px 0',
@@ -473,7 +476,8 @@ function Home({ crime, streak, onStart }) {
             width: '100%',
             transition: 'color 0.2s ease',
             display: 'flex',
-            alignItems: 'center'
+            alignItems: 'center',
+            letterSpacing: '0.3px'
           }}
           onMouseEnter={(e) => {
             if (selectedButton !== 0) e.target.style.color = '#00FF66'
@@ -500,7 +504,7 @@ function Home({ crime, streak, onStart }) {
             background: 'none',
             border: 'none',
             color: selectedButton === 1 ? '#00FF66' : '#00CC55',
-            fontFamily: "'IBM Plex Mono', monospace",
+            fontFamily: "'Courier New', 'Courier', 'Share Tech Mono', monospace",
             fontSize: '16px',
             cursor: 'pointer',
             padding: '8px 0',
@@ -509,7 +513,8 @@ function Home({ crime, streak, onStart }) {
             width: '100%',
             transition: 'color 0.2s ease',
             display: 'flex',
-            alignItems: 'center'
+            alignItems: 'center',
+            letterSpacing: '0.3px'
           }}
           onMouseEnter={(e) => {
             if (selectedButton !== 1) e.target.style.color = '#00FF66'

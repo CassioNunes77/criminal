@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import Home from './components/Home'
+import CaseDescription from './components/CaseDescription'
 import Investigation from './components/Investigation'
 import Result from './components/Result'
 import { getDailyCrime } from './utils/dailySeed'
@@ -42,6 +43,10 @@ function App() {
   }, [])
 
   const startInvestigation = () => {
+    setScreen('caseDescription')
+  }
+
+  const acceptMission = () => {
     setScreen('investigation')
   }
 
@@ -127,6 +132,12 @@ function App() {
           crime={currentCrime}
           streak={investigationState.streak}
           onStart={startInvestigation}
+        />
+      )}
+      {screen === 'caseDescription' && (
+        <CaseDescription
+          crime={currentCrime}
+          onAccept={acceptMission}
         />
       )}
       {screen === 'investigation' && (

@@ -117,9 +117,9 @@ function Investigation({ crime, state, onDiscoverClue, onMakeAccusation, onViewC
       } else {
         // Main navigation - simple up/down for main buttons
         const mainButtons = []
-        mainButtons.push('case')
         if (!showWitnesses && witnessesViewed.length < crime.witnesses.length && !isFailed) mainButtons.push('witnesses')
         if (!showSuspects) mainButtons.push('suspects')
+        mainButtons.push('case')
         if (!isFailed && remainingAttempts > 0) mainButtons.push('accusation')
         mainButtons.push('back')
 
@@ -215,32 +215,6 @@ function Investigation({ crime, state, onDiscoverClue, onMakeAccusation, onViewC
 
         <div className="separator">------------------------------------</div>
 
-        {/* Case Description Section */}
-        <div className="case-section">
-          <button 
-            className="terminal-button" 
-            onClick={onViewCase}
-          >
-            &gt; CASO
-            {(() => {
-              const mainButtons = []
-              mainButtons.push('case')
-              if (!showWitnesses && witnessesViewed.length < crime.witnesses.length && !isFailed) mainButtons.push('witnesses')
-              if (!showSuspects) mainButtons.push('suspects')
-              if (!isFailed && remainingAttempts > 0) mainButtons.push('accusation')
-              return mainButtons.indexOf('case') === selectedButtonIndex
-            })() && (
-              <span className="cursor-blink" style={{
-                color: '#00FF66',
-                animation: 'blink 1s step-end infinite',
-                marginLeft: '4px'
-              }}>█</span>
-            )}
-          </button>
-        </div>
-
-        <div className="separator">------------------------------------</div>
-
         {/* Witnesses Section */}
         <div className="witnesses-section">
           <div className="section-title">
@@ -316,6 +290,7 @@ function Investigation({ crime, state, onDiscoverClue, onMakeAccusation, onViewC
                 const mainButtons = []
                 if (!showWitnesses && witnessesViewed.length < crime.witnesses.length && !isFailed) mainButtons.push('witnesses')
                 if (!showSuspects) mainButtons.push('suspects')
+                mainButtons.push('case')
                 if (!isFailed && remainingAttempts > 0) mainButtons.push('accusation')
                 return mainButtons.indexOf('suspects') === selectedButtonIndex
               })() && (
@@ -339,6 +314,32 @@ function Investigation({ crime, state, onDiscoverClue, onMakeAccusation, onViewC
               ))}
             </div>
           )}
+        </div>
+
+        <div className="separator">------------------------------------</div>
+
+        {/* Case Description Section */}
+        <div className="case-section">
+          <button 
+            className="terminal-button" 
+            onClick={onViewCase}
+          >
+            &gt; CASO
+            {(() => {
+              const mainButtons = []
+              if (!showWitnesses && witnessesViewed.length < crime.witnesses.length && !isFailed) mainButtons.push('witnesses')
+              if (!showSuspects) mainButtons.push('suspects')
+              mainButtons.push('case')
+              if (!isFailed && remainingAttempts > 0) mainButtons.push('accusation')
+              return mainButtons.indexOf('case') === selectedButtonIndex
+            })() && (
+              <span className="cursor-blink" style={{
+                color: '#00FF66',
+                animation: 'blink 1s step-end infinite',
+                marginLeft: '4px'
+              }}>█</span>
+            )}
+          </button>
         </div>
 
         <div className="separator">------------------------------------</div>
@@ -468,9 +469,9 @@ function Investigation({ crime, state, onDiscoverClue, onMakeAccusation, onViewC
           &gt; VOLTAR AO INICIO
           {(() => {
             const mainButtons = []
-            mainButtons.push('case')
             if (!showWitnesses && witnessesViewed.length < crime.witnesses.length && !isFailed) mainButtons.push('witnesses')
             if (!showSuspects) mainButtons.push('suspects')
+            mainButtons.push('case')
             if (!isFailed && remainingAttempts > 0) mainButtons.push('accusation')
             mainButtons.push('back')
             return mainButtons.length - 1 === selectedButtonIndex

@@ -117,7 +117,15 @@ function App() {
   }
 
   return (
-    <div className="app">
+    <div className="app" style={{
+      minHeight: '100vh',
+      padding: '16px',
+      maxWidth: '1200px',
+      margin: '0 auto',
+      background: '#020403',
+      color: '#00CC55',
+      fontFamily: "'IBM Plex Mono', monospace"
+    }}>
       {screen === 'home' && (
         <Home 
           crime={currentCrime}

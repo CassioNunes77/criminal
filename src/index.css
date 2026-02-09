@@ -52,6 +52,9 @@ body::before {
   min-height: 100vh;
   position: relative;
   z-index: 1;
+  background: #020403;
+  color: #00CC55;
+  font-family: 'IBM Plex Mono', monospace;
 }
 
 /* Terminal text glow */

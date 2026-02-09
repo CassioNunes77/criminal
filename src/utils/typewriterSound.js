@@ -31,7 +31,7 @@ export class TypewriterSound {
     this.audioContext = null
     this.isEnabled = true
     this.lastPlayTime = 0
-    this.minInterval = 15 // Shorter interval for more responsive 80s terminal feel
+    this.minInterval = 30 // Longer interval for softer, more comfortable feel
   }
 
   init() {
@@ -52,29 +52,28 @@ export class TypewriterSound {
     this.lastPlayTime = now
 
     try {
-      // 80s terminal/computer beep sound - short, electronic, characteristic
+      // Soft, comfortable typing sound - very subtle and pleasant
       const oscillator = this.audioContext.createOscillator()
       const gainNode = this.audioContext.createGain()
       
       oscillator.connect(gainNode)
       gainNode.connect(this.audioContext.destination)
       
-      // Classic 80s terminal beep frequency range (800-1200 Hz)
-      // Slight variation for realism
-      const baseFreq = 900 + Math.random() * 200
+      // Very low, soft frequency - gentle and comfortable
+      const baseFreq = 150 + Math.random() * 50 // 150-200 Hz - very low and soft
       oscillator.frequency.setValueAtTime(baseFreq, this.audioContext.currentTime)
       
-      // Square wave for that classic digital/electronic sound
-      oscillator.type = 'square'
+      // Sine wave for smooth, soft sound
+      oscillator.type = 'sine'
       
-      // Quick attack and decay - characteristic terminal beep
+      // Very gentle attack and smooth decay - comfortable typing sound
       gainNode.gain.setValueAtTime(0, this.audioContext.currentTime)
-      gainNode.gain.linearRampToValueAtTime(0.08, this.audioContext.currentTime + 0.002) // Quick attack
-      gainNode.gain.exponentialRampToValueAtTime(0.01, this.audioContext.currentTime + 0.015) // Fast decay
-      gainNode.gain.linearRampToValueAtTime(0, this.audioContext.currentTime + 0.025) // Quick fade
+      gainNode.gain.linearRampToValueAtTime(0.012, this.audioContext.currentTime + 0.005) // Gentle attack
+      gainNode.gain.exponentialRampToValueAtTime(0.002, this.audioContext.currentTime + 0.03) // Smooth decay
+      gainNode.gain.linearRampToValueAtTime(0, this.audioContext.currentTime + 0.05) // Gentle fade
       
       oscillator.start(this.audioContext.currentTime)
-      oscillator.stop(this.audioContext.currentTime + 0.025)
+      oscillator.stop(this.audioContext.currentTime + 0.05)
     } catch (e) {
       // Silently fail if audio context is suspended
       if (e.name !== 'InvalidStateError') {

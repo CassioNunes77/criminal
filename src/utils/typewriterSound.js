@@ -31,7 +31,7 @@ export class TypewriterSound {
     this.audioContext = null
     this.isEnabled = true
     this.lastPlayTime = 0
-    this.minInterval = 20 // Slightly longer interval for softer effect
+    this.minInterval = 25 // Longer interval for softer, more natural effect
   }
 
   init() {
@@ -52,29 +52,61 @@ export class TypewriterSound {
     this.lastPlayTime = now
 
     try {
-      const oscillator = this.audioContext.createOscillator()
-      const gainNode = this.audioContext.createGain()
+      // Create a very soft typing sound using white noise filtered
+      const bufferSize = this.audioContext.sampleRate * 0.02 // 20ms
+      const buffer = this.audioContext.createBuffer(1, bufferSize, this.audioContext.sampleRate)
+      const data = buffer.getChannelData(0)
       
-      oscillator.connect(gainNode)
+      // Generate soft white noise
+      for (let i = 0; i < bufferSize; i++) {
+        data[i] = (Math.random() * 2 - 1) * 0.1 // Very quiet white noise
+      }
+      
+      const source = this.audioContext.createBufferSource()
+      const gainNode = this.audioContext.createGain()
+      const filter = this.audioContext.createBiquadFilter()
+      
+      // Low-pass filter for softer sound
+      filter.type = 'lowpass'
+      filter.frequency.value = 2000 // Cut high frequencies
+      filter.Q.value = 1
+      
+      source.buffer = buffer
+      source.connect(filter)
+      filter.connect(gainNode)
       gainNode.connect(this.audioContext.destination)
       
-      // Soft, subtle typewriter sound - lower frequency, smoother
-      const baseFreq = 300 + Math.random() * 100 // Lower, softer frequency
-      oscillator.frequency.setValueAtTime(baseFreq, this.audioContext.currentTime)
-      oscillator.frequency.exponentialRampToValueAtTime(baseFreq * 0.7, this.audioContext.currentTime + 0.015)
+      // Very subtle volume envelope
+      gainNode.gain.setValueAtTime(0.015, this.audioContext.currentTime)
+      gainNode.gain.exponentialRampToValueAtTime(0.001, this.audioContext.currentTime + 0.02)
       
-      oscillator.type = 'sine' // Softer than square wave
-      
-      // Much lower volume - very subtle
-      gainNode.gain.setValueAtTime(0.02, this.audioContext.currentTime)
-      gainNode.gain.exponentialRampToValueAtTime(0.001, this.audioContext.currentTime + 0.06)
-      
-      oscillator.start(this.audioContext.currentTime)
-      oscillator.stop(this.audioContext.currentTime + 0.06)
+      source.start(this.audioContext.currentTime)
+      source.stop(this.audioContext.currentTime + 0.02)
     } catch (e) {
-      // Silently fail if audio context is suspended
-      if (e.name !== 'InvalidStateError') {
-        console.warn('Error playing sound:', e)
+      // Fallback to very soft sine wave if buffer creation fails
+      try {
+        const oscillator = this.audioContext.createOscillator()
+        const gainNode = this.audioContext.createGain()
+        
+        oscillator.connect(gainNode)
+        gainNode.connect(this.audioContext.destination)
+        
+        // Very soft, low frequency sine wave
+        const baseFreq = 200 + Math.random() * 50
+        oscillator.frequency.setValueAtTime(baseFreq, this.audioContext.currentTime)
+        oscillator.type = 'sine'
+        
+        // Extremely low volume
+        gainNode.gain.setValueAtTime(0.01, this.audioContext.currentTime)
+        gainNode.gain.exponentialRampToValueAtTime(0.001, this.audioContext.currentTime + 0.05)
+        
+        oscillator.start(this.audioContext.currentTime)
+        oscillator.stop(this.audioContext.currentTime + 0.05)
+      } catch (e2) {
+        // Silently fail if audio context is suspended
+        if (e2.name !== 'InvalidStateError') {
+          console.warn('Error playing sound:', e2)
+        }
       }
     }
   }

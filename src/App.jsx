@@ -39,11 +39,41 @@ function App() {
         const savedState = localStorage.getItem(`crime_${crime.id}`)
         if (savedState) {
           const parsed = JSON.parse(savedState)
-          setInvestigationState(parsed)
+          // Validate and sanitize saved state
+          const sanitizedState = {
+            cluesDiscovered: parsed.cluesDiscovered || 0,
+            cluesRevealed: parsed.cluesRevealed || [],
+            witnessesViewed: parsed.witnessesViewed || [],
+            attempts: Math.max(0, Math.min(parsed.attempts || 0, 3)), // Ensure between 0 and 3
+            hypothesis: parsed.hypothesis || {
+              suspect: null,
+              location: null,
+              method: null
+            },
+            streak: parsed.streak || 0,
+            solved: parsed.solved || false,
+            failed: parsed.failed || false
+          }
+          setInvestigationState(sanitizedState)
           // Always start at home screen, regardless of saved state
         }
       } catch (e) {
         console.warn('Error loading saved state:', e)
+        // Reset to initial state on error
+        setInvestigationState({
+          cluesDiscovered: 0,
+          cluesRevealed: [],
+          witnessesViewed: [],
+          attempts: 0,
+          hypothesis: {
+            suspect: null,
+            location: null,
+            method: null
+          },
+          streak: 0,
+          solved: false,
+          failed: false
+        })
       }
 
       // Ensure minimum loading time of 1 second

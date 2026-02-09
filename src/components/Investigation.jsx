@@ -23,7 +23,8 @@ function Investigation({ crime, state, onDiscoverClue, onMakeAccusation, onBack 
   const revealedClues = crime.clues.filter(clue => clue.revealed)
   const canDiscoverMore = availableClues.length > 0
   const maxAttempts = 3
-  const remainingAttempts = maxAttempts - state.attempts
+  const currentAttempts = Math.max(0, Math.min(state.attempts || 0, maxAttempts)) // Ensure valid range
+  const remainingAttempts = Math.max(0, maxAttempts - currentAttempts)
   const isFailed = remainingAttempts <= 0 && !state.solved
 
   // Get suspects with records
@@ -160,7 +161,7 @@ function Investigation({ crime, state, onDiscoverClue, onMakeAccusation, onBack 
       <div className="terminal-content">
         {/* Attempts counter */}
         <div className="section-title">
-          TENTATIVAS: {state.attempts}/{maxAttempts} {remainingAttempts > 0 ? `(${remainingAttempts} RESTANTES)` : '(ESGOTADAS)'}
+          TENTATIVAS: {currentAttempts}/{maxAttempts} {remainingAttempts > 0 ? `(${remainingAttempts} RESTANTES)` : '(ESGOTADAS)'}
         </div>
 
         {isFailed && (
@@ -341,7 +342,7 @@ function Investigation({ crime, state, onDiscoverClue, onMakeAccusation, onBack 
               cursor: remainingAttempts <= 0 ? 'not-allowed' : 'pointer'
             }}
           >
-            &gt; FAZER ACUSACAO ({remainingAttempts} TENTATIVA{remainingAttempts !== 1 ? 'S' : ''} RESTANTE{remainingAttempts !== 1 ? 'S' : ''})
+            &gt; FAZER ACUSACAO ({remainingAttempts > 0 ? `${remainingAttempts} TENTATIVA${remainingAttempts !== 1 ? 'S' : ''} RESTANTE${remainingAttempts !== 1 ? 'S' : ''}` : 'ESGOTADAS'})
             {(() => {
               const mainButtons = []
               if (!showWitnesses && witnessesViewed.length < crime.witnesses.length && !isFailed) mainButtons.push('witnesses')

@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from 'react'
 import './Investigation.css'
 
-function Investigation({ crime, state, onDiscoverClue, onMakeAccusation, onBack }) {
+function Investigation({ crime, state, onDiscoverClue, onMakeAccusation, onViewCase, onBack }) {
   const [showAccusation, setShowAccusation] = useState(false)
   const [selectedSuspect, setSelectedSuspect] = useState(null)
   const [selectedLocation, setSelectedLocation] = useState(null)
@@ -117,6 +117,7 @@ function Investigation({ crime, state, onDiscoverClue, onMakeAccusation, onBack 
       } else {
         // Main navigation - simple up/down for main buttons
         const mainButtons = []
+        mainButtons.push('case')
         if (!showWitnesses && witnessesViewed.length < crime.witnesses.length && !isFailed) mainButtons.push('witnesses')
         if (!showSuspects) mainButtons.push('suspects')
         if (!isFailed && remainingAttempts > 0) mainButtons.push('accusation')
@@ -131,7 +132,9 @@ function Investigation({ crime, state, onDiscoverClue, onMakeAccusation, onBack 
         } else if (e.key === 'Enter') {
           e.preventDefault()
           const action = mainButtons[selectedButtonIndex]
-          if (action === 'accusation' && remainingAttempts > 0) {
+          if (action === 'case') {
+            onViewCase()
+          } else if (action === 'accusation' && remainingAttempts > 0) {
             setShowAccusation(true)
           } else if (action === 'witnesses') {
             setShowWitnesses(true)
@@ -148,7 +151,7 @@ function Investigation({ crime, state, onDiscoverClue, onMakeAccusation, onBack 
     return () => {
       window.removeEventListener('keydown', handleKeyPress)
     }
-  }, [showAccusation, selectedSuspect, selectedLocation, selectedMethod, canDiscoverMore, showWitnesses, showSuspects, isFailed, remainingAttempts, witnessesViewed.length, crime.witnesses.length, selectedButtonIndex, handleAccusation, onBack])
+  }, [showAccusation, selectedSuspect, selectedLocation, selectedMethod, canDiscoverMore, showWitnesses, showSuspects, isFailed, remainingAttempts, witnessesViewed.length, crime.witnesses.length, selectedButtonIndex, handleAccusation, onViewCase, onBack])
 
   return (
     <div className="investigation">
@@ -210,6 +213,32 @@ function Investigation({ crime, state, onDiscoverClue, onMakeAccusation, onBack 
               ))}
             </div>
           )}
+        </div>
+
+        <div className="separator">------------------------------------</div>
+
+        {/* Case Description Section */}
+        <div className="case-section">
+          <button 
+            className="terminal-button" 
+            onClick={onViewCase}
+          >
+            &gt; CASO
+            {(() => {
+              const mainButtons = []
+              mainButtons.push('case')
+              if (!showWitnesses && witnessesViewed.length < crime.witnesses.length && !isFailed) mainButtons.push('witnesses')
+              if (!showSuspects) mainButtons.push('suspects')
+              if (!isFailed && remainingAttempts > 0) mainButtons.push('accusation')
+              return mainButtons.indexOf('case') === selectedButtonIndex
+            })() && (
+              <span className="cursor-blink" style={{
+                color: '#00FF66',
+                animation: 'blink 1s step-end infinite',
+                marginLeft: '4px'
+              }}>█</span>
+            )}
+          </button>
         </div>
 
         <div className="separator">------------------------------------</div>
@@ -441,6 +470,7 @@ function Investigation({ crime, state, onDiscoverClue, onMakeAccusation, onBack 
           &gt; VOLTAR AO INICIO
           {(() => {
             const mainButtons = []
+            mainButtons.push('case')
             if (!showWitnesses && witnessesViewed.length < crime.witnesses.length && !isFailed) mainButtons.push('witnesses')
             if (!showSuspects) mainButtons.push('suspects')
             if (!isFailed && remainingAttempts > 0) mainButtons.push('accusation')

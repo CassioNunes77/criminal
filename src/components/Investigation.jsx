@@ -224,8 +224,6 @@ function Investigation({ crime, state, onDiscoverClue, onMakeAccusation, onViewC
             {renderProgressBar(witnessesViewed.length, crime.witnesses.length)}
           </div>
 
-          <div className="separator">------------------------------------</div>
-
           {!showWitnesses && witnessesViewed.length < crime.witnesses.length && !isFailed && (
             <button 
               className="terminal-button" 

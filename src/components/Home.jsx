@@ -23,11 +23,9 @@ function Home({ crime, streak, onStart }) {
 
   const formatDate = () => {
     const today = new Date()
-    return today.toLocaleDateString('pt-BR', {
-      day: '2-digit',
-      month: '2-digit',
-      year: '1994'
-    })
+    const day = String(today.getDate()).padStart(2, '0')
+    const month = String(today.getMonth() + 1).padStart(2, '0')
+    return `${day}/${month}/1994`
   }
 
   return (

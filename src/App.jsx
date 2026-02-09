@@ -123,7 +123,7 @@ function App() {
         minHeight: '100vh',
         fontSize: '18px',
         color: '#00CC55',
-        fontFamily: 'IBM Plex Mono, monospace',
+        fontFamily: "'PxPlus IBM VGA8', monospace",
         background: '#020403'
       }}>
         CARREGANDO TERMINAL...

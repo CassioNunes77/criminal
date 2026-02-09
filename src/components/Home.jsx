@@ -302,40 +302,6 @@ function Home({ crime, streak, onStart }) {
           fontSize: '14px',
           marginTop: '20px'
         }}>
-        <div className="separator" style={{
-          color: '#007A33',
-          fontSize: '14px',
-          margin: '12px 0'
-        }}>------------------------------------</div>
-
-          <button 
-            className="terminal-button" 
-            onClick={() => setShowAbout(false)}
-            style={{
-              background: 'none',
-              border: 'none',
-              color: '#00CC55',
-              fontFamily: "'IBM Plex Mono', monospace",
-              fontSize: '16px',
-              cursor: 'pointer',
-              padding: '8px 0',
-              margin: '8px 0',
-              textAlign: 'left',
-              width: '100%',
-              transition: 'color 0.2s ease'
-            }}
-            onMouseEnter={(e) => e.target.style.color = '#00FF66'}
-            onMouseLeave={(e) => e.target.style.color = '#00CC55'}
-          >
-            &gt; VOLTAR
-          </button>
-
-        <div className="separator" style={{
-          color: '#007A33',
-          fontSize: '14px',
-          margin: '12px 0'
-        }}>------------------------------------</div>
-
           <div style={{
             whiteSpace: 'pre-wrap',
             wordWrap: 'break-word',
@@ -363,11 +329,41 @@ function Home({ crime, streak, onStart }) {
               <span style={{ color: '#00CC55' }}>{dots}</span>
             )}
             {aboutComplete && (
-              <span className="cursor-blink" style={{
-                color: '#00FF66',
-                animation: 'blink 1s step-end infinite',
-                marginLeft: '2px'
-              }}>█</span>
+              <>
+                <span className="cursor-blink" style={{
+                  color: '#00FF66',
+                  animation: 'blink 1s step-end infinite',
+                  marginLeft: '2px'
+                }}>█</span>
+                
+                <div className="separator" style={{
+                  color: '#007A33',
+                  fontSize: '14px',
+                  margin: '24px 0 12px 0'
+                }}>------------------------------------</div>
+
+                <button 
+                  className="terminal-button" 
+                  onClick={() => setShowAbout(false)}
+                  style={{
+                    background: 'none',
+                    border: 'none',
+                    color: '#00CC55',
+                    fontFamily: "'IBM Plex Mono', monospace",
+                    fontSize: '16px',
+                    cursor: 'pointer',
+                    padding: '8px 0',
+                    margin: '8px 0',
+                    textAlign: 'left',
+                    width: '100%',
+                    transition: 'color 0.2s ease'
+                  }}
+                  onMouseEnter={(e) => e.target.style.color = '#00FF66'}
+                  onMouseLeave={(e) => e.target.style.color = '#00CC55'}
+                >
+                  &gt; VOLTAR
+                </button>
+              </>
             )}
           </div>
         </div>

@@ -8,6 +8,7 @@ function CaseDescription({ crime, onAccept }) {
   const [dots, setDots] = useState('')
   const [descriptionComplete, setDescriptionComplete] = useState(false)
   const typewriterSoundRef = useRef(null)
+  const typingTimeoutRef = useRef(null)
 
   useEffect(() => {
     // Initialize typewriter sound
@@ -15,6 +16,27 @@ function CaseDescription({ crime, onAccept }) {
       typewriterSoundRef.current = new TypewriterSound()
       typewriterSoundRef.current.init()
     }
+
+    // Handle Enter key - skip animation if typing
+    const handleKeyPress = (e) => {
+      if (e.key === 'Enter' && !descriptionComplete) {
+        e.preventDefault()
+        
+        // Cancel animation completely
+        if (window.__cancelCaseAnimation) {
+          window.__cancelCaseAnimation()
+        }
+        
+        // Show all text immediately
+        const allLines = crime.description || []
+        setDescriptionLines(allLines)
+        setCurrentLineIndex(allLines.length - 1)
+        setDots('')
+        setDescriptionComplete(true)
+      }
+    }
+
+    window.addEventListener('keydown', handleKeyPress)
 
     setDescriptionLines([])
     setCurrentLineIndex(0)
@@ -27,72 +49,95 @@ function CaseDescription({ crime, onAccept }) {
     let charIndex = 0
     let dotsCount = 0
     let timeoutId = null
+    let isCancelled = false
 
-    const showDots = () => {
-      if (dotsCount < 3) {
-        setDots('.'.repeat(dotsCount + 1))
-        dotsCount++
-        timeoutId = setTimeout(showDots, 300)
-      } else {
-        setDots('')
-        dotsCount = 0
-        lineIndex++
-        if (lineIndex < lines.length) {
-          setCurrentLineIndex(lineIndex)
-          charIndex = 0
-          timeoutId = setTimeout(typeLine, 50)
-        } else {
-          setDescriptionComplete(true)
-        }
-      }
-    }
-
-    const typeLine = () => {
-      if (lineIndex >= lines.length) {
-        setDescriptionComplete(true)
-        return
-      }
-
-      const currentLine = lines[lineIndex]
-      
-      if (currentLine === '') {
-        timeoutId = setTimeout(showDots, 200)
-        return
-      }
-
-      if (charIndex < currentLine.length) {
-        // Play typewriter sound for each character (except spaces)
-        if (currentLine[charIndex] !== ' ') {
-          typewriterSoundRef.current?.play()
-        }
-        
-        setDescriptionLines(prev => {
-          const newLines = [...prev]
-          if (!newLines[lineIndex]) {
-            newLines[lineIndex] = ''
-          }
-          newLines[lineIndex] = currentLine.slice(0, charIndex + 1)
-          return newLines
-        })
-        charIndex++
-        timeoutId = setTimeout(typeLine, 20)
-      } else {
-        if (lineIndex < lines.length - 1) {
+      const showDots = () => {
+        if (isCancelled || descriptionComplete) return
+        if (dotsCount < 3) {
+          setDots('.'.repeat(dotsCount + 1))
+          dotsCount++
           timeoutId = setTimeout(showDots, 300)
         } else {
-          setDescriptionComplete(true)
+          setDots('')
+          dotsCount = 0
+          lineIndex++
+          if (lineIndex < lines.length) {
+            setCurrentLineIndex(lineIndex)
+            charIndex = 0
+            timeoutId = setTimeout(typeLine, 50)
+          } else {
+            setDescriptionComplete(true)
+          }
         }
       }
-    }
 
-    timeoutId = setTimeout(() => {
-      setCurrentLineIndex(0)
-      typeLine()
-    }, 500)
+      const typeLine = () => {
+        if (isCancelled || descriptionComplete) return
+        if (lineIndex >= lines.length) {
+          setDescriptionComplete(true)
+          return
+        }
 
-    return () => {
-      if (timeoutId) clearTimeout(timeoutId)
-    }
+        const currentLine = lines[lineIndex]
+        
+        if (currentLine === '') {
+          timeoutId = setTimeout(showDots, 200)
+          return
+        }
+
+        if (charIndex < currentLine.length) {
+          // Play typewriter sound for each character (except spaces)
+          if (currentLine[charIndex] !== ' ') {
+            typewriterSoundRef.current?.play()
+          }
+          
+          setDescriptionLines(prev => {
+            const newLines = [...prev]
+            if (!newLines[lineIndex]) {
+              newLines[lineIndex] = ''
+            }
+            newLines[lineIndex] = currentLine.slice(0, charIndex + 1)
+            return newLines
+          })
+          charIndex++
+          timeoutId = setTimeout(typeLine, 20)
+        } else {
+          if (lineIndex < lines.length - 1) {
+            timeoutId = setTimeout(showDots, 300)
+          } else {
+            setDescriptionComplete(true)
+          }
+        }
+      }
+
+      typingTimeoutRef.current = setTimeout(() => {
+        if (!isCancelled) {
+          setCurrentLineIndex(0)
+          typeLine()
+        }
+      }, 500)
+
+      // Store cancellation function
+      const cancelAnimation = () => {
+        isCancelled = true
+        if (typingTimeoutRef.current) {
+          clearTimeout(typingTimeoutRef.current)
+          typingTimeoutRef.current = null
+        }
+        if (timeoutId) {
+          clearTimeout(timeoutId)
+          timeoutId = null
+        }
+      }
+
+      // Expose cancel function for Enter key handler
+      window.__cancelCaseAnimation = cancelAnimation
+
+      return () => {
+        window.removeEventListener('keydown', handleKeyPress)
+        cancelAnimation()
+        delete window.__cancelCaseAnimation
+      }
   }, [crime])
 
   return (

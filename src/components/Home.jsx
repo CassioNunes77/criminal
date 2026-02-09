@@ -11,6 +11,7 @@ function Home({ crime, streak, onStart }) {
   const [dots, setDots] = useState('')
   const [aboutComplete, setAboutComplete] = useState(false)
   const typewriterSoundRef = useRef(null)
+  const typingTimeoutRef = useRef(null)
 
   useEffect(() => {
     // Initialize typewriter sound for title
@@ -45,17 +46,54 @@ function Home({ crime, streak, onStart }) {
       typewriterSoundRef.current.init()
     }
 
-    // Handle Enter key to go back when about is complete
+    // Handle Enter key - skip animation if typing, go back if complete
     const handleKeyPress = (e) => {
-      if (showAbout && aboutComplete && e.key === 'Enter') {
-        setShowAbout(false)
+      if (showAbout && e.key === 'Enter') {
+        if (!aboutComplete) {
+          // Skip animation - show all text immediately
+          e.preventDefault()
+          const allLines = [
+            'SYSTEM BOOT SEQUENCE INITIATED...',
+            'ARQUIVO DE ACESSO RESTRITO CARREGADO....',
+            'ANO 1987.',
+            '',
+            'Você é um investigador de uma divisão secreta de inteligência policial, especializado em análise de dados e invasão autorizada de sistemas usados por organizações criminosas.',
+            '',
+            'Seu trabalho acontece dentro de redes fechadas e bancos de dados sigilosos, onde todos os dias um novo caso chega ao seu terminal contendo registros incompletos e pistas fragmentadas.',
+            '',
+            'Não existem testemunhas, apenas padrões, acessos, horários e erros deixados por quem acreditou que nunca seria rastreado.',
+            '',
+            'Sua função é cruzar informações, reconstruir eventos e identificar a verdade antes que os dados desapareçam.',
+            '',
+            'Cada crime deve ser resolvido usando lógica, observação e interpretação fria dos fatos.',
+            '',
+            'Sem ação direta, apenas você, o sistema e a mente por trás do crime.',
+            '',
+            'ACESSO CONCEDIDO.',
+            'AGUARDANDO PRÓXIMO CASO.'
+          ]
+          setAboutLines(allLines)
+          setCurrentLineIndex(allLines.length - 1)
+          setDots('')
+          setAboutComplete(true)
+          // Clear any pending timeouts
+          if (typingTimeoutRef.current) {
+            clearTimeout(typingTimeoutRef.current)
+          }
+        } else {
+          // Go back to home
+          setShowAbout(false)
+        }
       }
     }
 
-    if (showAbout && aboutComplete) {
+    if (showAbout) {
       window.addEventListener('keydown', handleKeyPress)
       return () => {
         window.removeEventListener('keydown', handleKeyPress)
+        if (typingTimeoutRef.current) {
+          clearTimeout(typingTimeoutRef.current)
+        }
       }
     }
   }, [showAbout, aboutComplete])
@@ -100,6 +138,7 @@ function Home({ crime, streak, onStart }) {
       let timeoutId = null
 
       const showDots = () => {
+        if (aboutComplete) return // Stop if animation was skipped
         if (dotsCount < 3) {
           setDots('.'.repeat(dotsCount + 1))
           dotsCount++
@@ -119,6 +158,7 @@ function Home({ crime, streak, onStart }) {
       }
 
       const typeLine = () => {
+        if (aboutComplete) return // Stop if animation was skipped
         if (lineIndex >= lines.length) {
           setAboutComplete(true)
           return
@@ -156,13 +196,19 @@ function Home({ crime, streak, onStart }) {
         }
       }
 
-      timeoutId = setTimeout(() => {
+      typingTimeoutRef.current = setTimeout(() => {
         setCurrentLineIndex(0)
         typeLine()
       }, 500)
 
       return () => {
-        if (timeoutId) clearTimeout(timeoutId)
+        if (typingTimeoutRef.current) {
+          clearTimeout(typingTimeoutRef.current)
+          typingTimeoutRef.current = null
+        }
+        if (timeoutId) {
+          clearTimeout(timeoutId)
+        }
       }
     } else {
       setAboutLines([])

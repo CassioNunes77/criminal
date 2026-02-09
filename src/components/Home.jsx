@@ -414,20 +414,6 @@ function Home({ crime, streak, onStart }) {
       <div className="terminal-content" style={{
         lineHeight: '1.6'
       }}>
-        <div className="status-line" style={{
-          fontSize: '14px',
-          margin: '8px 0',
-          color: '#00CC55'
-        }}>
-          CARREGANDO...
-        </div>
-
-        <div className="separator" style={{
-          color: '#007A33',
-          fontSize: '14px',
-          margin: '12px 0'
-        }}>------------------------------------</div>
-
         <button 
           className="terminal-button" 
           onClick={onStart}

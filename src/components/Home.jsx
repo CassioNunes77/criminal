@@ -5,6 +5,7 @@ import { TypewriterSound } from '../utils/typewriterSound'
 function Home({ crime, streak, onStart }) {
   const [displayedText, setDisplayedText] = useState('')
   const [showCursor, setShowCursor] = useState(true)
+  const [titleAnimationComplete, setTitleAnimationComplete] = useState(false)
   const [showAbout, setShowAbout] = useState(false)
   const [aboutLines, setAboutLines] = useState([])
   const [currentLineIndex, setCurrentLineIndex] = useState(0)
@@ -45,7 +46,10 @@ function Home({ crime, streak, onStart }) {
         index++
       } else {
         clearInterval(interval)
-        setTimeout(() => setShowCursor(false), 500)
+        setTimeout(() => {
+          setShowCursor(false)
+          setTitleAnimationComplete(true)
+        }, 500)
       }
     }, 30)
 
@@ -486,7 +490,7 @@ function Home({ crime, streak, onStart }) {
           }}
         >
           &gt; INICIAR INVESTIGACAO
-          {selectedButton === 0 && (
+          {selectedButton === 0 && titleAnimationComplete && (
             <span className="cursor-blink" style={{
               color: '#00FF66',
               animation: 'blink 1s step-end infinite',
@@ -522,7 +526,7 @@ function Home({ crime, streak, onStart }) {
           }}
         >
           &gt; SOBRE
-          {selectedButton === 1 && (
+          {selectedButton === 1 && titleAnimationComplete && (
             <span className="cursor-blink" style={{
               color: '#00FF66',
               animation: 'blink 1s step-end infinite',

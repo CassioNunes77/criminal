@@ -10,15 +10,15 @@ function Result({ crime, state, onBack }) {
   
   const renderCluesBar = () => {
     const total = crime.clues ? crime.clues.length : 6
-    const filled = '█'.repeat(cluesRevealed)
-    const empty = '░'.repeat(total - cluesRevealed)
+    const filled = '■'.repeat(cluesRevealed)
+    const empty = '□'.repeat(total - cluesRevealed)
     return `[${filled}${empty}]`
   }
   
   const renderWitnessesBar = () => {
     const total = 3
-    const filled = '█'.repeat(witnessesCount)
-    const empty = '░'.repeat(total - witnessesCount)
+    const filled = '■'.repeat(witnessesCount)
+    const empty = '□'.repeat(total - witnessesCount)
     return `[${filled}${empty}]`
   }
   
@@ -34,16 +34,18 @@ function Result({ crime, state, onBack }) {
     return `[${filledBars}${emptyBars}]`
   }
   
-  const attemptText = state.attempts === 1 ? '1ª tentativa' : 
-                      state.attempts === 2 ? '2ª tentativa' : 
-                      state.attempts === 3 ? '3ª tentativa' : 
-                      `${state.attempts}ª tentativa`
+  const attemptText = state.attempts === 1 ? '1º Tentativa' : 
+                      state.attempts === 2 ? '2º Tentativa' : 
+                      state.attempts === 3 ? '3º Tentativa' : 
+                      `${state.attempts}º Tentativa`
 
-  const shareText = `CASO #${String(crime.id).slice(-3)}
+  const statusText = state.solved ? 'RESOLVIDO' : 'ENCERRADO'
+  
+  const shareText = `CASO #${String(crime.id).slice(-3)} - ${statusText}
 
 PISTAS: ${cluesBar}
 TESTEMUNHAS: ${witnessesBar}
-ACUSACAO: ${attemptText}
+ACUSAÇÃO: ${attemptText}
 
 https://selenecriminal.netlify.app/`
 

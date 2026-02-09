@@ -361,11 +361,17 @@ function Home({ crime, streak, onStart }) {
             minHeight: '200px',
             lineHeight: '1.8'
           }}>
-            {aboutLines.map((line, index) => (
-              <div key={index} style={{ 
-                marginBottom: line === '' ? '12px' : '4px',
-                minHeight: line === '' ? '12px' : 'auto'
-              }}>
+            {aboutLines.map((line, index) => {
+              const isDosHeaderLine =
+                line === 'SYSTEM BOOT SEQUENCE INITIATED...' ||
+                line === 'ARQUIVO DE ACESSO RESTRITO CARREGADO....'
+
+              return (
+                <div key={index} style={{ 
+                  marginBottom: line === '' ? '12px' : '4px',
+                  minHeight: line === '' ? '12px' : 'auto',
+                  fontFamily: isDosHeaderLine ? "'PxPlus IBM VGA8', monospace" : undefined
+                }}>
                 {line}
                 {index === currentLineIndex && !aboutComplete && !dots && (
                   <span className="cursor-blink" style={{
@@ -375,7 +381,8 @@ function Home({ crime, streak, onStart }) {
                   }}>█</span>
                 )}
               </div>
-            ))}
+              )
+            })}
             {dots && (
               <span style={{ color: '#00CC55' }}>{dots}</span>
             )}

@@ -1,5 +1,9 @@
 .investigation {
-  font-family: 'IBM Plex Mono', monospace;
+  font-family: 'PxPlus IBM VGA8', monospace;
+  -webkit-font-smoothing: none;
+  -moz-osx-font-smoothing: unset;
+  font-smooth: never;
+  text-rendering: optimizeSpeed;
 }
 
 .section-title {
@@ -13,7 +17,7 @@
   font-size: 18px;
   margin: 12px 0;
   color: var(--text-primary);
-  font-family: 'VT323', monospace;
+  font-family: 'PxPlus IBM VGA8', monospace;
 }
 
 .clues-list {
@@ -28,7 +32,7 @@
 }
 
 .clue-text {
-  font-family: 'IBM Plex Mono', monospace;
+  font-family: 'PxPlus IBM VGA8', monospace;
 }
 
 .hypothesis-section {
@@ -66,7 +70,7 @@
   background: none;
   border: none;
   color: var(--text-secondary);
-  font-family: 'IBM Plex Mono', monospace;
+  font-family: 'PxPlus IBM VGA8', monospace;
   font-size: 14px;
   cursor: pointer;
   padding: 6px 0;

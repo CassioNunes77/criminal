@@ -61,28 +61,28 @@ function Home({ crime, streak, onStart }) {
     if (showAbout) return // Don't apply glitches on about screen
 
     const glitchInterval = setInterval(() => {
-      // Random glitch (flicker) - happens occasionally
-      if (Math.random() < 0.15) { // 15% chance
+      // Random glitch (flicker) - happens more frequently
+      if (Math.random() < 0.35) { // 35% chance (increased from 15%)
         setCrtGlitch(true)
-        setTimeout(() => setCrtGlitch(false), 50 + Math.random() * 100)
+        setTimeout(() => setCrtGlitch(false), 80 + Math.random() * 150) // Longer duration
       }
-    }, 2000 + Math.random() * 3000) // Every 2-5 seconds
+    }, 1500 + Math.random() * 2000) // Every 1.5-3.5 seconds (more frequent)
 
     const flickerInterval = setInterval(() => {
-      // Subtle flicker - happens more often but shorter
-      if (Math.random() < 0.3) { // 30% chance
+      // More intense flicker - happens more often
+      if (Math.random() < 0.5) { // 50% chance (increased from 30%)
         setCrtFlicker(true)
-        setTimeout(() => setCrtFlicker(false), 20 + Math.random() * 40)
+        setTimeout(() => setCrtFlicker(false), 30 + Math.random() * 60) // Longer duration
       }
-    }, 1000 + Math.random() * 2000) // Every 1-3 seconds
+    }, 800 + Math.random() * 1200) // Every 0.8-2 seconds (more frequent)
 
     const distortionInterval = setInterval(() => {
-      // Horizontal distortion - rare but noticeable
-      if (Math.random() < 0.08) { // 8% chance
-        setCrtDistortion(1 + Math.random() * 2)
-        setTimeout(() => setCrtDistortion(0), 100 + Math.random() * 200)
+      // More frequent horizontal distortion
+      if (Math.random() < 0.2) { // 20% chance (increased from 8%)
+        setCrtDistortion(2 + Math.random() * 4) // Stronger distortion (increased from 1-3)
+        setTimeout(() => setCrtDistortion(0), 150 + Math.random() * 300) // Longer duration
       }
-    }, 3000 + Math.random() * 5000) // Every 3-8 seconds
+    }, 2000 + Math.random() * 3000) // Every 2-5 seconds (more frequent)
 
     return () => {
       clearInterval(glitchInterval)

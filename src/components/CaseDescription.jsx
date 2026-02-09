@@ -220,12 +220,6 @@ function CaseDescription({ crime, onAccept, onBack }) {
           )}
           {descriptionComplete && (
             <>
-              <span className="cursor-blink" style={{
-                color: '#00FF66',
-                animation: 'blink 1s step-end infinite',
-                marginLeft: '2px'
-              }}>█</span>
-              
               <div className="separator" style={{
                 color: '#007A33',
                 fontSize: '14px',

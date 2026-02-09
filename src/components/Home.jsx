@@ -5,7 +5,9 @@ function Home({ crime, streak, onStart }) {
   const [displayedText, setDisplayedText] = useState('')
   const [showCursor, setShowCursor] = useState(true)
   const [showAbout, setShowAbout] = useState(false)
-  const [aboutText, setAboutText] = useState('')
+  const [aboutLines, setAboutLines] = useState([])
+  const [currentLineIndex, setCurrentLineIndex] = useState(0)
+  const [dots, setDots] = useState('')
   const [aboutComplete, setAboutComplete] = useState(false)
 
   useEffect(() => {
@@ -26,23 +28,101 @@ function Home({ crime, streak, onStart }) {
 
   useEffect(() => {
     if (showAbout) {
-      const fullText = `SYSTEM BOOT SEQUENCE INITIATED. ARQUIVO DE ACESSO RESTRITO CARREGADO. ANO 1987. Você é um investigador de uma divisão secreta de inteligência policial, especializado em análise de dados e invasão autorizada de sistemas usados por organizações criminosas. Seu trabalho acontece dentro de redes fechadas e bancos de dados sigilosos, onde todos os dias um novo caso chega ao seu terminal contendo registros incompletos e pistas fragmentadas. Não existem testemunhas, apenas padrões, acessos, horários e erros deixados por quem acreditou que nunca seria rastreado. Sua função é cruzar informações, reconstruir eventos e identificar a verdade antes que os dados desapareçam. Cada crime deve ser resolvido usando lógica, observação e interpretação fria dos fatos. Sem ação direta, apenas você, o sistema e a mente por trás do crime. ACESSO CONCEDIDO. AGUARDANDO PRÓXIMO CASO.`
-      setAboutText('')
+      setAboutLines([])
+      setCurrentLineIndex(0)
+      setDots('')
       setAboutComplete(false)
-      let index = 0
-      const interval = setInterval(() => {
-        if (index < fullText.length) {
-          setAboutText(fullText.slice(0, index + 1))
-          index++
-        } else {
-          clearInterval(interval)
-          setAboutComplete(true)
-        }
-      }, 20)
 
-      return () => clearInterval(interval)
+      const lines = [
+        'SYSTEM BOOT SEQUENCE INITIATED...',
+        'ARQUIVO DE ACESSO RESTRITO CARREGADO....',
+        'ANO 1987.',
+        '',
+        'Você é um investigador de uma divisão secreta de inteligência policial, especializado em análise de dados e invasão autorizada de sistemas usados por organizações criminosas.',
+        '',
+        'Seu trabalho acontece dentro de redes fechadas e bancos de dados sigilosos, onde todos os dias um novo caso chega ao seu terminal contendo registros incompletos e pistas fragmentadas.',
+        '',
+        'Não existem testemunhas, apenas padrões, acessos, horários e erros deixados por quem acreditou que nunca seria rastreado.',
+        '',
+        'Sua função é cruzar informações, reconstruir eventos e identificar a verdade antes que os dados desapareçam.',
+        '',
+        'Cada crime deve ser resolvido usando lógica, observação e interpretação fria dos fatos.',
+        '',
+        'Sem ação direta, apenas você, o sistema e a mente por trás do crime.',
+        '',
+        'ACESSO CONCEDIDO.',
+        'AGUARDANDO PRÓXIMO CASO.'
+      ]
+
+      let lineIndex = 0
+      let charIndex = 0
+      let dotsCount = 0
+      let timeoutId = null
+
+      const showDots = () => {
+        if (dotsCount < 3) {
+          setDots('.'.repeat(dotsCount + 1))
+          dotsCount++
+          timeoutId = setTimeout(showDots, 300)
+        } else {
+          setDots('')
+          dotsCount = 0
+          lineIndex++
+          if (lineIndex < lines.length) {
+            setCurrentLineIndex(lineIndex)
+            charIndex = 0
+            timeoutId = setTimeout(typeLine, 50)
+          } else {
+            setAboutComplete(true)
+          }
+        }
+      }
+
+      const typeLine = () => {
+        if (lineIndex >= lines.length) {
+          setAboutComplete(true)
+          return
+        }
+
+        const currentLine = lines[lineIndex]
+        
+        if (currentLine === '') {
+          timeoutId = setTimeout(showDots, 200)
+          return
+        }
+
+        if (charIndex < currentLine.length) {
+          setAboutLines(prev => {
+            const newLines = [...prev]
+            if (!newLines[lineIndex]) {
+              newLines[lineIndex] = ''
+            }
+            newLines[lineIndex] = currentLine.slice(0, charIndex + 1)
+            return newLines
+          })
+          charIndex++
+          timeoutId = setTimeout(typeLine, 20)
+        } else {
+          if (lineIndex < lines.length - 1) {
+            timeoutId = setTimeout(showDots, 300)
+          } else {
+            setAboutComplete(true)
+          }
+        }
+      }
+
+      timeoutId = setTimeout(() => {
+        setCurrentLineIndex(0)
+        typeLine()
+      }, 500)
+
+      return () => {
+        if (timeoutId) clearTimeout(timeoutId)
+      }
     } else {
-      setAboutText('')
+      setAboutLines([])
+      setCurrentLineIndex(0)
+      setDots('')
       setAboutComplete(false)
     }
   }, [showAbout])
@@ -90,51 +170,76 @@ function Home({ crime, streak, onStart }) {
           fontSize: '14px',
           marginTop: '20px'
         }}>
+          <div className="separator" style={{
+            color: '#007A33',
+            fontSize: '14px',
+            margin: '12px 0',
+            textAlign: 'center'
+          }}>------------------------------------</div>
+
+          <button 
+            className="terminal-button" 
+            onClick={() => setShowAbout(false)}
+            style={{
+              background: 'none',
+              border: 'none',
+              color: '#00CC55',
+              fontFamily: "'IBM Plex Mono', monospace",
+              fontSize: '16px',
+              cursor: 'pointer',
+              padding: '8px 0',
+              margin: '8px 0',
+              textAlign: 'left',
+              width: '100%',
+              transition: 'color 0.2s ease'
+            }}
+            onMouseEnter={(e) => e.target.style.color = '#00FF66'}
+            onMouseLeave={(e) => e.target.style.color = '#00CC55'}
+          >
+            &gt; VOLTAR
+          </button>
+
+          <div className="separator" style={{
+            color: '#007A33',
+            fontSize: '14px',
+            margin: '12px 0',
+            textAlign: 'center'
+          }}>------------------------------------</div>
+
           <div style={{
             whiteSpace: 'pre-wrap',
             wordWrap: 'break-word',
             color: '#00CC55',
-            fontFamily: "'IBM Plex Mono', monospace"
+            fontFamily: "'IBM Plex Mono', monospace",
+            minHeight: '200px',
+            lineHeight: '1.8'
           }}>
-            {aboutText}
-            <span className="cursor-blink" style={{
-              color: '#00FF66',
-              animation: 'blink 1s step-end infinite',
-              marginLeft: '2px'
-            }}>█</span>
+            {aboutLines.map((line, index) => (
+              <div key={index} style={{ 
+                marginBottom: line === '' ? '12px' : '4px',
+                minHeight: line === '' ? '12px' : 'auto'
+              }}>
+                {line}
+                {index === currentLineIndex && !aboutComplete && !dots && (
+                  <span className="cursor-blink" style={{
+                    color: '#00FF66',
+                    animation: 'blink 1s step-end infinite',
+                    marginLeft: '2px'
+                  }}>█</span>
+                )}
+              </div>
+            ))}
+            {dots && (
+              <span style={{ color: '#00CC55' }}>{dots}</span>
+            )}
+            {aboutComplete && (
+              <span className="cursor-blink" style={{
+                color: '#00FF66',
+                animation: 'blink 1s step-end infinite',
+                marginLeft: '2px'
+              }}>█</span>
+            )}
           </div>
-
-          {aboutComplete && (
-            <>
-              <div className="separator" style={{
-                color: '#007A33',
-                fontSize: '14px',
-                margin: '24px 0 12px 0',
-                textAlign: 'center'
-              }}>------------------------------------</div>
-              <button 
-                className="terminal-button" 
-                onClick={() => setShowAbout(false)}
-                style={{
-                  background: 'none',
-                  border: 'none',
-                  color: '#00CC55',
-                  fontFamily: "'IBM Plex Mono', monospace",
-                  fontSize: '16px',
-                  cursor: 'pointer',
-                  padding: '8px 0',
-                  margin: '8px 0',
-                  textAlign: 'left',
-                  width: '100%',
-                  transition: 'color 0.2s ease'
-                }}
-                onMouseEnter={(e) => e.target.style.color = '#00FF66'}
-                onMouseLeave={(e) => e.target.style.color = '#00CC55'}
-              >
-                &gt; VOLTAR
-              </button>
-            </>
-          )}
         </div>
       </div>
     )

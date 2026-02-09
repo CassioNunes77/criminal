@@ -25,17 +25,13 @@ function App() {
       const crime = getDailyCrime()
       setCurrentCrime(crime)
       
-      // Load saved state from localStorage
+      // Load saved state from localStorage (but always start at home screen)
       try {
         const savedState = localStorage.getItem(`crime_${crime.id}`)
         if (savedState) {
           const parsed = JSON.parse(savedState)
           setInvestigationState(parsed)
-          if (parsed.solved) {
-            setScreen('result')
-          } else if (parsed.cluesDiscovered > 0) {
-            setScreen('investigation')
-          }
+          // Always start at home screen, regardless of saved state
         }
       } catch (e) {
         console.warn('Error loading saved state:', e)

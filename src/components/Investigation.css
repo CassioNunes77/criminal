@@ -131,7 +131,6 @@
 .witness-item {
   margin: 12px 0;
   padding: 8px 0;
-  border-bottom: 1px solid var(--text-secondary);
 }
 
 .witness-header {

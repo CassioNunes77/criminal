@@ -13,10 +13,20 @@ function Home({ crime, streak, onStart }) {
   const typewriterSoundRef = useRef(null)
 
   useEffect(() => {
+    // Initialize typewriter sound for title
+    if (!typewriterSoundRef.current) {
+      typewriterSoundRef.current = new TypewriterSound()
+      typewriterSoundRef.current.init()
+    }
+
     const text = `NEXO TERMINAL v1.0`
     let index = 0
     const interval = setInterval(() => {
       if (index < text.length) {
+        // Play typewriter sound for each character (except spaces)
+        if (text[index] !== ' ') {
+          typewriterSoundRef.current?.play()
+        }
         setDisplayedText(text.slice(0, index + 1))
         index++
       } else {

@@ -44,9 +44,14 @@ function CaseDescription({ crime, onAccept, onBack }) {
             onBack()
           }
         }
-      } else if (descriptionComplete && (e.key === 'ArrowDown' || e.key === 'ArrowUp')) {
-        e.preventDefault()
-        setSelectedButton(prev => (prev + 1) % 2) // Toggle between 0 and 1
+      } else if (descriptionComplete) {
+        if (e.key === 'ArrowDown') {
+          e.preventDefault()
+          setSelectedButton(prev => (prev + 1) % 2) // Move down: 0 -> 1, 1 -> 0
+        } else if (e.key === 'ArrowUp') {
+          e.preventDefault()
+          setSelectedButton(prev => (prev - 1 + 2) % 2) // Move up: 1 -> 0, 0 -> 1
+        }
       }
     }
 
@@ -247,14 +252,14 @@ function CaseDescription({ crime, onAccept, onBack }) {
                   alignItems: 'center'
                 }}
               >
-                &gt; ACEITAR MISSÃO
                 {selectedButton === 0 && (
                   <span className="cursor-blink" style={{
                     color: '#00FF66',
                     animation: 'blink 1s step-end infinite',
-                    marginLeft: '4px'
+                    marginRight: '4px'
                   }}>█</span>
                 )}
+                &gt; ACEITAR MISSÃO
               </button>
 
               <button 
@@ -277,14 +282,14 @@ function CaseDescription({ crime, onAccept, onBack }) {
                   alignItems: 'center'
                 }}
               >
-                &gt; RECUSAR
                 {selectedButton === 1 && (
                   <span className="cursor-blink" style={{
                     color: '#00FF66',
                     animation: 'blink 1s step-end infinite',
-                    marginLeft: '4px'
+                    marginRight: '4px'
                   }}>█</span>
                 )}
+                &gt; RECUSAR
               </button>
             </>
           )}

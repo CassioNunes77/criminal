@@ -10,6 +10,7 @@ function Home({ crime, streak, onStart }) {
   const [currentLineIndex, setCurrentLineIndex] = useState(0)
   const [dots, setDots] = useState('')
   const [aboutComplete, setAboutComplete] = useState(false)
+  const [selectedButton, setSelectedButton] = useState(0) // 0 = iniciar, 1 = sobre
   const typewriterSoundRef = useRef(null)
   const typingTimeoutRef = useRef(null)
 
@@ -38,6 +39,33 @@ function Home({ crime, streak, onStart }) {
 
     return () => clearInterval(interval)
   }, [])
+
+  // Keyboard navigation for DOS-style menu
+  useEffect(() => {
+    if (showAbout) return // Don't handle navigation when in about screen
+
+    const handleKeyDown = (e) => {
+      if (e.key === 'ArrowDown') {
+        e.preventDefault()
+        setSelectedButton(prev => (prev + 1) % 2) // Toggle between 0 and 1
+      } else if (e.key === 'ArrowUp') {
+        e.preventDefault()
+        setSelectedButton(prev => (prev - 1 + 2) % 2) // Toggle between 0 and 1
+      } else if (e.key === 'Enter') {
+        e.preventDefault()
+        if (selectedButton === 0) {
+          onStart()
+        } else {
+          setShowAbout(true)
+        }
+      }
+    }
+
+    window.addEventListener('keydown', handleKeyDown)
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown)
+    }
+  }, [showAbout, selectedButton, onStart])
 
   useEffect(() => {
     // Initialize typewriter sound
@@ -401,7 +429,7 @@ function Home({ crime, streak, onStart }) {
           style={{
             background: 'none',
             border: 'none',
-            color: '#00CC55',
+            color: selectedButton === 0 ? '#00FF66' : '#00CC55',
             fontFamily: "'IBM Plex Mono', monospace",
             fontSize: '16px',
             cursor: 'pointer',
@@ -409,11 +437,25 @@ function Home({ crime, streak, onStart }) {
             margin: '8px 0',
             textAlign: 'left',
             width: '100%',
-            transition: 'color 0.2s ease'
+            transition: 'color 0.2s ease',
+            display: 'flex',
+            alignItems: 'center'
           }}
-          onMouseEnter={(e) => e.target.style.color = '#00FF66'}
-          onMouseLeave={(e) => e.target.style.color = '#00CC55'}
+          onMouseEnter={(e) => {
+            if (selectedButton !== 0) e.target.style.color = '#00FF66'
+            setSelectedButton(0)
+          }}
+          onMouseLeave={(e) => {
+            if (selectedButton !== 0) e.target.style.color = '#00CC55'
+          }}
         >
+          {selectedButton === 0 && (
+            <span className="cursor-blink" style={{
+              color: '#00FF66',
+              animation: 'blink 1s step-end infinite',
+              marginRight: '4px'
+            }}>█</span>
+          )}
           &gt; INICIAR INVESTIGACAO
         </button>
 
@@ -423,7 +465,7 @@ function Home({ crime, streak, onStart }) {
           style={{
             background: 'none',
             border: 'none',
-            color: '#00CC55',
+            color: selectedButton === 1 ? '#00FF66' : '#00CC55',
             fontFamily: "'IBM Plex Mono', monospace",
             fontSize: '16px',
             cursor: 'pointer',
@@ -431,11 +473,25 @@ function Home({ crime, streak, onStart }) {
             margin: '8px 0',
             textAlign: 'left',
             width: '100%',
-            transition: 'color 0.2s ease'
+            transition: 'color 0.2s ease',
+            display: 'flex',
+            alignItems: 'center'
           }}
-          onMouseEnter={(e) => e.target.style.color = '#00FF66'}
-          onMouseLeave={(e) => e.target.style.color = '#00CC55'}
+          onMouseEnter={(e) => {
+            if (selectedButton !== 1) e.target.style.color = '#00FF66'
+            setSelectedButton(1)
+          }}
+          onMouseLeave={(e) => {
+            if (selectedButton !== 1) e.target.style.color = '#00CC55'
+          }}
         >
+          {selectedButton === 1 && (
+            <span className="cursor-blink" style={{
+              color: '#00FF66',
+              animation: 'blink 1s step-end infinite',
+              marginRight: '4px'
+            }}>█</span>
+          )}
           &gt; SOBRE O GAME
         </button>
       </div>

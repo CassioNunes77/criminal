@@ -1,3 +1,11 @@
+@font-face {
+  font-family: 'PxPlus IBM VGA8';
+  src: url('/fonts/PxPlus_IBM_VGA8.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
 * {
   margin: 0;
   padding: 0;

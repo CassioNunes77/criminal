@@ -422,7 +422,7 @@ function Home({ crime, streak, onStart }) {
     <div 
       className={`home ${crtGlitch ? 'crt-glitch' : ''} ${crtFlicker ? 'crt-flicker' : ''}`}
       style={{
-        fontFamily: "'IBM Plex Mono', monospace",
+        fontFamily: "'PxPlus IBM VGA8', monospace",
         color: '#00CC55',
         background: '#020403',
         transform: crtDistortion > 0 ? `translateX(${Math.sin(Date.now() / 10) * crtDistortion}px)` : 'none',
@@ -433,10 +433,11 @@ function Home({ crime, streak, onStart }) {
         <div className="separator" style={{
           color: '#007A33',
           fontSize: '14px',
-          margin: '12px 0'
+          margin: '12px 0',
+          fontFamily: "'PxPlus IBM VGA8', monospace"
         }}>====================================</div>
         <div className="title terminal-text" style={{
-          fontFamily: "'VT323', monospace",
+          fontFamily: "'PxPlus IBM VGA8', monospace",
           fontSize: '32px',
           padding: '8px 0',
           color: '#00FF66',
@@ -450,7 +451,8 @@ function Home({ crime, streak, onStart }) {
         <div className="separator" style={{
           color: '#007A33',
           fontSize: '14px',
-          margin: '12px 0'
+          margin: '12px 0',
+          fontFamily: "'PxPlus IBM VGA8', monospace"
         }}>====================================</div>
       </div>
 
@@ -464,7 +466,7 @@ function Home({ crime, streak, onStart }) {
             background: 'none',
             border: 'none',
             color: selectedButton === 0 ? '#00FF66' : '#00CC55',
-            fontFamily: "'IBM Plex Mono', monospace",
+            fontFamily: "'PxPlus IBM VGA8', monospace",
             fontSize: '16px',
             cursor: 'pointer',
             padding: '8px 0',
@@ -500,7 +502,7 @@ function Home({ crime, streak, onStart }) {
             background: 'none',
             border: 'none',
             color: selectedButton === 1 ? '#00FF66' : '#00CC55',
-            fontFamily: "'IBM Plex Mono', monospace",
+            fontFamily: "'PxPlus IBM VGA8', monospace",
             fontSize: '16px',
             cursor: 'pointer',
             padding: '8px 0',

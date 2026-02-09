@@ -19,6 +19,11 @@ function Home({ crime, streak, onStart }) {
     if (!typewriterSoundRef.current) {
       typewriterSoundRef.current = new TypewriterSound()
       typewriterSoundRef.current.init()
+      
+      // Resume audio context if suspended (required by some browsers)
+      if (typewriterSoundRef.current.audioContext && typewriterSoundRef.current.audioContext.state === 'suspended') {
+        typewriterSoundRef.current.audioContext.resume()
+      }
     }
 
     const text = `NEXO TERMINAL v1.0`
@@ -27,6 +32,10 @@ function Home({ crime, streak, onStart }) {
       if (index < text.length) {
         // Play typewriter sound for each character (except spaces)
         if (text[index] !== ' ') {
+          // Ensure audio context is resumed
+          if (typewriterSoundRef.current?.audioContext?.state === 'suspended') {
+            typewriterSoundRef.current.audioContext.resume()
+          }
           typewriterSoundRef.current?.play()
         }
         setDisplayedText(text.slice(0, index + 1))

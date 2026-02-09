@@ -13,13 +13,20 @@
   --glow-color: rgba(0, 255, 100, 0.4);
 }
 
+html {
+  background: #020403;
+}
+
 body {
   font-family: 'IBM Plex Mono', monospace;
-  background: var(--bg-primary);
+  background: #020403;
+  background-color: var(--bg-primary);
   color: var(--text-primary);
   min-height: 100vh;
   overflow-x: hidden;
   position: relative;
+  margin: 0;
+  padding: 0;
 }
 
 body::before {

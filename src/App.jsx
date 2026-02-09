@@ -20,20 +20,28 @@ function App() {
   })
 
   useEffect(() => {
-    // Load daily crime
-    const crime = getDailyCrime()
-    setCurrentCrime(crime)
-    
-    // Load saved state from localStorage
-    const savedState = localStorage.getItem(`crime_${crime.id}`)
-    if (savedState) {
-      const parsed = JSON.parse(savedState)
-      setInvestigationState(parsed)
-      if (parsed.solved) {
-        setScreen('result')
-      } else if (parsed.cluesDiscovered > 0) {
-        setScreen('investigation')
+    try {
+      // Load daily crime
+      const crime = getDailyCrime()
+      setCurrentCrime(crime)
+      
+      // Load saved state from localStorage
+      try {
+        const savedState = localStorage.getItem(`crime_${crime.id}`)
+        if (savedState) {
+          const parsed = JSON.parse(savedState)
+          setInvestigationState(parsed)
+          if (parsed.solved) {
+            setScreen('result')
+          } else if (parsed.cluesDiscovered > 0) {
+            setScreen('investigation')
+          }
+        }
+      } catch (e) {
+        console.warn('Error loading saved state:', e)
       }
+    } catch (error) {
+      console.error('Error loading crime:', error)
     }
   }, [])
 
@@ -91,7 +99,21 @@ function App() {
   }
 
   if (!currentCrime) {
-    return <div className="loading">CARREGANDO TERMINAL...</div>
+    return (
+      <div className="loading" style={{ 
+        display: 'flex', 
+        alignItems: 'center', 
+        justifyContent: 'center', 
+        minHeight: '100vh',
+        fontSize: '18px',
+        color: '#00CC55',
+        fontFamily: 'IBM Plex Mono, monospace',
+        background: '#020403'
+      }}>
+        CARREGANDO TERMINAL...
+        <span className="cursor-blink" style={{ marginLeft: '4px' }}>█</span>
+      </div>
+    )
   }
 
   return (

@@ -8,9 +8,26 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=VT323&display=swap" rel="stylesheet">
+    <style>
+      html, body {
+        margin: 0;
+        padding: 0;
+        background: #020403;
+        color: #00CC55;
+        font-family: 'IBM Plex Mono', monospace;
+        min-height: 100vh;
+      }
+      #root {
+        min-height: 100vh;
+      }
+    </style>
   </head>
   <body>
-    <div id="root"></div>
+    <div id="root">
+      <div style="color: #00CC55; font-family: 'IBM Plex Mono', monospace; padding: 20px; background: #020403; min-height: 100vh; display: flex; align-items: center; justify-content: center;">
+        CARREGANDO TERMINAL...
+      </div>
+    </div>
     <script type="module" src="/src/main.jsx"></script>
   </body>
 </html>

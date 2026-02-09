@@ -35,12 +35,13 @@ function CaseDescription({ crime, onAccept, onBack }) {
           setDots('')
           setDescriptionComplete(true)
           setSelectedButton(0) // Select accept button by default
-        } else if (descriptionComplete) {
-          // Activate selected button
+          // Don't activate button yet - user needs to press Enter again
+        } else {
+          // Description is complete - activate the selected button
           if (selectedButton === 0) {
-            onAccept()
+            onAccept() // Accept mission
           } else {
-            onBack()
+            onBack() // Refuse mission (go back to home)
           }
         }
       } else if (descriptionComplete && (e.key === 'ArrowDown' || e.key === 'ArrowUp')) {

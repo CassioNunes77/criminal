@@ -11,6 +11,9 @@ function Home({ crime, streak, onStart }) {
   const [dots, setDots] = useState('')
   const [aboutComplete, setAboutComplete] = useState(false)
   const [selectedButton, setSelectedButton] = useState(0) // 0 = iniciar, 1 = sobre
+  const [crtGlitch, setCrtGlitch] = useState(false)
+  const [crtFlicker, setCrtFlicker] = useState(false)
+  const [crtDistortion, setCrtDistortion] = useState(0)
   const typewriterSoundRef = useRef(null)
   const typingTimeoutRef = useRef(null)
 
@@ -48,6 +51,41 @@ function Home({ crime, streak, onStart }) {
 
     return () => clearInterval(interval)
   }, [])
+
+  // CRT monitor glitch effects
+  useEffect(() => {
+    if (showAbout) return // Don't apply glitches on about screen
+
+    const glitchInterval = setInterval(() => {
+      // Random glitch (flicker) - happens occasionally
+      if (Math.random() < 0.15) { // 15% chance
+        setCrtGlitch(true)
+        setTimeout(() => setCrtGlitch(false), 50 + Math.random() * 100)
+      }
+    }, 2000 + Math.random() * 3000) // Every 2-5 seconds
+
+    const flickerInterval = setInterval(() => {
+      // Subtle flicker - happens more often but shorter
+      if (Math.random() < 0.3) { // 30% chance
+        setCrtFlicker(true)
+        setTimeout(() => setCrtFlicker(false), 20 + Math.random() * 40)
+      }
+    }, 1000 + Math.random() * 2000) // Every 1-3 seconds
+
+    const distortionInterval = setInterval(() => {
+      // Horizontal distortion - rare but noticeable
+      if (Math.random() < 0.08) { // 8% chance
+        setCrtDistortion(1 + Math.random() * 2)
+        setTimeout(() => setCrtDistortion(0), 100 + Math.random() * 200)
+      }
+    }, 3000 + Math.random() * 5000) // Every 3-8 seconds
+
+    return () => {
+      clearInterval(glitchInterval)
+      clearInterval(flickerInterval)
+      clearInterval(distortionInterval)
+    }
+  }, [showAbout])
 
   // Keyboard navigation for DOS-style menu
   useEffect(() => {
@@ -381,11 +419,16 @@ function Home({ crime, streak, onStart }) {
   }
 
   return (
-    <div className="home" style={{
-      fontFamily: "'IBM Plex Mono', monospace",
-      color: '#00CC55',
-      background: '#020403'
-    }}>
+    <div 
+      className={`home ${crtGlitch ? 'crt-glitch' : ''} ${crtFlicker ? 'crt-flicker' : ''}`}
+      style={{
+        fontFamily: "'IBM Plex Mono', monospace",
+        color: '#00CC55',
+        background: '#020403',
+        transform: crtDistortion > 0 ? `translateX(${Math.sin(Date.now() / 10) * crtDistortion}px)` : 'none',
+        transition: crtDistortion > 0 ? 'none' : 'transform 0.1s ease-out'
+      }}
+    >
       <div className="terminal-header">
         <div className="separator" style={{
           color: '#007A33',

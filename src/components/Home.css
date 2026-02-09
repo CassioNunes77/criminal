@@ -128,3 +128,136 @@
 .menu {
   margin-top: 16px;
 }
+
+/* CRT Monitor Glitch Effects */
+.crt-glitch {
+  animation: crtGlitch 0.1s;
+}
+
+.crt-flicker {
+  animation: crtFlicker 0.05s;
+}
+
+@keyframes crtGlitch {
+  0% {
+    filter: brightness(1);
+    transform: translateX(0);
+  }
+  20% {
+    filter: brightness(1.2);
+    transform: translateX(-1px);
+  }
+  40% {
+    filter: brightness(0.8);
+    transform: translateX(1px);
+  }
+  60% {
+    filter: brightness(1.1);
+    transform: translateX(-1px);
+  }
+  80% {
+    filter: brightness(0.9);
+    transform: translateX(1px);
+  }
+  100% {
+    filter: brightness(1);
+    transform: translateX(0);
+  }
+}
+
+@keyframes crtFlicker {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.95;
+  }
+}
+
+/* CRT Scanline flicker overlay */
+.home::after {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: 
+    repeating-linear-gradient(
+      0deg,
+      rgba(0, 255, 100, 0.03) 0px,
+      transparent 1px,
+      transparent 2px,
+      rgba(0, 255, 100, 0.03) 3px
+    );
+  pointer-events: none;
+  z-index: 1001;
+  opacity: 0;
+  animation: scanlineFlicker 3s infinite;
+}
+
+@keyframes scanlineFlicker {
+  0%, 90%, 100% {
+    opacity: 0;
+  }
+  91%, 92% {
+    opacity: 0.3;
+  }
+  93%, 94% {
+    opacity: 0.1;
+  }
+  95%, 96% {
+    opacity: 0.4;
+  }
+  97%, 98% {
+    opacity: 0.05;
+  }
+  99% {
+    opacity: 0.2;
+  }
+}
+
+/* Horizontal distortion lines */
+.home::before {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: 
+    repeating-linear-gradient(
+      90deg,
+      transparent 0px,
+      transparent 98%,
+      rgba(0, 255, 100, 0.05) 99%,
+      rgba(0, 255, 100, 0.05) 100%
+    );
+  pointer-events: none;
+  z-index: 1000;
+  opacity: 0;
+  animation: horizontalDistortion 4s infinite;
+}
+
+@keyframes horizontalDistortion {
+  0%, 85%, 100% {
+    opacity: 0;
+    transform: translateY(0);
+  }
+  86% {
+    opacity: 0.1;
+    transform: translateY(-2px);
+  }
+  87% {
+    opacity: 0.15;
+    transform: translateY(2px);
+  }
+  88% {
+    opacity: 0.1;
+    transform: translateY(-1px);
+  }
+  89% {
+    opacity: 0.05;
+    transform: translateY(1px);
+  }
+}

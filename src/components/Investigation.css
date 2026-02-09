@@ -195,3 +195,13 @@
 .clue-selection {
   margin: 16px 0;
 }
+
+.separator {
+  text-align: left;
+}
+
+@media (max-width: 768px) {
+  .separator {
+    text-align: left !important;
+  }
+}

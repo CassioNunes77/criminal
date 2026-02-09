@@ -449,14 +449,14 @@ function Home({ crime, streak, onStart }) {
             if (selectedButton !== 0) e.target.style.color = '#00CC55'
           }}
         >
+          &gt; INICIAR INVESTIGACAO
           {selectedButton === 0 && (
             <span className="cursor-blink" style={{
               color: '#00FF66',
               animation: 'blink 1s step-end infinite',
-              marginRight: '4px'
+              marginLeft: '4px'
             }}>█</span>
           )}
-          &gt; INICIAR INVESTIGACAO
         </button>
 
         <button 
@@ -485,14 +485,14 @@ function Home({ crime, streak, onStart }) {
             if (selectedButton !== 1) e.target.style.color = '#00CC55'
           }}
         >
+          &gt; SOBRE O GAME
           {selectedButton === 1 && (
             <span className="cursor-blink" style={{
               color: '#00FF66',
               animation: 'blink 1s step-end infinite',
-              marginRight: '4px'
+              marginLeft: '4px'
             }}>█</span>
           )}
-          &gt; SOBRE O GAME
         </button>
       </div>
     </div>

@@ -35,6 +35,28 @@ function Home({ crime, streak, onStart }) {
       typewriterSoundRef.current.init()
     }
 
+    // Handle Enter key to go back when about is complete
+    const handleKeyPress = (e) => {
+      if (showAbout && aboutComplete && e.key === 'Enter') {
+        setShowAbout(false)
+      }
+    }
+
+    if (showAbout && aboutComplete) {
+      window.addEventListener('keydown', handleKeyPress)
+      return () => {
+        window.removeEventListener('keydown', handleKeyPress)
+      }
+    }
+  }, [showAbout, aboutComplete])
+
+  useEffect(() => {
+    // Initialize typewriter sound
+    if (!typewriterSoundRef.current) {
+      typewriterSoundRef.current = new TypewriterSound()
+      typewriterSoundRef.current.init()
+    }
+
     if (showAbout) {
       setAboutLines([])
       setCurrentLineIndex(0)

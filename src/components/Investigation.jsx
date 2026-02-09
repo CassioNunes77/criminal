@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from 'react'
 import './Investigation.css'
 
-function Investigation({ crime, state, onDiscoverClue, onMakeAccusation, onViewCase, onBack }) {
+function Investigation({ crime, state, onDiscoverClue, onMakeAccusation, onViewCase, onBack, onViewResult }) {
   const [showAccusation, setShowAccusation] = useState(false)
   const [selectedSuspect, setSelectedSuspect] = useState(null)
   const [selectedLocation, setSelectedLocation] = useState(null)
@@ -168,9 +168,19 @@ function Investigation({ crime, state, onDiscoverClue, onMakeAccusation, onViewC
         </div>
 
         {isFailed && (
-          <div className="feedback error">
-            CASO ENCERRADO. VOCE FALHOU.
-          </div>
+          <>
+            <div className="feedback error">
+              CASO ENCERRADO. VOCE FALHOU.
+            </div>
+            <div style={{ marginTop: '16px' }}>
+              <button 
+                className="terminal-button highlight"
+                onClick={onViewResult}
+              >
+                &gt; VER RESULTADO E COMPARTILHAR
+              </button>
+            </div>
+          </>
         )}
 
         {/* Clues Section */}

@@ -215,6 +215,7 @@ function App() {
           onDiscoverClue={discoverClue}
           onMakeAccusation={makeAccusation}
           onViewCase={() => setScreen('caseView')}
+          onViewResult={() => setScreen('result')}
           onBack={() => setScreen('home')}
         />
       )}

@@ -22,7 +22,7 @@ TENTATIVAS: ${state.attempts}
 SEQUENCIA: ${state.streak} ${state.streak === 1 ? 'DIA' : 'DIAS'}
 
 JOGUE EM:
-crime1x.com`
+https://selenecriminal.netlify.app/`
 
   const copyToClipboard = () => {
     navigator.clipboard.writeText(shareText)

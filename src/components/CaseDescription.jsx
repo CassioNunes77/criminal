@@ -18,44 +18,6 @@ function CaseDescription({ crime, onAccept, onBack }) {
       typewriterSoundRef.current.init()
     }
 
-    // Handle keyboard navigation
-    const handleKeyPress = (e) => {
-      if (e.key === 'Enter') {
-        e.preventDefault()
-        if (!descriptionComplete) {
-          // Cancel animation completely and show all text
-          if (window.__cancelCaseAnimation) {
-            window.__cancelCaseAnimation()
-          }
-          
-          // Show all text immediately
-          const allLines = crime.description || []
-          setDescriptionLines(allLines)
-          setCurrentLineIndex(allLines.length - 1)
-          setDots('')
-          setDescriptionComplete(true)
-          setSelectedButton(0) // Select accept button by default
-          // Don't activate button yet - user needs to press Enter again
-        } else {
-          // Description is complete - activate the selected button
-          if (selectedButton === 0) {
-            onAccept() // Accept mission
-          } else {
-            onBack() // Refuse mission (go back to home)
-          }
-        }
-      } else if (descriptionComplete && (e.key === 'ArrowDown' || e.key === 'ArrowUp')) {
-        e.preventDefault()
-        if (e.key === 'ArrowDown') {
-          setSelectedButton(prev => (prev + 1) % 2) // Move down: 0 -> 1, 1 -> 0
-        } else if (e.key === 'ArrowUp') {
-          setSelectedButton(prev => (prev - 1 + 2) % 2) // Move up: 1 -> 0, 0 -> 1
-        }
-      }
-    }
-
-    window.addEventListener('keydown', handleKeyPress)
-
     setDescriptionLines([])
     setCurrentLineIndex(0)
     setDots('')
@@ -153,11 +115,52 @@ function CaseDescription({ crime, onAccept, onBack }) {
       window.__cancelCaseAnimation = cancelAnimation
 
       return () => {
-        window.removeEventListener('keydown', handleKeyPress)
         cancelAnimation()
         delete window.__cancelCaseAnimation
       }
   }, [crime])
+
+  // Keyboard navigation - separate useEffect like in Home.jsx
+  useEffect(() => {
+    const handleKeyPress = (e) => {
+      if (e.key === 'Enter') {
+        e.preventDefault()
+        if (!descriptionComplete) {
+          // Cancel animation completely and show all text
+          if (window.__cancelCaseAnimation) {
+            window.__cancelCaseAnimation()
+          }
+          
+          // Show all text immediately
+          const allLines = crime.description || []
+          setDescriptionLines(allLines)
+          setCurrentLineIndex(allLines.length - 1)
+          setDots('')
+          setDescriptionComplete(true)
+          setSelectedButton(0) // Select accept button by default
+        } else {
+          // Description is complete - activate the selected button
+          if (selectedButton === 0) {
+            onAccept() // Accept mission
+          } else {
+            onBack() // Refuse mission (go back to home)
+          }
+        }
+      } else if (descriptionComplete && (e.key === 'ArrowDown' || e.key === 'ArrowUp')) {
+        e.preventDefault()
+        if (e.key === 'ArrowDown') {
+          setSelectedButton(prev => (prev + 1) % 2) // Move down: 0 -> 1, 1 -> 0
+        } else if (e.key === 'ArrowUp') {
+          setSelectedButton(prev => (prev - 1 + 2) % 2) // Move up: 1 -> 0, 0 -> 1
+        }
+      }
+    }
+
+    window.addEventListener('keydown', handleKeyPress)
+    return () => {
+      window.removeEventListener('keydown', handleKeyPress)
+    }
+  }, [descriptionComplete, selectedButton, onAccept, onBack, crime])
 
   return (
     <div className="case-description" style={{

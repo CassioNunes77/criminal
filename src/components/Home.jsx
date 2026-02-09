@@ -323,7 +323,7 @@ function Home({ crime, streak, onStart }) {
   if (showAbout) {
     return (
       <div className="home" style={{
-        fontFamily: "'IBM Plex Mono', monospace",
+        fontFamily: "'PxPlus IBM VGA8', monospace",
         color: '#00CC55',
         background: '#020403'
       }}>
@@ -357,7 +357,7 @@ function Home({ crime, streak, onStart }) {
             whiteSpace: 'pre-wrap',
             wordWrap: 'break-word',
             color: '#00CC55',
-            fontFamily: "'IBM Plex Mono', monospace",
+            fontFamily: "'PxPlus IBM VGA8', monospace",
             minHeight: '200px',
             lineHeight: '1.8'
           }}>

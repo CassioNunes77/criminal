@@ -138,6 +138,7 @@ function App() {
         <CaseDescription
           crime={currentCrime}
           onAccept={acceptMission}
+          onBack={() => setScreen('home')}
         />
       )}
       {screen === 'investigation' && (

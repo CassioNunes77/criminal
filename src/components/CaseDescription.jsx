@@ -2,12 +2,12 @@ import { useState, useEffect, useRef } from 'react'
 import { TypewriterSound } from '../utils/typewriterSound'
 import './CaseDescription.css'
 
-function CaseDescription({ crime, onAccept }) {
+function CaseDescription({ crime, onAccept, onBack }) {
   const [descriptionLines, setDescriptionLines] = useState([])
   const [currentLineIndex, setCurrentLineIndex] = useState(0)
   const [dots, setDots] = useState('')
   const [descriptionComplete, setDescriptionComplete] = useState(false)
-  const [buttonSelected, setButtonSelected] = useState(false)
+  const [selectedButton, setSelectedButton] = useState(0) // 0 = aceitar, 1 = recusar
   const typewriterSoundRef = useRef(null)
   const typingTimeoutRef = useRef(null)
 
@@ -18,7 +18,7 @@ function CaseDescription({ crime, onAccept }) {
       typewriterSoundRef.current.init()
     }
 
-    // Handle Enter key - skip animation if typing, accept mission if complete
+    // Handle keyboard navigation
     const handleKeyPress = (e) => {
       if (e.key === 'Enter') {
         if (!descriptionComplete) {
@@ -35,11 +35,18 @@ function CaseDescription({ crime, onAccept }) {
           setCurrentLineIndex(allLines.length - 1)
           setDots('')
           setDescriptionComplete(true)
-          setButtonSelected(true)
-        } else if (descriptionComplete && buttonSelected) {
+          setSelectedButton(0)
+        } else if (descriptionComplete) {
           e.preventDefault()
-          onAccept()
+          if (selectedButton === 0) {
+            onAccept()
+          } else {
+            onBack()
+          }
         }
+      } else if (descriptionComplete && (e.key === 'ArrowDown' || e.key === 'ArrowUp')) {
+        e.preventDefault()
+        setSelectedButton(prev => (prev + 1) % 2) // Toggle between 0 and 1
       }
     }
 
@@ -113,7 +120,7 @@ function CaseDescription({ crime, onAccept }) {
             timeoutId = setTimeout(showDots, 300)
           } else {
             setDescriptionComplete(true)
-            setButtonSelected(true) // Auto-select button when animation completes
+            setSelectedButton(0) // Auto-select accept button when animation completes
           }
         }
       }
@@ -140,11 +147,6 @@ function CaseDescription({ crime, onAccept }) {
 
       // Expose cancel function for Enter key handler
       window.__cancelCaseAnimation = cancelAnimation
-
-      // Auto-select button when description completes
-      if (descriptionComplete) {
-        setButtonSelected(true)
-      }
 
       return () => {
         window.removeEventListener('keydown', handleKeyPress)
@@ -228,12 +230,11 @@ function CaseDescription({ crime, onAccept }) {
               <button 
                 className="terminal-button" 
                 onClick={onAccept}
-                onMouseEnter={() => setButtonSelected(true)}
-                onMouseLeave={() => setButtonSelected(true)}
+                onMouseEnter={() => setSelectedButton(0)}
                 style={{
                   background: 'none',
                   border: 'none',
-                  color: buttonSelected ? '#00FF66' : '#00CC55',
+                  color: selectedButton === 0 ? '#00FF66' : '#00CC55',
                   fontFamily: "'IBM Plex Mono', monospace",
                   fontSize: '16px',
                   cursor: 'pointer',
@@ -247,7 +248,37 @@ function CaseDescription({ crime, onAccept }) {
                 }}
               >
                 &gt; ACEITAR MISSÃO
-                {buttonSelected && (
+                {selectedButton === 0 && (
+                  <span className="cursor-blink" style={{
+                    color: '#00FF66',
+                    animation: 'blink 1s step-end infinite',
+                    marginLeft: '4px'
+                  }}>█</span>
+                )}
+              </button>
+
+              <button 
+                className="terminal-button" 
+                onClick={onBack}
+                onMouseEnter={() => setSelectedButton(1)}
+                style={{
+                  background: 'none',
+                  border: 'none',
+                  color: selectedButton === 1 ? '#00FF66' : '#00CC55',
+                  fontFamily: "'IBM Plex Mono', monospace",
+                  fontSize: '16px',
+                  cursor: 'pointer',
+                  padding: '8px 0',
+                  margin: '8px 0',
+                  textAlign: 'left',
+                  width: '100%',
+                  transition: 'color 0.2s ease',
+                  display: 'flex',
+                  alignItems: 'center'
+                }}
+              >
+                &gt; RECUSAR
+                {selectedButton === 1 && (
                   <span className="cursor-blink" style={{
                     color: '#00FF66',
                     animation: 'blink 1s step-end infinite',

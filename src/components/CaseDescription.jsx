@@ -7,6 +7,7 @@ function CaseDescription({ crime, onAccept }) {
   const [currentLineIndex, setCurrentLineIndex] = useState(0)
   const [dots, setDots] = useState('')
   const [descriptionComplete, setDescriptionComplete] = useState(false)
+  const [buttonSelected, setButtonSelected] = useState(false)
   const typewriterSoundRef = useRef(null)
   const typingTimeoutRef = useRef(null)
 
@@ -17,22 +18,28 @@ function CaseDescription({ crime, onAccept }) {
       typewriterSoundRef.current.init()
     }
 
-    // Handle Enter key - skip animation if typing
+    // Handle Enter key - skip animation if typing, accept mission if complete
     const handleKeyPress = (e) => {
-      if (e.key === 'Enter' && !descriptionComplete) {
-        e.preventDefault()
-        
-        // Cancel animation completely
-        if (window.__cancelCaseAnimation) {
-          window.__cancelCaseAnimation()
+      if (e.key === 'Enter') {
+        if (!descriptionComplete) {
+          e.preventDefault()
+          
+          // Cancel animation completely
+          if (window.__cancelCaseAnimation) {
+            window.__cancelCaseAnimation()
+          }
+          
+          // Show all text immediately
+          const allLines = crime.description || []
+          setDescriptionLines(allLines)
+          setCurrentLineIndex(allLines.length - 1)
+          setDots('')
+          setDescriptionComplete(true)
+          setButtonSelected(true)
+        } else if (descriptionComplete && buttonSelected) {
+          e.preventDefault()
+          onAccept()
         }
-        
-        // Show all text immediately
-        const allLines = crime.description || []
-        setDescriptionLines(allLines)
-        setCurrentLineIndex(allLines.length - 1)
-        setDots('')
-        setDescriptionComplete(true)
       }
     }
 
@@ -106,6 +113,7 @@ function CaseDescription({ crime, onAccept }) {
             timeoutId = setTimeout(showDots, 300)
           } else {
             setDescriptionComplete(true)
+            setButtonSelected(true) // Auto-select button when animation completes
           }
         }
       }
@@ -132,6 +140,11 @@ function CaseDescription({ crime, onAccept }) {
 
       // Expose cancel function for Enter key handler
       window.__cancelCaseAnimation = cancelAnimation
+
+      // Auto-select button when description completes
+      if (descriptionComplete) {
+        setButtonSelected(true)
+      }
 
       return () => {
         window.removeEventListener('keydown', handleKeyPress)
@@ -215,10 +228,12 @@ function CaseDescription({ crime, onAccept }) {
               <button 
                 className="terminal-button" 
                 onClick={onAccept}
+                onMouseEnter={() => setButtonSelected(true)}
+                onMouseLeave={() => setButtonSelected(true)}
                 style={{
                   background: 'none',
                   border: 'none',
-                  color: '#00CC55',
+                  color: buttonSelected ? '#00FF66' : '#00CC55',
                   fontFamily: "'IBM Plex Mono', monospace",
                   fontSize: '16px',
                   cursor: 'pointer',
@@ -226,12 +241,19 @@ function CaseDescription({ crime, onAccept }) {
                   margin: '8px 0',
                   textAlign: 'left',
                   width: '100%',
-                  transition: 'color 0.2s ease'
+                  transition: 'color 0.2s ease',
+                  display: 'flex',
+                  alignItems: 'center'
                 }}
-                onMouseEnter={(e) => e.target.style.color = '#00FF66'}
-                onMouseLeave={(e) => e.target.style.color = '#00CC55'}
               >
                 &gt; ACEITAR MISSÃO
+                {buttonSelected && (
+                  <span className="cursor-blink" style={{
+                    color: '#00FF66',
+                    animation: 'blink 1s step-end infinite',
+                    marginLeft: '4px'
+                  }}>█</span>
+                )}
               </button>
             </>
           )}

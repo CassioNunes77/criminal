@@ -521,7 +521,7 @@ function Home({ crime, streak, onStart }) {
             if (selectedButton !== 1) e.target.style.color = '#00CC55'
           }}
         >
-          &gt; SOBRE O GAME
+          &gt; SOBRE
           {selectedButton === 1 && (
             <span className="cursor-blink" style={{
               color: '#00FF66',

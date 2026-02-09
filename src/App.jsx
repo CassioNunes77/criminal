@@ -9,6 +9,7 @@ import './App.css'
 function App() {
   const [screen, setScreen] = useState('home')
   const [currentCrime, setCurrentCrime] = useState(null)
+  const [isLoading, setIsLoading] = useState(true)
   const [investigationState, setInvestigationState] = useState({
     cluesDiscovered: 0,
     attempts: 0,
@@ -21,6 +22,9 @@ function App() {
   })
 
   useEffect(() => {
+    const startTime = Date.now()
+    const minLoadTime = 1000 // Minimum 1 second
+
     try {
       // Load daily crime
       const crime = getDailyCrime()
@@ -37,8 +41,19 @@ function App() {
       } catch (e) {
         console.warn('Error loading saved state:', e)
       }
+
+      // Ensure minimum loading time of 1 second
+      const elapsed = Date.now() - startTime
+      const remainingTime = Math.max(0, minLoadTime - elapsed)
+      
+      setTimeout(() => {
+        setIsLoading(false)
+      }, remainingTime)
     } catch (error) {
       console.error('Error loading crime:', error)
+      setTimeout(() => {
+        setIsLoading(false)
+      }, minLoadTime)
     }
   }, [])
 
@@ -99,7 +114,7 @@ function App() {
     }
   }
 
-  if (!currentCrime) {
+  if (!currentCrime || isLoading) {
     return (
       <div className="loading" style={{ 
         display: 'flex', 

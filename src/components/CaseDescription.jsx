@@ -252,14 +252,14 @@ function CaseDescription({ crime, onAccept, onBack }) {
                   alignItems: 'center'
                 }}
               >
+                &gt; ACEITAR MISSÃO
                 {selectedButton === 0 && (
                   <span className="cursor-blink" style={{
                     color: '#00FF66',
                     animation: 'blink 1s step-end infinite',
-                    marginRight: '4px'
+                    marginLeft: '4px'
                   }}>█</span>
                 )}
-                &gt; ACEITAR MISSÃO
               </button>
 
               <button 
@@ -282,14 +282,14 @@ function CaseDescription({ crime, onAccept, onBack }) {
                   alignItems: 'center'
                 }}
               >
+                &gt; RECUSAR
                 {selectedButton === 1 && (
                   <span className="cursor-blink" style={{
                     color: '#00FF66',
                     animation: 'blink 1s step-end infinite',
-                    marginRight: '4px'
+                    marginLeft: '4px'
                   }}>█</span>
                 )}
-                &gt; RECUSAR
               </button>
             </>
           )}

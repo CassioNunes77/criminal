@@ -31,7 +31,7 @@ export class TypewriterSound {
     this.audioContext = null
     this.isEnabled = true
     this.lastPlayTime = 0
-    this.minInterval = 30 // Longer interval for softer, more comfortable feel
+    this.minInterval = 25 // Balanced interval for comfortable keyboard feel
   }
 
   init() {
@@ -52,32 +52,70 @@ export class TypewriterSound {
     this.lastPlayTime = now
 
     try {
-      // Soft, comfortable typing sound - very subtle and pleasant
-      const oscillator = this.audioContext.createOscillator()
+      // Soft keyboard typing sound - discrete, audible, comfortable
+      // Using a combination of frequencies to simulate a soft key press
+      const oscillator1 = this.audioContext.createOscillator()
+      const oscillator2 = this.audioContext.createOscillator()
       const gainNode = this.audioContext.createGain()
+      const merger = this.audioContext.createChannelMerger(2)
       
-      oscillator.connect(gainNode)
+      // Main frequency - soft keyboard click (around 400-500 Hz)
+      const mainFreq = 450 + Math.random() * 50
+      oscillator1.frequency.setValueAtTime(mainFreq, this.audioContext.currentTime)
+      oscillator1.type = 'sine'
+      
+      // Subtle harmonic for realism (higher frequency, quieter)
+      const harmonicFreq = mainFreq * 2.5
+      oscillator2.frequency.setValueAtTime(harmonicFreq, this.audioContext.currentTime)
+      oscillator2.type = 'sine'
+      
+      // Connect oscillators to merger
+      oscillator1.connect(merger, 0, 0)
+      oscillator2.connect(merger, 0, 1)
+      merger.connect(gainNode)
       gainNode.connect(this.audioContext.destination)
       
-      // Very low, soft frequency - gentle and comfortable
-      const baseFreq = 150 + Math.random() * 50 // 150-200 Hz - very low and soft
-      oscillator.frequency.setValueAtTime(baseFreq, this.audioContext.currentTime)
+      // Soft, comfortable volume - audible but discrete
+      const mainVolume = 0.04 // Main frequency volume
+      const harmonicVolume = 0.01 // Harmonic volume (quieter)
       
-      // Sine wave for smooth, soft sound
-      oscillator.type = 'sine'
-      
-      // Very gentle attack and smooth decay - comfortable typing sound
+      // Quick, soft attack and smooth decay - like a gentle key press
       gainNode.gain.setValueAtTime(0, this.audioContext.currentTime)
-      gainNode.gain.linearRampToValueAtTime(0.012, this.audioContext.currentTime + 0.005) // Gentle attack
-      gainNode.gain.exponentialRampToValueAtTime(0.002, this.audioContext.currentTime + 0.03) // Smooth decay
-      gainNode.gain.linearRampToValueAtTime(0, this.audioContext.currentTime + 0.05) // Gentle fade
+      gainNode.gain.linearRampToValueAtTime(mainVolume, this.audioContext.currentTime + 0.003) // Quick soft attack
+      gainNode.gain.exponentialRampToValueAtTime(0.005, this.audioContext.currentTime + 0.025) // Smooth decay
+      gainNode.gain.linearRampToValueAtTime(0, this.audioContext.currentTime + 0.04) // Gentle fade
       
-      oscillator.start(this.audioContext.currentTime)
-      oscillator.stop(this.audioContext.currentTime + 0.05)
+      oscillator1.start(this.audioContext.currentTime)
+      oscillator2.start(this.audioContext.currentTime)
+      oscillator1.stop(this.audioContext.currentTime + 0.04)
+      oscillator2.stop(this.audioContext.currentTime + 0.04)
     } catch (e) {
-      // Silently fail if audio context is suspended
-      if (e.name !== 'InvalidStateError') {
-        console.warn('Error playing sound:', e)
+      // Fallback to simple sine wave if merger fails
+      try {
+        const oscillator = this.audioContext.createOscillator()
+        const gainNode = this.audioContext.createGain()
+        
+        oscillator.connect(gainNode)
+        gainNode.connect(this.audioContext.destination)
+        
+        // Soft keyboard frequency
+        const baseFreq = 450 + Math.random() * 50
+        oscillator.frequency.setValueAtTime(baseFreq, this.audioContext.currentTime)
+        oscillator.type = 'sine'
+        
+        // Comfortable volume
+        gainNode.gain.setValueAtTime(0, this.audioContext.currentTime)
+        gainNode.gain.linearRampToValueAtTime(0.04, this.audioContext.currentTime + 0.003)
+        gainNode.gain.exponentialRampToValueAtTime(0.005, this.audioContext.currentTime + 0.025)
+        gainNode.gain.linearRampToValueAtTime(0, this.audioContext.currentTime + 0.04)
+        
+        oscillator.start(this.audioContext.currentTime)
+        oscillator.stop(this.audioContext.currentTime + 0.04)
+      } catch (e2) {
+        // Silently fail if audio context is suspended
+        if (e2.name !== 'InvalidStateError') {
+          console.warn('Error playing sound:', e2)
+        }
       }
     }
   }

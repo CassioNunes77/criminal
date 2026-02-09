@@ -47,7 +47,7 @@ function Home({ crime, streak, onStart }) {
           textAlign: 'center',
           padding: '8px 0',
           color: '#00FF66',
-          textShadow: '0 0 4px rgba(0, 255, 100, 0.4), 0 0 8px rgba(0, 255, 100, 0.2)'
+          textShadow: '0 0 2px rgba(0, 255, 100, 0.4), 0 0 4px rgba(0, 255, 100, 0.15)'
         }}>
           {displayedText}
           {showCursor && <span className="cursor-blink" style={{
@@ -140,8 +140,7 @@ function Home({ crime, streak, onStart }) {
             margin: '8px 0',
             textAlign: 'left',
             width: '100%',
-            transition: 'color 0.2s ease',
-            textShadow: '0 0 4px rgba(0, 255, 100, 0.4), 0 0 8px rgba(0, 255, 100, 0.2)'
+            transition: 'color 0.2s ease'
           }}
           onMouseEnter={(e) => e.target.style.color = '#00FF66'}
           onMouseLeave={(e) => e.target.style.color = '#00CC55'}

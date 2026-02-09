@@ -65,7 +65,6 @@ function Investigation({ crime, state, onDiscoverClue, onMakeAccusation }) {
           <div className="clues-list">
             {availableClues.map((clue, index) => (
               <div key={index} className="clue-item">
-                <span className="clue-emoji">{clue.emoji}</span>
                 <span className="clue-text">{clue.text}</span>
               </div>
             ))}

@@ -15,13 +15,13 @@ function Result({ crime, state, onBack }) {
     return `[${filledBars}${emptyBars}]`
   }
 
-  const shareText = `🕵️ Caso #${String(crime.id).slice(-3)} — Resolvido
+  const shareText = `CASO #${String(crime.id).slice(-3)} - RESOLVIDO
 
-🔎 Pistas: ${renderAccuracyBar()}
-🎯 Tentativas: ${state.attempts}
-🔥 Streak: ${state.streak} ${state.streak === 1 ? 'dia' : 'dias'}
+PISTAS: ${renderAccuracyBar()}
+TENTATIVAS: ${state.attempts}
+SEQUENCIA: ${state.streak} ${state.streak === 1 ? 'DIA' : 'DIAS'}
 
-Joga aí 👇
+JOGUE EM:
 crime1x.com`
 
   const copyToClipboard = () => {

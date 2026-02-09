@@ -25,12 +25,12 @@ const CRIMES_DATABASE = [
     locations: ['Galeria Principal', 'Depósito', 'Sala de Exposição', 'Escritório'],
     methods: ['Forçou a fechadura', 'Usou chave falsa', 'Desativou alarme', 'Acesso interno'],
     clues: [
-      { emoji: '⏰', text: 'Horário do crime: 22:40' },
-      { emoji: '📍', text: 'Local exato: Galeria Principal' },
-      { emoji: '🎥', text: 'Câmera desativada às 22:35' },
-      { emoji: '🧤', text: 'Luva encontrada no local' },
-      { emoji: '🧾', text: 'Álibi verificado: Visitante estava em casa' },
-      { emoji: '🔑', text: 'Chave mestra acessada às 22:38' }
+      { text: '[HORARIO] Crime ocorreu as 22:40' },
+      { text: '[LOCAL] Local exato: Galeria Principal' },
+      { text: '[CAMERA] Camera desativada as 22:35' },
+      { text: '[EVIDENCIA] Luva encontrada no local' },
+      { text: '[ALIBI] Visitante estava em casa' },
+      { text: '[ACESSO] Chave mestra acessada as 22:38' }
     ],
     solution: {
       suspect: 'Funcionário',
@@ -47,12 +47,12 @@ const CRIMES_DATABASE = [
     locations: ['Cofre', 'Sala de Servidores', 'Caixa Eletrônico', 'Escritório'],
     methods: ['Transferência não autorizada', 'Hackeou sistema', 'Falsificou documento', 'Acesso privilegiado'],
     clues: [
-      { emoji: '⏰', text: 'Horário: 14:20' },
-      { emoji: '💻', text: 'Log de acesso suspeito' },
-      { emoji: '📧', text: 'Email de confirmação enviado' },
-      { emoji: '🔐', text: 'Senha administrativa usada' },
-      { emoji: '🧾', text: 'Álibi: Gerente estava em reunião' },
-      { emoji: '📱', text: 'Dispositivo desconhecido conectado' }
+      { text: '[HORARIO] Crime ocorreu as 14:20' },
+      { text: '[LOG] Log de acesso suspeito detectado' },
+      { text: '[EMAIL] Email de confirmacao enviado' },
+      { text: '[SENHA] Senha administrativa usada' },
+      { text: '[ALIBI] Gerente estava em reuniao' },
+      { text: '[DISPOSITIVO] Dispositivo desconhecido conectado' }
     ],
     solution: {
       suspect: 'TI',
@@ -69,12 +69,12 @@ const CRIMES_DATABASE = [
     locations: ['Entrada Principal', 'Lago', 'Bosque', 'Estacionamento'],
     methods: ['Planejado', 'Acidental', 'Coerção', 'Fuga voluntária'],
     clues: [
-      { emoji: '⏰', text: 'Última vista: 18:00' },
-      { emoji: '📱', text: 'Celular encontrado no lago' },
-      { emoji: '👟', text: 'Pegadas na direção do bosque' },
-      { emoji: '🧾', text: 'Álibi: Familiar estava em casa' },
-      { emoji: '📞', text: 'Última chamada: Amigo' },
-      { emoji: '🚗', text: 'Carro ainda no estacionamento' }
+      { text: '[HORARIO] Ultima vista as 18:00' },
+      { text: '[EVIDENCIA] Celular encontrado no lago' },
+      { text: '[PEGADAS] Pegadas na direcao do bosque' },
+      { text: '[ALIBI] Familiar estava em casa' },
+      { text: '[CHAMADA] Ultima chamada: Amigo' },
+      { text: '[VEICULO] Carro ainda no estacionamento' }
     ],
     solution: {
       suspect: 'Amigo',

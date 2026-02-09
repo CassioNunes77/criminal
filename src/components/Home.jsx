@@ -330,7 +330,7 @@ function Home({ crime, streak, onStart }) {
             margin: '12px 0'
           }}>====================================</div>
           <div className="title" style={{
-            fontFamily: "'VT323', monospace",
+            fontFamily: "'PxPlus IBM VGA8', monospace",
             fontSize: '32px',
             padding: '8px 0',
             color: '#00FF66'
@@ -396,7 +396,7 @@ function Home({ crime, streak, onStart }) {
                     background: 'none',
                     border: 'none',
                     color: '#00CC55',
-                    fontFamily: "'IBM Plex Mono', monospace",
+                    fontFamily: "'PxPlus IBM VGA8', monospace",
                     fontSize: '16px',
                     cursor: 'pointer',
                     padding: '8px 0',

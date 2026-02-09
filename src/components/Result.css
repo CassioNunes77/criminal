@@ -1,0 +1,55 @@
+.result {
+  font-family: 'IBM Plex Mono', monospace;
+}
+
+.stats-section {
+  margin: 16px 0;
+}
+
+.stat-item {
+  font-size: 14px;
+  margin: 8px 0;
+  color: var(--text-primary);
+}
+
+.result-section {
+  margin: 24px 0;
+  text-align: center;
+}
+
+.accuracy-bar {
+  font-size: 24px;
+  margin: 16px 0;
+  color: var(--text-highlight);
+  font-family: 'VT323', monospace;
+}
+
+.accuracy-text {
+  font-size: 16px;
+  color: var(--text-primary);
+  margin-top: 8px;
+}
+
+.solution-section {
+  margin: 24px 0;
+}
+
+.solution-item {
+  font-size: 14px;
+  margin: 12px 0;
+  color: var(--text-primary);
+}
+
+.solution-item .highlight {
+  color: var(--text-highlight);
+  font-weight: 600;
+}
+
+.share-feedback {
+  margin: 16px 0;
+  padding: 12px;
+  text-align: center;
+  font-size: 14px;
+  color: var(--text-highlight);
+  animation: flash 120ms ease-in-out;
+}

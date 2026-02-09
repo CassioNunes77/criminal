@@ -1,0 +1,8 @@
+{
+  "appId": "com.selene.criminal",
+  "appName": "Selene",
+  "webDir": "dist",
+  "server": {
+    "androidScheme": "https"
+  }
+}

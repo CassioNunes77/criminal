@@ -1,0 +1,105 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+:root {
+  --bg-primary: #020403;
+  --text-primary: #00CC55;
+  --text-highlight: #00FF66;
+  --text-secondary: #007A33;
+  --text-disabled: #003311;
+  --glow-color: rgba(0, 255, 100, 0.4);
+}
+
+body {
+  font-family: 'IBM Plex Mono', monospace;
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  min-height: 100vh;
+  overflow-x: hidden;
+  position: relative;
+}
+
+body::before {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: 
+    repeating-linear-gradient(
+      0deg,
+      rgba(0, 255, 100, 0.03) 0px,
+      transparent 1px,
+      transparent 2px,
+      rgba(0, 255, 100, 0.03) 3px
+    );
+  pointer-events: none;
+  z-index: 1000;
+}
+
+#root {
+  min-height: 100vh;
+  position: relative;
+  z-index: 1;
+}
+
+/* Terminal text glow */
+.terminal-text {
+  text-shadow:
+    0 0 4px var(--glow-color),
+    0 0 8px rgba(0, 255, 100, 0.2);
+}
+
+/* Blinking cursor */
+@keyframes blink {
+  0%, 50% { opacity: 1; }
+  51%, 100% { opacity: 0; }
+}
+
+.cursor-blink {
+  animation: blink 1s step-end infinite;
+}
+
+/* Typewriter effect */
+@keyframes typewriter {
+  from { width: 0; }
+  to { width: 100%; }
+}
+
+.typewriter {
+  overflow: hidden;
+  white-space: nowrap;
+  border-right: 2px solid var(--text-primary);
+  animation: typewriter 0.5s steps(40, end), blink 1s step-end infinite;
+}
+
+/* Flash effect */
+@keyframes flash {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.3; }
+}
+
+.flash-green {
+  animation: flash 120ms ease-in-out;
+}
+
+/* Scrollbar styling */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--bg-primary);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--text-secondary);
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--text-primary);
+}

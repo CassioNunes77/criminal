@@ -18,6 +18,37 @@ function Home({ crime, streak, onStart }) {
   const typewriterSoundRef = useRef(null)
   const typingTimeoutRef = useRef(null)
 
+  const completeAboutAnimation = () => {
+    if (aboutComplete) return
+    if (window.__cancelAboutAnimation) {
+      window.__cancelAboutAnimation()
+    }
+    const allLines = [
+      'SYSTEM BOOT SEQUENCE INITIATED...',
+      'ARQUIVO DE ACESSO RESTRITO CARREGADO....',
+      'ANO 1987.',
+      '',
+      'Você é um investigador de uma divisão secreta de inteligência policial, especializado em análise de dados e invasão autorizada de sistemas usados por organizações criminosas.',
+      '',
+      'Seu trabalho acontece dentro de redes fechadas e bancos de dados sigilosos, onde todos os dias um novo caso chega ao seu terminal contendo registros incompletos e pistas fragmentadas.',
+      '',
+      'Não existem testemunhas, apenas padrões, acessos, horários e erros deixados por quem acreditou que nunca seria rastreado.',
+      '',
+      'Sua função é cruzar informações, reconstruir eventos e identificar a verdade antes que os dados desapareçam.',
+      '',
+      'Cada crime deve ser resolvido usando lógica, observação e interpretação fria dos fatos.',
+      '',
+      'Sem ação direta, apenas você, o sistema e a mente por trás do crime.',
+      '',
+      'ACESSO CONCEDIDO.',
+      'AGUARDANDO PRÓXIMO CASO.'
+    ]
+    setAboutLines(allLines)
+    setCurrentLineIndex(allLines.length - 1)
+    setDots('')
+    setAboutComplete(true)
+  }
+
   useEffect(() => {
     // Initialize typewriter sound for title
     if (!typewriterSoundRef.current) {
@@ -128,41 +159,10 @@ function Home({ crime, streak, onStart }) {
     // Handle Enter key - skip animation if typing, go back if complete
     const handleKeyPress = (e) => {
       if (showAbout && e.key === 'Enter') {
+        e.preventDefault()
         if (!aboutComplete) {
-          // Skip animation - show all text immediately and cancel all timeouts
-          e.preventDefault()
-          
-          // Cancel animation completely
-          if (window.__cancelAboutAnimation) {
-            window.__cancelAboutAnimation()
-          }
-          
-          const allLines = [
-            'SYSTEM BOOT SEQUENCE INITIATED...',
-            'ARQUIVO DE ACESSO RESTRITO CARREGADO....',
-            'ANO 1987.',
-            '',
-            'Você é um investigador de uma divisão secreta de inteligência policial, especializado em análise de dados e invasão autorizada de sistemas usados por organizações criminosas.',
-            '',
-            'Seu trabalho acontece dentro de redes fechadas e bancos de dados sigilosos, onde todos os dias um novo caso chega ao seu terminal contendo registros incompletos e pistas fragmentadas.',
-            '',
-            'Não existem testemunhas, apenas padrões, acessos, horários e erros deixados por quem acreditou que nunca seria rastreado.',
-            '',
-            'Sua função é cruzar informações, reconstruir eventos e identificar a verdade antes que os dados desapareçam.',
-            '',
-            'Cada crime deve ser resolvido usando lógica, observação e interpretação fria dos fatos.',
-            '',
-            'Sem ação direta, apenas você, o sistema e a mente por trás do crime.',
-            '',
-            'ACESSO CONCEDIDO.',
-            'AGUARDANDO PRÓXIMO CASO.'
-          ]
-          setAboutLines(allLines)
-          setCurrentLineIndex(allLines.length - 1)
-          setDots('')
-          setAboutComplete(true)
+          completeAboutAnimation()
         } else {
-          // Go back to home
           setShowAbout(false)
         }
       }
@@ -320,13 +320,53 @@ function Home({ crime, streak, onStart }) {
     return `${day}/${month}/1994`
   }
 
+  const completeAboutAnimation = () => {
+    if (aboutComplete) return
+    if (window.__cancelAboutAnimation) {
+      window.__cancelAboutAnimation()
+    }
+    const allLines = [
+      'SYSTEM BOOT SEQUENCE INITIATED...',
+      'ARQUIVO DE ACESSO RESTRITO CARREGADO....',
+      'ANO 1987.',
+      '',
+      'Você é um investigador de uma divisão secreta de inteligência policial, especializado em análise de dados e invasão autorizada de sistemas usados por organizações criminosas.',
+      '',
+      'Seu trabalho acontece dentro de redes fechadas e bancos de dados sigilosos, onde todos os dias um novo caso chega ao seu terminal contendo registros incompletos e pistas fragmentadas.',
+      '',
+      'Não existem testemunhas, apenas padrões, acessos, horários e erros deixados por quem acreditou que nunca seria rastreado.',
+      '',
+      'Sua função é cruzar informações, reconstruir eventos e identificar a verdade antes que os dados desapareçam.',
+      '',
+      'Cada crime deve ser resolvido usando lógica, observação e interpretação fria dos fatos.',
+      '',
+      'Sem ação direta, apenas você, o sistema e a mente por trás do crime.',
+      '',
+      'ACESSO CONCEDIDO.',
+      'AGUARDANDO PRÓXIMO CASO.'
+    ]
+    setAboutLines(allLines)
+    setCurrentLineIndex(allLines.length - 1)
+    setDots('')
+    setAboutComplete(true)
+  }
+
   if (showAbout) {
     return (
-      <div className="home" style={{
-        fontFamily: "'PxPlus IBM VGA8', monospace",
-        color: '#00CC55',
-        background: '#020403'
-      }}>
+      <div 
+        className="home" 
+        style={{
+          fontFamily: "'PxPlus IBM VGA8', monospace",
+          color: '#00CC55',
+          background: '#020403',
+          cursor: 'pointer',
+          minHeight: '100vh'
+        }}
+        onClick={completeAboutAnimation}
+        role="button"
+        tabIndex={0}
+        aria-label="Toque ou clique para avançar a animação"
+      >
         <div className="terminal-header">
           <div className="separator" style={{
             color: '#007A33',

@@ -52,7 +52,7 @@ PISTAS: ${cluesBar}
 TESTEMUNHAS: ${witnessesBar}
 ACUSAÇÃO: ${attemptText}
 
-https://selenecriminal.netlify.app/`
+http://nexoterminal.netlify.app`
 
   const copyToClipboard = () => {
     navigator.clipboard.writeText(shareText)

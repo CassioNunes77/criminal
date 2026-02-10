@@ -79,7 +79,7 @@ https://selenecriminal.netlify.app/`
             PISTAS USADAS: {state.cluesDiscovered}
           </div>
           <div className="stat-item">
-            SEQUENCIA: {state.streak} {state.streak === 1 ? 'DIA' : 'DIAS'}
+            TESTEMUNHAS: {witnessesCount}
           </div>
         </div>
 

@@ -31,7 +31,7 @@ function Home({ crime, streak, onStart }) {
       'ARQUIVO DE ACESSO RESTRITO CARREGADO....',
       'ANO 1987.',
       '',
-      'Você é um investigador de uma divisão secreta de inteligência policial, especializado em análise de dados e invasão autorizada de sistemas usados por organizações criminosas.',
+      'Você é um(a) investigador(a) de uma divisão secreta de inteligência policial, especializado(a) em análise de dados e invasão autorizada de sistemas usados por organizações criminosas.',
       '',
       'Seu trabalho acontece dentro de redes fechadas e bancos de dados sigilosos, onde todos os dias um novo caso chega ao seu terminal contendo registros incompletos e pistas fragmentadas.',
       '',
@@ -46,8 +46,9 @@ function Home({ crime, streak, onStart }) {
       'ACESSO CONCEDIDO.',
       'AGUARDANDO PRÓXIMO CASO.'
     ]
-    setAboutLines(allLines)
-    setCurrentLineIndex(allLines.length - 1)
+    const linesNoSpacing = allLines.filter(line => line !== '')
+    setAboutLines(linesNoSpacing)
+    setCurrentLineIndex(linesNoSpacing.length - 1)
     setDots('')
     setAboutComplete(true)
   }
@@ -243,7 +244,7 @@ function Home({ crime, streak, onStart }) {
         'ARQUIVO DE ACESSO RESTRITO CARREGADO....',
         'ANO 1987.',
         '',
-        'Você é um investigador de uma divisão secreta de inteligência policial, especializado em análise de dados e invasão autorizada de sistemas usados por organizações criminosas.',
+        'Você é um(a) investigador(a) de uma divisão secreta de inteligência policial, especializado(a) em análise de dados e invasão autorizada de sistemas usados por organizações criminosas.',
         '',
         'Seu trabalho acontece dentro de redes fechadas e bancos de dados sigilosos, onde todos os dias um novo caso chega ao seu terminal contendo registros incompletos e pistas fragmentadas.',
         '',

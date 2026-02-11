@@ -101,6 +101,18 @@ http://nexoterminal.netlify.app`
           <div className="accuracy-text">
             {accuracy}% DE PRECISAO
           </div>
+          <button 
+            className="terminal-button highlight"
+            onClick={copyToClipboard}
+            style={{ marginTop: '12px' }}
+          >
+            &gt; COMPARTILHAR RESULTADO
+          </button>
+          {showShare && (
+            <div className="share-feedback">
+              COPIADO PARA AREA DE TRANSFERENCIA!
+            </div>
+          )}
         </div>
 
         <div className="separator">------------------------------------</div>
@@ -117,21 +129,6 @@ http://nexoterminal.netlify.app`
             METODO: <span className="highlight">{crime.solution.method}</span>
           </div>
         </div>
-
-        <div className="separator">------------------------------------</div>
-
-        <button 
-          className="terminal-button highlight"
-          onClick={copyToClipboard}
-        >
-          &gt; COMPARTILHAR RESULTADO
-        </button>
-
-        {showShare && (
-          <div className="share-feedback">
-            COPIADO PARA AREA DE TRANSFERENCIA!
-          </div>
-        )}
 
         <div className="separator">------------------------------------</div>
 

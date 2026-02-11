@@ -336,31 +336,10 @@ function Home({ crime, streak, onStart }) {
         tabIndex={0}
         aria-label="Toque ou clique para avançar a animação"
       >
-        <div className="terminal-header">
-          <div className="separator" style={{
-            color: '#007A33',
-            fontSize: '14px',
-            margin: '12px 0'
-          }}>====================================</div>
-          <div className="title" style={{
-            fontFamily: "'PxPlus IBM VGA8', monospace",
-            fontSize: '32px',
-            padding: '8px 0',
-            color: '#00FF66'
-          }}>
-            SOBRE
-          </div>
-          <div className="separator" style={{
-            color: '#007A33',
-            fontSize: '14px',
-            margin: '12px 0'
-          }}>====================================</div>
-        </div>
-
         <div className="terminal-content" style={{
           lineHeight: '1.8',
           fontSize: '14px',
-          marginTop: '20px'
+          marginTop: '24px'
         }}>
           <div style={{
             whiteSpace: 'pre-wrap',

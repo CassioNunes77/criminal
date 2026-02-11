@@ -66,11 +66,11 @@ function Home({ crime, streak, onStart }) {
     '',
     'OBJETIVO: Identificar o suspeito, o local exato do crime e o metodo utilizado.',
     '',
-    'TENTATIVAS: Voce tem ate 10 acusacoes. Cada erro conta.',
+    'TENTATIVAS: Voce tem ate 3 acusacoes. Cada erro conta.',
     '',
     'PRECISAO: Comeca em 100%. Diminui conforme usa pistas, testemunhas e tentativas.',
     '',
-    'Dica: A descricao do caso sempre esconde uma pista sobre o local.',
+    'Dica: A descricao do caso pode esconder uma pista. Nao precisa entregar o jogo.',
     '',
     'BOA SORTE.'
   ]

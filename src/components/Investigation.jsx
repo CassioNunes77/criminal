@@ -113,6 +113,35 @@ function Investigation({ crime, state, onDiscoverClue, onMakeAccusation, onViewC
     }
   }, [crime.id, crime.type, crime.location])
 
+  // Get available clues that haven't been revealed yet (deve vir antes dos useEffects que usam)
+  const availableClues = crime.clues.filter(clue => !clue.revealed)
+  const revealedClues = crime.clues.filter(clue => clue.revealed)
+  const canDiscoverMore = availableClues.length > 0
+  const maxAttempts = 10
+  const currentAttempts = Math.max(0, Math.min(state.attempts || 0, maxAttempts)) // Ensure valid range
+  const remainingAttempts = Math.max(0, maxAttempts - currentAttempts)
+  const isFailed = remainingAttempts <= 0 && !state.solved
+
+  // Get suspects with records
+  const suspectsWithRecords = crime.suspectsWithRecords || crime.suspects.map(s =>
+    typeof s === 'object' ? s : { name: s, criminalRecord: 'Sem antecedentes' }
+  )
+
+  // Main menu buttons - ordem única para cursor e teclado
+  const mainButtons = [
+    (!showWitnesses && witnessesViewed.length < crime.witnesses.length && !isFailed) && 'witnesses',
+    !showSuspects && 'suspects',
+    'case',
+    (!isFailed && remainingAttempts > 0) && 'accusation',
+    'back'
+  ].filter(Boolean)
+
+  // Itens focáveis: pistas (se houver) + botões do menu. Ordem visual para setas cima/baixo
+  const focusableItems = [
+    ...(canDiscoverMore && !isFailed ? availableClues.map((c, i) => ({ type: 'clue', index: i })) : []),
+    ...mainButtons.map(id => ({ type: 'button', id }))
+  ]
+
   // Clamp selectedFocusIndex quando focusableItems muda
   useEffect(() => {
     const max = Math.max(0, focusableItems.length - 1)
@@ -134,35 +163,6 @@ function Investigation({ crime, state, onDiscoverClue, onMakeAccusation, onViewC
       })
     }
   }, [showWitnesses, witnessesViewed.length, crime.witnesses.length])
-
-  // Get available clues that haven't been revealed yet
-  const availableClues = crime.clues.filter(clue => !clue.revealed)
-  const revealedClues = crime.clues.filter(clue => clue.revealed)
-  const canDiscoverMore = availableClues.length > 0
-  const maxAttempts = 10
-  const currentAttempts = Math.max(0, Math.min(state.attempts || 0, maxAttempts)) // Ensure valid range
-  const remainingAttempts = Math.max(0, maxAttempts - currentAttempts)
-  const isFailed = remainingAttempts <= 0 && !state.solved
-
-  // Get suspects with records
-  const suspectsWithRecords = crime.suspectsWithRecords || crime.suspects.map(s => 
-    typeof s === 'object' ? s : { name: s, criminalRecord: 'Sem antecedentes' }
-  )
-
-  // Main menu buttons - ordem única para cursor e teclado
-  const mainButtons = [
-    (!showWitnesses && witnessesViewed.length < crime.witnesses.length && !isFailed) && 'witnesses',
-    !showSuspects && 'suspects',
-    'case',
-    (!isFailed && remainingAttempts > 0) && 'accusation',
-    'back'
-  ].filter(Boolean)
-
-  // Itens focáveis: pistas (se houver) + botões do menu. Ordem visual para setas cima/baixo
-  const focusableItems = [
-    ...(canDiscoverMore && !isFailed ? availableClues.map((c, i) => ({ type: 'clue', index: i })) : []),
-    ...mainButtons.map(id => ({ type: 'button', id }))
-  ]
 
   const handleDiscoverClue = (clueType) => {
     const clue = crime.clues.find(c => c.type === clueType && !c.revealed)

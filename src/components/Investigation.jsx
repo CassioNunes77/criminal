@@ -386,7 +386,7 @@ function Investigation({ crime, state, onDiscoverClue, onMakeAccusation, onViewC
               <div className="form-label">ESCOLHA QUAL PISTA REVELAR:</div>
               <div className="form-options">
                 {availableClues.map((clue, index) => {
-                  const isSelected = titleAnimationComplete && focusableItems[selectedFocusIndex]?.type === 'clue' && focusableItems[selectedFocusIndex]?.index === index
+                  const isSelected = titleAnimationComplete && !showWitnesses && !showAccusation && focusableItems[selectedFocusIndex]?.type === 'clue' && focusableItems[selectedFocusIndex]?.index === index
                   return (
                     <button
                       key={index}
@@ -437,7 +437,7 @@ function Investigation({ crime, state, onDiscoverClue, onMakeAccusation, onViewC
               onClick={() => setShowWitnesses(true)}
             >
               &gt; VER TESTEMUNHAS
-              {titleAnimationComplete && focusableItems[selectedFocusIndex]?.id === 'witnesses' && (
+              {titleAnimationComplete && !showAccusation && focusableItems[selectedFocusIndex]?.id === 'witnesses' && (
                 <span className="cursor-blink" style={{
                   color: '#00FF66',
                   animation: 'blink 1s step-end infinite',
@@ -455,7 +455,7 @@ function Investigation({ crime, state, onDiscoverClue, onMakeAccusation, onViewC
             <div className="witnesses-list">
               {crime.witnesses.map((witness, index) => {
                 const buttonIdx = witnessButtons.indexOf(index)
-                const isFocused = buttonIdx >= 0 && buttonIdx === selectedWitnessIndex
+                const isFocused = !showAccusation && buttonIdx >= 0 && buttonIdx === selectedWitnessIndex
                 return (
                   <div key={index} className="witness-item">
                     <div className="witness-header">
@@ -501,7 +501,7 @@ function Investigation({ crime, state, onDiscoverClue, onMakeAccusation, onViewC
               onClick={() => setShowSuspects(true)}
             >
               &gt; BANCO DE DADOS DOS SUSPEITOS
-              {titleAnimationComplete && focusableItems[selectedFocusIndex]?.id === 'suspects' && (
+              {titleAnimationComplete && !showWitnesses && !showAccusation && focusableItems[selectedFocusIndex]?.id === 'suspects' && (
                 <span className="cursor-blink" style={{
                   color: '#00FF66',
                   animation: 'blink 1s step-end infinite',
@@ -533,7 +533,7 @@ function Investigation({ crime, state, onDiscoverClue, onMakeAccusation, onViewC
             onClick={onViewCase}
           >
             &gt; CASO
-            {titleAnimationComplete && focusableItems[selectedFocusIndex]?.id === 'case' && (
+            {titleAnimationComplete && !showWitnesses && !showAccusation && focusableItems[selectedFocusIndex]?.id === 'case' && (
               <span className="cursor-blink" style={{
                 color: '#00FF66',
                 animation: 'blink 1s step-end infinite',
@@ -572,7 +572,7 @@ function Investigation({ crime, state, onDiscoverClue, onMakeAccusation, onViewC
             }}
           >
             &gt; FAZER ACUSACAO ({remainingAttempts > 0 ? `${remainingAttempts} TENTATIVA${remainingAttempts !== 1 ? 'S' : ''} RESTANTE${remainingAttempts !== 1 ? 'S' : ''}` : 'ESGOTADAS'})
-            {titleAnimationComplete && focusableItems[selectedFocusIndex]?.id === 'accusation' && (
+            {titleAnimationComplete && !showWitnesses && !showAccusation && focusableItems[selectedFocusIndex]?.id === 'accusation' && (
               <span className="cursor-blink" style={{
                 color: '#00FF66',
                 animation: 'blink 1s step-end infinite',
@@ -719,7 +719,7 @@ function Investigation({ crime, state, onDiscoverClue, onMakeAccusation, onViewC
           onClick={onBack}
         >
           &gt; VOLTAR AO INICIO
-          {titleAnimationComplete && focusableItems[selectedFocusIndex]?.id === 'back' && (
+          {titleAnimationComplete && !showWitnesses && !showAccusation && focusableItems[selectedFocusIndex]?.id === 'back' && (
             <span className="cursor-blink" style={{
               color: '#00FF66',
               animation: 'blink 1s step-end infinite',

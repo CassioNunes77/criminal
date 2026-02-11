@@ -79,6 +79,21 @@ http://nexoterminal.netlify.app`
       </div>
 
       <div className="terminal-content">
+        <div className="solution-section">
+          <div className="section-title">SOLUCAO:</div>
+          <div className="solution-item">
+            SUSPEITO: <span className="highlight">{crime.solution.suspect}</span>
+          </div>
+          <div className="solution-item">
+            LOCAL: <span className="highlight">{crime.solution.location}</span>
+          </div>
+          <div className="solution-item">
+            METODO: <span className="highlight">{crime.solution.method}</span>
+          </div>
+        </div>
+
+        <div className="separator">------------------------------------</div>
+
         <div className="stats-section">
           <div className="stat-item">
             TENTATIVAS: {state.attempts}
@@ -113,21 +128,6 @@ http://nexoterminal.netlify.app`
               COPIADO PARA AREA DE TRANSFERENCIA!
             </div>
           )}
-        </div>
-
-        <div className="separator">------------------------------------</div>
-
-        <div className="solution-section">
-          <div className="section-title">SOLUCAO:</div>
-          <div className="solution-item">
-            SUSPEITO: <span className="highlight">{crime.solution.suspect}</span>
-          </div>
-          <div className="solution-item">
-            LOCAL: <span className="highlight">{crime.solution.location}</span>
-          </div>
-          <div className="solution-item">
-            METODO: <span className="highlight">{crime.solution.method}</span>
-          </div>
         </div>
 
         <div className="separator">------------------------------------</div>

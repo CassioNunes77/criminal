@@ -126,7 +126,7 @@ function Home({ crime, streak, onStart }) {
 
   // CRT monitor glitch effects
   useEffect(() => {
-    if (showAbout || showInfo) return // Don't apply glitches on about/info screen
+    if (showAbout) return // Don't apply glitches on about screen
 
     const glitchInterval = setInterval(() => {
       // Random glitch (flicker) - happens more frequently
@@ -558,7 +558,7 @@ function Home({ crime, streak, onStart }) {
   if (showInfo) {
     return (
       <div 
-        className="home" 
+        className={`home ${crtGlitch ? 'crt-glitch' : ''} ${crtFlicker ? 'crt-flicker' : ''}`}
         style={{
           fontFamily: "'PxPlus IBM VGA8', monospace",
           color: '#00CC55',

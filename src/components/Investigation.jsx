@@ -324,7 +324,7 @@ function Investigation({ crime, state, onDiscoverClue, onMakeAccusation, onViewC
   return (
     <div className="investigation">
       <div className="terminal-header">
-        <div className="separator">====================================</div>
+        <div className="separator separator-full-width">{'░'.repeat(150)}</div>
         <div className="case-title-animated" style={{
           fontFamily: "'PxPlus IBM VGA8', monospace",
           fontSize: '18px',
@@ -345,7 +345,7 @@ function Investigation({ crime, state, onDiscoverClue, onMakeAccusation, onViewC
             {!titleAnimationComplete && titleLine3 && !dateGlitchAnim && <span className="cursor-blink" style={{ animation: 'blink 1s step-end infinite' }}>█</span>}
           </div>
         </div>
-        <div className="separator">====================================</div>
+        <div className="separator separator-full-width">{'░'.repeat(150)}</div>
       </div>
 
       <div className="terminal-content">

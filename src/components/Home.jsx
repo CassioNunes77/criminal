@@ -66,7 +66,7 @@ function Home({ crime, streak, onStart }) {
     '',
     'TESTEMUNHAS: 3 depoimentos. Alguns podem ser falsos. Analise com cuidado.',
     '',
-    'SUSPEITOS: 4 suspeitos com nome e historico criminal. Um e o culpado.',
+    'SUSPEITOS: 4 suspeitos com nome e historico criminal. Um é o culpado.',
     '',
     'OBJETIVO: Identificar o suspeito, o local exato do crime e o metodo utilizado.',
     '',

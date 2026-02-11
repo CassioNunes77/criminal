@@ -102,6 +102,7 @@ function App() {
 
   const discoverClue = () => {
     if (!currentCrime) return
+    if (investigationState.solved) return // Não altera estatísticas se já solucionou
     
     const newState = {
       ...investigationState,
@@ -113,6 +114,12 @@ function App() {
 
   const makeAccusation = (suspect, location, method) => {
     if (!currentCrime) return false
+    
+    // Se já solucionou o caso, não altera estatísticas nem estado; apenas mostra resultado
+    if (investigationState.solved) {
+      setScreen('result')
+      return true
+    }
     
     const maxAttempts = 10
     const currentAttempts = investigationState.attempts + 1

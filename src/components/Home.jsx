@@ -7,11 +7,14 @@ function Home({ crime, streak, onStart }) {
   const [showCursor, setShowCursor] = useState(true)
   const [titleAnimationComplete, setTitleAnimationComplete] = useState(false)
   const [showAbout, setShowAbout] = useState(false)
+  const [showInfo, setShowInfo] = useState(false)
   const [aboutLines, setAboutLines] = useState([])
+  const [infoLines, setInfoLines] = useState([])
   const [currentLineIndex, setCurrentLineIndex] = useState(0)
   const [dots, setDots] = useState('')
   const [aboutComplete, setAboutComplete] = useState(false)
-  const [selectedButton, setSelectedButton] = useState(0) // 0 = iniciar, 1 = sobre
+  const [infoComplete, setInfoComplete] = useState(false)
+  const [selectedButton, setSelectedButton] = useState(0) // 0 = iniciar, 1 = sobre, 2 = info
   const [crtGlitch, setCrtGlitch] = useState(false)
   const [crtFlicker, setCrtFlicker] = useState(false)
   const [crtDistortion, setCrtDistortion] = useState(0)
@@ -47,6 +50,39 @@ function Home({ crime, streak, onStart }) {
     setCurrentLineIndex(allLines.length - 1)
     setDots('')
     setAboutComplete(true)
+  }
+
+  const INFO_LINES = [
+    'REGRAS DO JOGO',
+    '',
+    'Todo dia um novo caso de crime da decada de 80.',
+    '',
+    'PISTAS: Sao 6 tipos. Voce escolhe qual revelar primeiro: Horario, Local, Acesso, Alibi, Comportamento, Evidencia.',
+    '',
+    'TESTEMUNHAS: 3 depoimentos. Alguns podem ser falsos. Analise com cuidado.',
+    '',
+    'SUSPEITOS: 4 suspeitos com nome e historico criminal. Um e o culpado.',
+    '',
+    'OBJETIVO: Identificar o suspeito, o local exato do crime e o metodo utilizado.',
+    '',
+    'TENTATIVAS: Voce tem ate 10 acusacoes. Cada erro conta.',
+    '',
+    'PRECISAO: Comeca em 100%. Diminui conforme usa pistas, testemunhas e tentativas.',
+    '',
+    'Dica: A descricao do caso sempre esconde uma pista sobre o local.',
+    '',
+    'BOA SORTE.'
+  ]
+
+  const completeInfoAnimation = () => {
+    if (infoComplete) return
+    if (window.__cancelInfoAnimation) {
+      window.__cancelInfoAnimation()
+    }
+    setInfoLines(INFO_LINES)
+    setCurrentLineIndex(INFO_LINES.length - 1)
+    setDots('')
+    setInfoComplete(true)
   }
 
   useEffect(() => {
@@ -89,7 +125,7 @@ function Home({ crime, streak, onStart }) {
 
   // CRT monitor glitch effects
   useEffect(() => {
-    if (showAbout) return // Don't apply glitches on about screen
+    if (showAbout || showInfo) return // Don't apply glitches on about/info screen
 
     const glitchInterval = setInterval(() => {
       // Random glitch (flicker) - happens more frequently
@@ -124,21 +160,23 @@ function Home({ crime, streak, onStart }) {
 
   // Keyboard navigation for DOS-style menu
   useEffect(() => {
-    if (showAbout) return // Don't handle navigation when in about screen
+    if (showAbout || showInfo) return // Don't handle navigation when in about/info screen
 
     const handleKeyDown = (e) => {
       if (e.key === 'ArrowDown') {
         e.preventDefault()
-        setSelectedButton(prev => (prev + 1) % 2) // Toggle between 0 and 1
+        setSelectedButton(prev => (prev + 1) % 3)
       } else if (e.key === 'ArrowUp') {
         e.preventDefault()
-        setSelectedButton(prev => (prev - 1 + 2) % 2) // Toggle between 0 and 1
+        setSelectedButton(prev => (prev - 1 + 3) % 3)
       } else if (e.key === 'Enter') {
         e.preventDefault()
         if (selectedButton === 0) {
           onStart()
-        } else {
+        } else if (selectedButton === 1) {
           setShowAbout(true)
+        } else {
+          setShowInfo(true)
         }
       }
     }
@@ -147,7 +185,7 @@ function Home({ crime, streak, onStart }) {
     return () => {
       window.removeEventListener('keydown', handleKeyDown)
     }
-  }, [showAbout, selectedButton, onStart])
+  }, [showAbout, showInfo, selectedButton, onStart])
 
   useEffect(() => {
     // Initialize typewriter sound
@@ -158,17 +196,25 @@ function Home({ crime, streak, onStart }) {
 
     // Handle Enter key - skip animation if typing, go back if complete
     const handleKeyPress = (e) => {
-      if (showAbout && e.key === 'Enter') {
+      if (e.key === 'Enter') {
         e.preventDefault()
-        if (!aboutComplete) {
-          completeAboutAnimation()
-        } else {
-          setShowAbout(false)
+        if (showAbout) {
+          if (!aboutComplete) {
+            completeAboutAnimation()
+          } else {
+            setShowAbout(false)
+          }
+        } else if (showInfo) {
+          if (!infoComplete) {
+            completeInfoAnimation()
+          } else {
+            setShowInfo(false)
+          }
         }
       }
     }
 
-    if (showAbout) {
+    if (showAbout || showInfo) {
       window.addEventListener('keydown', handleKeyPress)
       return () => {
         window.removeEventListener('keydown', handleKeyPress)
@@ -177,7 +223,7 @@ function Home({ crime, streak, onStart }) {
         }
       }
     }
-  }, [showAbout, aboutComplete])
+  }, [showAbout, showInfo, aboutComplete, infoComplete])
 
   useEffect(() => {
     // Initialize typewriter sound
@@ -313,6 +359,111 @@ function Home({ crime, streak, onStart }) {
     }
   }, [showAbout])
 
+  // Info screen animation
+  useEffect(() => {
+    if (!typewriterSoundRef.current) {
+      typewriterSoundRef.current = new TypewriterSound()
+      typewriterSoundRef.current.init()
+    }
+
+    if (showInfo) {
+      setInfoLines([])
+      setCurrentLineIndex(0)
+      setDots('')
+      setInfoComplete(false)
+
+      const lines = INFO_LINES
+      let lineIndex = 0
+      let charIndex = 0
+      let dotsCount = 0
+      let timeoutId = null
+      let isCancelled = false
+
+      const showDots = () => {
+        if (isCancelled || infoComplete) return
+        if (dotsCount < 3) {
+          setDots('.'.repeat(dotsCount + 1))
+          dotsCount++
+          timeoutId = setTimeout(showDots, 300)
+        } else {
+          setDots('')
+          dotsCount = 0
+          lineIndex++
+          if (lineIndex < lines.length) {
+            setCurrentLineIndex(lineIndex)
+            charIndex = 0
+            timeoutId = setTimeout(typeLine, 50)
+          } else {
+            setInfoComplete(true)
+          }
+        }
+      }
+
+      const typeLine = () => {
+        if (isCancelled || infoComplete) return
+        if (lineIndex >= lines.length) {
+          setInfoComplete(true)
+          return
+        }
+        const currentLine = lines[lineIndex]
+        if (currentLine === '') {
+          timeoutId = setTimeout(showDots, 200)
+          return
+        }
+        if (charIndex < currentLine.length) {
+          if (currentLine[charIndex] !== ' ') {
+            typewriterSoundRef.current?.play()
+          }
+          setInfoLines(prev => {
+            const newLines = [...prev]
+            if (!newLines[lineIndex]) newLines[lineIndex] = ''
+            newLines[lineIndex] = currentLine.slice(0, charIndex + 1)
+            return newLines
+          })
+          charIndex++
+          timeoutId = setTimeout(typeLine, 20)
+        } else {
+          if (lineIndex < lines.length - 1) {
+            timeoutId = setTimeout(showDots, 300)
+          } else {
+            setInfoComplete(true)
+          }
+        }
+      }
+
+      typingTimeoutRef.current = setTimeout(() => {
+        if (!isCancelled) {
+          setCurrentLineIndex(0)
+          typeLine()
+        }
+      }, 500)
+
+      const cancelAnimation = () => {
+        isCancelled = true
+        if (typingTimeoutRef.current) {
+          clearTimeout(typingTimeoutRef.current)
+          typingTimeoutRef.current = null
+        }
+        if (timeoutId) {
+          clearTimeout(timeoutId)
+          timeoutId = null
+        }
+      }
+
+      window.__cancelInfoAnimation = cancelAnimation
+
+      return () => {
+        cancelAnimation()
+        delete window.__cancelInfoAnimation
+      }
+    } else {
+      setInfoLines([])
+      setCurrentLineIndex(0)
+      setDots('')
+      setInfoComplete(false)
+    }
+  }, [showInfo])
+
   const formatDate = () => {
     const today = new Date()
     const day = String(today.getDate()).padStart(2, '0')
@@ -371,6 +522,89 @@ function Home({ crime, streak, onStart }) {
               <button 
                 className="terminal-button" 
                 onClick={() => setShowAbout(false)}
+                style={{
+                  background: 'none',
+                  border: 'none',
+                  color: '#00FF66',
+                  fontFamily: "'PxPlus IBM VGA8', monospace",
+                  fontSize: '16px',
+                  cursor: 'pointer',
+                  padding: '8px 0',
+                  margin: '24px 0 8px 0',
+                  textAlign: 'left',
+                  width: '100%',
+                  transition: 'color 0.2s ease',
+                  display: 'flex',
+                  alignItems: 'center'
+                }}
+                onMouseEnter={(e) => e.target.style.color = '#00FF66'}
+                onMouseLeave={(e) => e.target.style.color = '#00CC55'}
+              >
+                &gt; VOLTAR
+                <span className="cursor-blink" style={{
+                  color: '#00FF66',
+                  animation: 'blink 1s step-end infinite',
+                  marginLeft: '4px'
+                }}>█</span>
+              </button>
+            )}
+          </div>
+        </div>
+      </div>
+    )
+  }
+
+  if (showInfo) {
+    return (
+      <div 
+        className="home" 
+        style={{
+          fontFamily: "'PxPlus IBM VGA8', monospace",
+          color: '#00CC55',
+          background: '#020403',
+          cursor: 'pointer',
+          minHeight: '100vh'
+        }}
+        onClick={completeInfoAnimation}
+        role="button"
+        tabIndex={0}
+        aria-label="Toque ou clique para avançar a animação"
+      >
+        <div className="terminal-content" style={{
+          lineHeight: '1.8',
+          fontSize: '14px',
+          marginTop: '24px'
+        }}>
+          <div style={{
+            whiteSpace: 'pre-wrap',
+            wordWrap: 'break-word',
+            color: '#00CC55',
+            fontFamily: "'PxPlus IBM VGA8', monospace",
+            minHeight: '200px',
+            lineHeight: '1.8'
+          }}>
+            {infoLines.map((line, index) => (
+              <div key={index} style={{ 
+                marginBottom: line === '' ? '12px' : '4px',
+                minHeight: line === '' ? '12px' : 'auto'
+              }}>
+                {line}
+                {index === currentLineIndex && !infoComplete && !dots && (
+                  <span className="cursor-blink" style={{
+                    color: '#00FF66',
+                    animation: 'blink 1s step-end infinite',
+                    marginLeft: '2px'
+                  }}>█</span>
+                )}
+              </div>
+            ))}
+            {dots && (
+              <span style={{ color: '#00CC55' }}>{dots}</span>
+            )}
+            {infoComplete && (
+              <button 
+                className="terminal-button" 
+                onClick={() => setShowInfo(false)}
                 style={{
                   background: 'none',
                   border: 'none',
@@ -508,6 +742,42 @@ function Home({ crime, streak, onStart }) {
         >
           &gt; SOBRE
           {selectedButton === 1 && titleAnimationComplete && (
+            <span className="cursor-blink" style={{
+              color: '#00FF66',
+              animation: 'blink 1s step-end infinite',
+              marginLeft: '4px'
+            }}>█</span>
+          )}
+        </button>
+
+        <button 
+          className="terminal-button" 
+          onClick={() => setShowInfo(true)}
+          style={{
+            background: 'none',
+            border: 'none',
+            color: selectedButton === 2 ? '#00FF66' : '#00CC55',
+            fontFamily: "'PxPlus IBM VGA8', monospace",
+            fontSize: '16px',
+            cursor: 'pointer',
+            padding: '8px 0',
+            margin: '8px 0',
+            textAlign: 'left',
+            width: '100%',
+            transition: 'color 0.2s ease',
+            display: 'flex',
+            alignItems: 'center'
+          }}
+          onMouseEnter={(e) => {
+            if (selectedButton !== 2) e.target.style.color = '#00FF66'
+            setSelectedButton(2)
+          }}
+          onMouseLeave={(e) => {
+            if (selectedButton !== 2) e.target.style.color = '#00CC55'
+          }}
+        >
+          &gt; INFO
+          {selectedButton === 2 && titleAnimationComplete && (
             <span className="cursor-blink" style={{
               color: '#00FF66',
               animation: 'blink 1s step-end infinite',

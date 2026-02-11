@@ -80,8 +80,9 @@ function Home({ crime, streak, onStart }) {
     if (window.__cancelInfoAnimation) {
       window.__cancelInfoAnimation()
     }
-    setInfoLines(INFO_LINES)
-    setCurrentLineIndex(INFO_LINES.length - 1)
+    const linesNoSpacing = INFO_LINES.filter(line => line !== '')
+    setInfoLines(linesNoSpacing)
+    setCurrentLineIndex(linesNoSpacing.length - 1)
     setDots('')
     setInfoComplete(true)
   }

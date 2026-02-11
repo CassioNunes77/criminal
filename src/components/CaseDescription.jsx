@@ -127,8 +127,8 @@ function CaseDescription({ crime, onAccept, onBack }) {
         window.__cancelCaseAnimation()
       }
       
-      // Show all text immediately
-      const allLines = crime.description || []
+      // Show all text immediately, sem espaçamentos ao pular
+      const allLines = (crime.description || []).filter(line => line !== '')
       setDescriptionLines(allLines)
       setCurrentLineIndex(allLines.length - 1)
       setDots('')

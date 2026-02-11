@@ -254,22 +254,22 @@ function Investigation({ crime, state, onDiscoverClue, onMakeAccusation, onViewC
         <div className="separator">====================================</div>
         <div className="case-title-animated" style={{
           fontFamily: "'PxPlus IBM VGA8', monospace",
-          fontSize: '28px',
+          fontSize: '18px',
           padding: '8px 0',
           color: '#00FF66',
           lineHeight: 1.6
         }}>
           <div>
             {titleLine1}
-            {titleLine2 === '' && titleLine1 && <span className="cursor-blink" style={{ animation: 'blink 1s step-end infinite' }}>█</span>}
+            {!titleAnimationComplete && titleLine2 === '' && titleLine1 && <span className="cursor-blink" style={{ animation: 'blink 1s step-end infinite' }}>█</span>}
           </div>
           <div>
             {titleLine2}
-            {titleLine2 && titleLine3 === '' && <span className="cursor-blink" style={{ animation: 'blink 1s step-end infinite' }}>█</span>}
+            {!titleAnimationComplete && titleLine2 && titleLine3 === '' && <span className="cursor-blink" style={{ animation: 'blink 1s step-end infinite' }}>█</span>}
           </div>
           <div className={dateGlitchAnim ? 'date-glitch' : ''}>
             {titleLine3}
-            {titleLine3 && !dateGlitchAnim && <span className="cursor-blink" style={{ animation: 'blink 1s step-end infinite' }}>█</span>}
+            {!titleAnimationComplete && titleLine3 && !dateGlitchAnim && <span className="cursor-blink" style={{ animation: 'blink 1s step-end infinite' }}>█</span>}
           </div>
         </div>
         <div className="separator">====================================</div>

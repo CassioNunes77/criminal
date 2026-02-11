@@ -72,9 +72,7 @@ function Home({ crime, streak, onStart }) {
     '',
     'PRECISAO: Comeca em 100%. Diminui conforme usa pistas, testemunhas e tentativas.',
     '',
-    'Dica: A descricao do caso pode esconder uma pista. Nao precisa entregar o jogo.',
-    '',
-    'BOA SORTE.'
+    'BOM TRABALHO, AGENTE.'
   ]
 
   const completeInfoAnimation = () => {

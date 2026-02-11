@@ -58,7 +58,7 @@ function Home({ crime, streak, onStart }) {
     '',
     'INFORMATIVO',
     '',
-    'Todo dia um novo caso de crime da decada de 80.',
+    'Todo dia voce sera responsavel por investigar um novo caso da decada de 80.',
     '',
     'PISTAS: Sao 6 tipos. Voce escolhe qual revelar primeiro: Horario, Local, Acesso, Alibi, Comportamento, Evidencia.',
     '',
@@ -651,12 +651,12 @@ function Home({ crime, streak, onStart }) {
       }}
     >
       <div className="terminal-header">
-        <div className="separator" style={{
+        <div className="separator separator-full-width" style={{
           color: '#007A33',
           fontSize: '14px',
           margin: '12px 0',
           fontFamily: "'PxPlus IBM VGA8', monospace"
-        }}>====================================</div>
+        }}>{'░'.repeat(150)}</div>
         <div className="title terminal-text" style={{
           fontFamily: "'PxPlus IBM VGA8', monospace",
           fontSize: '32px',
@@ -669,12 +669,12 @@ function Home({ crime, streak, onStart }) {
             animation: 'blink 1s step-end infinite'
           }}>█</span>}
         </div>
-        <div className="separator" style={{
+        <div className="separator separator-full-width" style={{
           color: '#007A33',
           fontSize: '14px',
           margin: '12px 0',
           fontFamily: "'PxPlus IBM VGA8', monospace"
-        }}>====================================</div>
+        }}>{'░'.repeat(150)}</div>
       </div>
 
       <div className="terminal-content" style={{

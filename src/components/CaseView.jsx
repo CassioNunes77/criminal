@@ -29,6 +29,11 @@ function CaseView({ crime, onBack }) {
       background: '#020403'
     }}>
       <div className="terminal-header">
+        <div className="separator separator-full-width" style={{
+          color: '#007A33',
+          fontSize: '14px',
+          margin: '12px 0'
+        }}>{'░'.repeat(150)}</div>
         <div className="title" style={{
           fontFamily: "'PxPlus IBM VGA8', monospace",
           fontSize: '32px',
@@ -37,6 +42,11 @@ function CaseView({ crime, onBack }) {
         }}>
           CASO
         </div>
+        <div className="separator separator-full-width" style={{
+          color: '#007A33',
+          fontSize: '14px',
+          margin: '12px 0'
+        }}>{'░'.repeat(150)}</div>
       </div>
 
       <div className="terminal-content" style={{

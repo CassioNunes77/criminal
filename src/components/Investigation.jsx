@@ -318,7 +318,7 @@ function Investigation({ crime, state, onDiscoverClue, onMakeAccusation, onViewC
                     className="option-button"
                     onClick={() => handleDiscoverClue(clue.type)}
                   >
-                    &gt; {clue.type}
+                    &gt; {clue.type}..
                   </button>
                 ))}
               </div>
@@ -330,7 +330,7 @@ function Investigation({ crime, state, onDiscoverClue, onMakeAccusation, onViewC
               <div className="section-title">PISTAS REVELADAS:</div>
               {revealedClues.map((clue, index) => (
                 <div key={index} className="clue-item">
-                  <span className="clue-text">{clue.text}</span>
+                  <span className="clue-text">[{clue.type}]: {clue.text}</span>
                 </div>
               ))}
             </div>

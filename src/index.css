@@ -23,6 +23,7 @@
 
 html {
   background: #020403;
+  touch-action: manipulation; /* evita double-tap zoom */
 }
 
 body {
@@ -35,6 +36,7 @@ body {
   position: relative;
   margin: 0;
   padding: 0;
+  touch-action: manipulation;
 }
 
 body::before {
@@ -106,21 +108,18 @@ body::before {
   animation: flash 120ms ease-in-out;
 }
 
-/* Scrollbar styling */
-::-webkit-scrollbar {
-  width: 8px;
+/* Esconder barra de rolagem em todas as telas (scroll continua funcionando) */
+html,
+body,
+* {
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* IE, Edge */
 }
 
-::-webkit-scrollbar-track {
-  background: var(--bg-primary);
-}
-
-::-webkit-scrollbar-thumb {
-  background: var(--text-secondary);
-}
-
-::-webkit-scrollbar-thumb:hover {
-  background: var(--text-primary);
+html::-webkit-scrollbar,
+body::-webkit-scrollbar,
+*::-webkit-scrollbar {
+  display: none; /* Chrome, Safari, Edge */
 }
 
 /* Desktop alignment - left align all elements */

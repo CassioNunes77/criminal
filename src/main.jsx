@@ -4,6 +4,12 @@ import App from './App.jsx'
 import ErrorBoundary from './components/ErrorBoundary.jsx'
 import './index.css'
 
+// Bloquear zoom (Ctrl+scroll, pinch) em todas as telas
+document.addEventListener('wheel', (e) => { if (e.ctrlKey) e.preventDefault() }, { passive: false })
+document.addEventListener('gesturestart', (e) => e.preventDefault())
+document.addEventListener('gesturechange', (e) => e.preventDefault())
+document.addEventListener('gestureend', (e) => e.preventDefault())
+
 const rootElement = document.getElementById('root')
 
 if (!rootElement) {

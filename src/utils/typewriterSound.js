@@ -85,4 +85,31 @@ export class TypewriterSound {
   stop() {
     // Sound is very short, no need to stop
   }
+
+  playGlitch() {
+    if (!this.isEnabled || !this.audioContext) return
+
+    try {
+      const oscillator = this.audioContext.createOscillator()
+      const gainNode = this.audioContext.createGain()
+
+      oscillator.connect(gainNode)
+      gainNode.connect(this.audioContext.destination)
+
+      oscillator.type = 'sawtooth'
+      oscillator.frequency.setValueAtTime(120, this.audioContext.currentTime)
+      oscillator.frequency.exponentialRampToValueAtTime(80, this.audioContext.currentTime + 0.04)
+
+      gainNode.gain.setValueAtTime(0, this.audioContext.currentTime)
+      gainNode.gain.linearRampToValueAtTime(0.015, this.audioContext.currentTime + 0.005)
+      gainNode.gain.exponentialRampToValueAtTime(0.001, this.audioContext.currentTime + 0.08)
+
+      oscillator.start(this.audioContext.currentTime)
+      oscillator.stop(this.audioContext.currentTime + 0.08)
+    } catch (e) {
+      if (e.name !== 'InvalidStateError') {
+        console.warn('Error playing glitch sound:', e)
+      }
+    }
+  }
 }

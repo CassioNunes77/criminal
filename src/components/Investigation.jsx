@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from 'react'
 import { TypewriterSound } from '../utils/typewriterSound'
+import CaseView from './CaseView'
 import './Investigation.css'
 
 function Investigation({ crime, state, onDiscoverClue, onMakeAccusation, onViewCase, onBack, onViewResult }) {
@@ -12,13 +13,14 @@ function Investigation({ crime, state, onDiscoverClue, onMakeAccusation, onViewC
   const [showWitnesses, setShowWitnesses] = useState(false)
   const [witnessesViewed, setWitnessesViewed] = useState([])
   const [showSuspects, setShowSuspects] = useState(false)
-  const [selectedButtonIndex, setSelectedButtonIndex] = useState(0)
+  const [showCaseView, setShowCaseView] = useState(false)
+  const [selectedFocusIndex, setSelectedFocusIndex] = useState(0)
   const [selectedClueIndex, setSelectedClueIndex] = useState(0)
   const [selectedWitnessIndex, setSelectedWitnessIndex] = useState(0)
   const [selectedSuspectIndex, setSelectedSuspectIndex] = useState(0)
   const [selectedLocationIndex, setSelectedLocationIndex] = useState(0)
   const [selectedMethodIndex, setSelectedMethodIndex] = useState(0)
-  const [currentSection, setCurrentSection] = useState('main') // main, clues, witnesses, suspects, accusation
+  const [accusationFocusIndex, setAccusationFocusIndex] = useState(0)
 
   // Title animation state (typewriter like Home screen)
   const [titleLine1, setTitleLine1] = useState('')
@@ -91,6 +93,7 @@ function Investigation({ crime, state, onDiscoverClue, onMakeAccusation, onViewC
         } else {
           // Wait 1 second, then glitch to 1987
           timeoutId = setTimeout(() => {
+            typewriterSoundRef.current?.playGlitch?.()
             setDateGlitchAnim(true)
             setTimeout(() => {
               setTitleLine3(line3Glitched)
@@ -110,6 +113,28 @@ function Investigation({ crime, state, onDiscoverClue, onMakeAccusation, onViewC
     }
   }, [crime.id, crime.type, crime.location])
 
+  // Clamp selectedFocusIndex quando focusableItems muda
+  useEffect(() => {
+    const max = Math.max(0, focusableItems.length - 1)
+    setSelectedFocusIndex(prev => (prev > max ? max : prev))
+  }, [focusableItems.length])
+
+  // Reset accusationFocusIndex ao abrir formulário de acusação
+  useEffect(() => {
+    if (showAccusation) setAccusationFocusIndex(0)
+  }, [showAccusation])
+
+  // Reset e clamp selectedWitnessIndex para testemunhas
+  useEffect(() => {
+    if (showWitnesses) {
+      const count = crime.witnesses.filter((_, i) => !witnessesViewed.includes(i)).length
+      setSelectedWitnessIndex(prev => {
+        if (count === 0) return 0
+        return Math.min(prev, count - 1)
+      })
+    }
+  }, [showWitnesses, witnessesViewed.length, crime.witnesses.length])
+
   // Get available clues that haven't been revealed yet
   const availableClues = crime.clues.filter(clue => !clue.revealed)
   const revealedClues = crime.clues.filter(clue => clue.revealed)
@@ -123,6 +148,21 @@ function Investigation({ crime, state, onDiscoverClue, onMakeAccusation, onViewC
   const suspectsWithRecords = crime.suspectsWithRecords || crime.suspects.map(s => 
     typeof s === 'object' ? s : { name: s, criminalRecord: 'Sem antecedentes' }
   )
+
+  // Main menu buttons - ordem única para cursor e teclado
+  const mainButtons = [
+    (!showWitnesses && witnessesViewed.length < crime.witnesses.length && !isFailed) && 'witnesses',
+    !showSuspects && 'suspects',
+    'case',
+    (!isFailed && remainingAttempts > 0) && 'accusation',
+    'back'
+  ].filter(Boolean)
+
+  // Itens focáveis: pistas (se houver) + botões do menu. Ordem visual para setas cima/baixo
+  const focusableItems = [
+    ...(canDiscoverMore && !isFailed ? availableClues.map((c, i) => ({ type: 'clue', index: i })) : []),
+    ...mainButtons.map(id => ({ type: 'button', id }))
+  ]
 
   const handleDiscoverClue = (clueType) => {
     const clue = crime.clues.find(c => c.type === clueType && !c.revealed)
@@ -199,43 +239,76 @@ function Investigation({ crime, state, onDiscoverClue, onMakeAccusation, onViewC
   useEffect(() => {
     const handleKeyPress = (e) => {
       if (showAccusation) {
-        // Navigation within accusation form
-        if (e.key === 'Enter') {
+        const accItems = [
+          ...suspectsWithRecords.map(s => ({ type: 'suspect', value: s.name })),
+          ...crime.locations.map(l => ({ type: 'location', value: l })),
+          ...crime.methods.map(m => ({ type: 'method', value: m })),
+          { type: 'confirm' },
+          { type: 'cancel' }
+        ]
+        if (e.key === 'ArrowDown') {
           e.preventDefault()
-          if (selectedSuspect && selectedLocation && selectedMethod && remainingAttempts > 0) {
-            handleAccusation()
-          }
+          setAccusationFocusIndex(prev => Math.min(prev + 1, accItems.length - 1))
+        } else if (e.key === 'ArrowUp') {
+          e.preventDefault()
+          setAccusationFocusIndex(prev => Math.max(prev - 1, 0))
+        } else if (e.key === 'Enter') {
+          e.preventDefault()
+          const item = accItems[accusationFocusIndex]
+          if (item.type === 'suspect') setSelectedSuspect(item.value)
+          else if (item.type === 'location') setSelectedLocation(item.value)
+          else if (item.type === 'method') setSelectedMethod(item.value)
+          else if (item.type === 'confirm' && selectedSuspect && selectedLocation && selectedMethod && remainingAttempts > 0) handleAccusation()
+          else if (item.type === 'cancel') setShowAccusation(false)
         } else if (e.key === 'Escape') {
           e.preventDefault()
           setShowAccusation(false)
         }
-      } else {
-        // Main navigation - simple up/down for main buttons
-        const mainButtons = []
-        if (!showWitnesses && witnessesViewed.length < crime.witnesses.length && !isFailed) mainButtons.push('witnesses')
-        if (!showSuspects) mainButtons.push('suspects')
-        mainButtons.push('case')
-        if (!isFailed && remainingAttempts > 0) mainButtons.push('accusation')
-        mainButtons.push('back')
-
+      } else if (showWitnesses) {
+        const witnessButtons = crime.witnesses
+          .map((_, i) => i)
+          .filter(i => !witnessesViewed.includes(i))
         if (e.key === 'ArrowDown') {
           e.preventDefault()
-          setSelectedButtonIndex(prev => Math.min(prev + 1, mainButtons.length - 1))
+          setSelectedWitnessIndex(prev => Math.min(prev + 1, witnessButtons.length - 1))
         } else if (e.key === 'ArrowUp') {
           e.preventDefault()
-          setSelectedButtonIndex(prev => Math.max(prev - 1, 0))
+          setSelectedWitnessIndex(prev => Math.max(prev - 1, 0))
+        } else if (e.key === 'Enter' && witnessButtons[selectedWitnessIndex] !== undefined) {
+          e.preventDefault()
+          handleViewWitness(witnessButtons[selectedWitnessIndex])
+        } else if (e.key === 'Escape') {
+          e.preventDefault()
+          setShowWitnesses(false)
+        }
+      } else if (showSuspects) {
+        if (e.key === 'Escape') {
+          e.preventDefault()
+          setShowSuspects(false)
+        }
+      } else {
+        // Navegação por setas: pula entre itens focáveis (pistas + botões)
+        if (e.key === 'ArrowDown') {
+          e.preventDefault()
+          setSelectedFocusIndex(prev => Math.min(prev + 1, focusableItems.length - 1))
+        } else if (e.key === 'ArrowUp') {
+          e.preventDefault()
+          setSelectedFocusIndex(prev => Math.max(prev - 1, 0))
         } else if (e.key === 'Enter') {
           e.preventDefault()
-          const action = mainButtons[selectedButtonIndex]
-          if (action === 'case') {
+          const item = focusableItems[selectedFocusIndex]
+          if (!item) return
+          if (item.type === 'clue') {
+            handleDiscoverClue(availableClues[item.index].type)
+          } else if (item.id === 'case') {
             onViewCase()
-          } else if (action === 'accusation' && remainingAttempts > 0) {
+          } else if (item.id === 'accusation' && remainingAttempts > 0) {
             setShowAccusation(true)
-          } else if (action === 'witnesses') {
+          } else if (item.id === 'witnesses') {
             setShowWitnesses(true)
-          } else if (action === 'suspects') {
+          } else if (item.id === 'suspects') {
             setShowSuspects(true)
-          } else if (action === 'back') {
+          } else if (item.id === 'back') {
             onBack()
           }
         }
@@ -246,7 +319,7 @@ function Investigation({ crime, state, onDiscoverClue, onMakeAccusation, onViewC
     return () => {
       window.removeEventListener('keydown', handleKeyPress)
     }
-  }, [showAccusation, selectedSuspect, selectedLocation, selectedMethod, canDiscoverMore, showWitnesses, showSuspects, isFailed, remainingAttempts, witnessesViewed.length, crime.witnesses.length, selectedButtonIndex, handleAccusation, onViewCase, onBack])
+  }, [showAccusation, accusationFocusIndex, selectedSuspect, selectedLocation, selectedMethod, selectedWitnessIndex, suspectsWithRecords, crime, canDiscoverMore, showWitnesses, showSuspects, isFailed, remainingAttempts, witnessesViewed, selectedFocusIndex, focusableItems, availableClues, handleAccusation, handleViewWitness, onViewCase, onBack])
 
   return (
     <div className="investigation">
@@ -312,15 +385,25 @@ function Investigation({ crime, state, onDiscoverClue, onMakeAccusation, onViewC
             <div className="clue-selection">
               <div className="form-label">ESCOLHA QUAL PISTA REVELAR:</div>
               <div className="form-options">
-                {availableClues.map((clue, index) => (
-                  <button
-                    key={index}
-                    className="option-button"
-                    onClick={() => handleDiscoverClue(clue.type)}
-                  >
-                    &gt; {clue.type}..
-                  </button>
-                ))}
+                {availableClues.map((clue, index) => {
+                  const isSelected = titleAnimationComplete && focusableItems[selectedFocusIndex]?.type === 'clue' && focusableItems[selectedFocusIndex]?.index === index
+                  return (
+                    <button
+                      key={index}
+                      className={`option-button ${isSelected ? 'selected' : ''}`}
+                      onClick={() => handleDiscoverClue(clue.type)}
+                    >
+                      &gt; {clue.type}..
+                      {isSelected && (
+                        <span className="cursor-blink" style={{
+                          color: '#00FF66',
+                          animation: 'blink 1s step-end infinite',
+                          marginLeft: '4px'
+                        }}>█</span>
+                      )}
+                    </button>
+                  )
+                })}
               </div>
             </div>
           )}
@@ -354,13 +437,7 @@ function Investigation({ crime, state, onDiscoverClue, onMakeAccusation, onViewC
               onClick={() => setShowWitnesses(true)}
             >
               &gt; VER TESTEMUNHAS
-              {(() => {
-                const mainButtons = []
-                if (!showWitnesses && witnessesViewed.length < crime.witnesses.length && !isFailed) mainButtons.push('witnesses')
-                if (!showSuspects) mainButtons.push('suspects')
-                if (!isFailed && remainingAttempts > 0) mainButtons.push('accusation')
-                return mainButtons.indexOf('witnesses') === selectedButtonIndex
-              })() && (
+              {titleAnimationComplete && focusableItems[selectedFocusIndex]?.id === 'witnesses' && (
                 <span className="cursor-blink" style={{
                   color: '#00FF66',
                   animation: 'blink 1s step-end infinite',
@@ -370,32 +447,48 @@ function Investigation({ crime, state, onDiscoverClue, onMakeAccusation, onViewC
             </button>
           )}
 
-          {showWitnesses && (
+          {showWitnesses && (() => {
+            const witnessButtons = crime.witnesses
+              .map((_, i) => i)
+              .filter(i => !witnessesViewed.includes(i))
+            return (
             <div className="witnesses-list">
-              {crime.witnesses.map((witness, index) => (
-                <div key={index} className="witness-item">
-                  <div className="witness-header">
-                    <span className="witness-name">{witness.name}</span>
-                    {witnessesViewed.includes(index) && (
-                      <span className={`witness-status ${witness.isTruthful ? 'truthful' : 'false'}`}>
-                        {witness.isTruthful ? '[VERDADEIRA]' : '[PODE SER FALSA]'}
-                      </span>
+              {crime.witnesses.map((witness, index) => {
+                const buttonIdx = witnessButtons.indexOf(index)
+                const isFocused = buttonIdx >= 0 && buttonIdx === selectedWitnessIndex
+                return (
+                  <div key={index} className="witness-item">
+                    <div className="witness-header">
+                      <span className="witness-name">{witness.name}</span>
+                      {witnessesViewed.includes(index) && (
+                        <span className={`witness-status ${witness.isTruthful ? 'truthful' : 'false'}`}>
+                          {witness.isTruthful ? '[VERDADEIRA]' : '[PODE SER FALSA]'}
+                        </span>
+                      )}
+                    </div>
+                    {witnessesViewed.includes(index) ? (
+                      <div className="witness-statement">{witness.statement}</div>
+                    ) : (
+                      <button
+                        className={`option-button ${isFocused ? 'selected' : ''}`}
+                        onClick={() => handleViewWitness(index)}
+                      >
+                        &gt; VER DEPOIMENTO
+                        {isFocused && (
+                          <span className="cursor-blink" style={{
+                            color: '#00FF66',
+                            animation: 'blink 1s step-end infinite',
+                            marginLeft: '4px'
+                          }}>█</span>
+                        )}
+                      </button>
                     )}
                   </div>
-                  {witnessesViewed.includes(index) ? (
-                    <div className="witness-statement">{witness.statement}</div>
-                  ) : (
-                    <button
-                      className="option-button"
-                      onClick={() => handleViewWitness(index)}
-                    >
-                      &gt; VER DEPOIMENTO
-                    </button>
-                  )}
-                </div>
-              ))}
+                )
+              })}
             </div>
-          )}
+            )
+          })()}
         </div>
 
         <div className="separator">------------------------------------</div>
@@ -408,14 +501,7 @@ function Investigation({ crime, state, onDiscoverClue, onMakeAccusation, onViewC
               onClick={() => setShowSuspects(true)}
             >
               &gt; BANCO DE DADOS DOS SUSPEITOS
-              {(() => {
-                const mainButtons = []
-                if (!showWitnesses && witnessesViewed.length < crime.witnesses.length && !isFailed) mainButtons.push('witnesses')
-                if (!showSuspects) mainButtons.push('suspects')
-                mainButtons.push('case')
-                if (!isFailed && remainingAttempts > 0) mainButtons.push('accusation')
-                return mainButtons.indexOf('suspects') === selectedButtonIndex
-              })() && (
+              {titleAnimationComplete && focusableItems[selectedFocusIndex]?.id === 'suspects' && (
                 <span className="cursor-blink" style={{
                   color: '#00FF66',
                   animation: 'blink 1s step-end infinite',
@@ -447,14 +533,7 @@ function Investigation({ crime, state, onDiscoverClue, onMakeAccusation, onViewC
             onClick={onViewCase}
           >
             &gt; CASO
-            {(() => {
-              const mainButtons = []
-              if (!showWitnesses && witnessesViewed.length < crime.witnesses.length && !isFailed) mainButtons.push('witnesses')
-              if (!showSuspects) mainButtons.push('suspects')
-              mainButtons.push('case')
-              if (!isFailed && remainingAttempts > 0) mainButtons.push('accusation')
-              return mainButtons.indexOf('case') === selectedButtonIndex
-            })() && (
+            {titleAnimationComplete && focusableItems[selectedFocusIndex]?.id === 'case' && (
               <span className="cursor-blink" style={{
                 color: '#00FF66',
                 animation: 'blink 1s step-end infinite',
@@ -493,13 +572,7 @@ function Investigation({ crime, state, onDiscoverClue, onMakeAccusation, onViewC
             }}
           >
             &gt; FAZER ACUSACAO ({remainingAttempts > 0 ? `${remainingAttempts} TENTATIVA${remainingAttempts !== 1 ? 'S' : ''} RESTANTE${remainingAttempts !== 1 ? 'S' : ''}` : 'ESGOTADAS'})
-            {(() => {
-              const mainButtons = []
-              if (!showWitnesses && witnessesViewed.length < crime.witnesses.length && !isFailed) mainButtons.push('witnesses')
-              if (!showSuspects) mainButtons.push('suspects')
-              if (!isFailed && remainingAttempts > 0) mainButtons.push('accusation')
-              return mainButtons.indexOf('accusation') === selectedButtonIndex
-            })() && (
+            {titleAnimationComplete && focusableItems[selectedFocusIndex]?.id === 'accusation' && (
               <span className="cursor-blink" style={{
                 color: '#00FF66',
                 animation: 'blink 1s step-end infinite',
@@ -508,78 +581,135 @@ function Investigation({ crime, state, onDiscoverClue, onMakeAccusation, onViewC
             )}
           </button>
         ) : showAccusation && !isFailed ? (
-          <div className="accusation-form">
-            <div className="form-group">
-              <div className="form-label">SUSPEITO:</div>
-              <div className="form-options">
-                {suspectsWithRecords.map((suspect) => (
-                  <button
-                    key={suspect.name}
-                    className={`option-button ${selectedSuspect === suspect.name ? 'selected' : ''}`}
-                    onClick={() => setSelectedSuspect(suspect.name)}
-                  >
-                    &gt; {suspect.name}
-                  </button>
-                ))}
+          (() => {
+            const confirmIdx = suspectsWithRecords.length + crime.locations.length + crime.methods.length
+            const cancelIdx = confirmIdx + 1
+            let idx = 0
+            return (
+              <div className="accusation-form">
+                <div className="form-group">
+                  <div className="form-label">SUSPEITO:</div>
+                  <div className="form-options">
+                    {suspectsWithRecords.map((suspect) => {
+                      const curIdx = idx++
+                      const isFocused = accusationFocusIndex === curIdx
+                      return (
+                        <button
+                          key={suspect.name}
+                          className={`option-button ${selectedSuspect === suspect.name ? 'selected' : ''} ${isFocused ? 'focused' : ''}`}
+                          onClick={() => setSelectedSuspect(suspect.name)}
+                        >
+                          &gt; {suspect.name}
+                          {isFocused && (
+                            <span className="cursor-blink" style={{
+                              color: '#00FF66',
+                              animation: 'blink 1s step-end infinite',
+                              marginLeft: '4px'
+                            }}>█</span>
+                          )}
+                        </button>
+                      )
+                    })}
+                  </div>
+                </div>
+
+                <div className="form-group">
+                  <div className="form-label">LOCAL:</div>
+                  <div className="form-options">
+                    {crime.locations.map((location) => {
+                      const curIdx = idx++
+                      const isFocused = accusationFocusIndex === curIdx
+                      return (
+                        <button
+                          key={location}
+                          className={`option-button ${selectedLocation === location ? 'selected' : ''} ${isFocused ? 'focused' : ''}`}
+                          onClick={() => setSelectedLocation(location)}
+                        >
+                          &gt; {location}
+                          {isFocused && (
+                            <span className="cursor-blink" style={{
+                              color: '#00FF66',
+                              animation: 'blink 1s step-end infinite',
+                              marginLeft: '4px'
+                            }}>█</span>
+                          )}
+                        </button>
+                      )
+                    })}
+                  </div>
+                </div>
+
+                <div className="form-group">
+                  <div className="form-label">METODO:</div>
+                  <div className="form-options">
+                    {crime.methods.map((method) => {
+                      const curIdx = idx++
+                      const isFocused = accusationFocusIndex === curIdx
+                      return (
+                        <button
+                          key={method}
+                          className={`option-button ${selectedMethod === method ? 'selected' : ''} ${isFocused ? 'focused' : ''}`}
+                          onClick={() => setSelectedMethod(method)}
+                        >
+                          &gt; {method}
+                          {isFocused && (
+                            <span className="cursor-blink" style={{
+                              color: '#00FF66',
+                              animation: 'blink 1s step-end infinite',
+                              marginLeft: '4px'
+                            }}>█</span>
+                          )}
+                        </button>
+                      )
+                    })}
+                  </div>
+                </div>
+
+                <div className="separator">------------------------------------</div>
+
+                {feedback && (
+                  <div className={`feedback ${feedback.includes('CORRETA') ? 'success' : feedback.includes('PERTO') ? 'warning' : 'error'}`}>
+                    {feedback}
+                  </div>
+                )}
+
+                <button 
+                  className={`terminal-button highlight ${accusationFocusIndex === confirmIdx ? 'focused' : ''}`}
+                  onClick={handleAccusation}
+                  style={{
+                    opacity: remainingAttempts <= 0 ? 0.5 : 1,
+                    cursor: remainingAttempts <= 0 ? 'not-allowed' : 'pointer',
+                    display: 'flex',
+                    alignItems: 'center'
+                  }}
+                >
+                  &gt; CONFIRMAR ACUSACAO
+                  {accusationFocusIndex === confirmIdx && (
+                    <span className="cursor-blink" style={{
+                      color: '#00FF66',
+                      animation: 'blink 1s step-end infinite',
+                      marginLeft: '4px'
+                    }}>█</span>
+                  )}
+                </button>
+
+                <button 
+                  className={`terminal-button secondary ${accusationFocusIndex === cancelIdx ? 'focused' : ''}`}
+                  onClick={() => setShowAccusation(false)}
+                  style={{ display: 'flex', alignItems: 'center' }}
+                >
+                  &gt; CANCELAR
+                  {accusationFocusIndex === cancelIdx && (
+                    <span className="cursor-blink" style={{
+                      color: '#00FF66',
+                      animation: 'blink 1s step-end infinite',
+                      marginLeft: '4px'
+                    }}>█</span>
+                  )}
+                </button>
               </div>
-            </div>
-
-            <div className="form-group">
-              <div className="form-label">LOCAL:</div>
-              <div className="form-options">
-                {crime.locations.map((location) => (
-                  <button
-                    key={location}
-                    className={`option-button ${selectedLocation === location ? 'selected' : ''}`}
-                    onClick={() => setSelectedLocation(location)}
-                  >
-                    &gt; {location}
-                  </button>
-                ))}
-              </div>
-            </div>
-
-            <div className="form-group">
-              <div className="form-label">METODO:</div>
-              <div className="form-options">
-                {crime.methods.map((method) => (
-                  <button
-                    key={method}
-                    className={`option-button ${selectedMethod === method ? 'selected' : ''}`}
-                    onClick={() => setSelectedMethod(method)}
-                  >
-                    &gt; {method}
-                  </button>
-                ))}
-              </div>
-            </div>
-
-            <div className="separator">------------------------------------</div>
-
-            {feedback && (
-              <div className={`feedback ${feedback.includes('CORRETA') ? 'success' : feedback.includes('PERTO') ? 'warning' : 'error'}`}>
-                {feedback}
-              </div>
-            )}
-
-            <button 
-              className="terminal-button highlight"
-              onClick={handleAccusation}
-              style={{
-                opacity: remainingAttempts <= 0 ? 0.5 : 1,
-                cursor: remainingAttempts <= 0 ? 'not-allowed' : 'pointer'
-              }}
-            >
-              &gt; CONFIRMAR ACUSACAO
-            </button>
-
-            <button 
-              className="terminal-button secondary"
-              onClick={() => setShowAccusation(false)}
-            >
-              &gt; CANCELAR
-            </button>
-          </div>
+            )
+          })()
         ) : null}
 
         <div className="separator">------------------------------------</div>
@@ -589,15 +719,7 @@ function Investigation({ crime, state, onDiscoverClue, onMakeAccusation, onViewC
           onClick={onBack}
         >
           &gt; VOLTAR AO INICIO
-          {(() => {
-            const mainButtons = []
-            if (!showWitnesses && witnessesViewed.length < crime.witnesses.length && !isFailed) mainButtons.push('witnesses')
-            if (!showSuspects) mainButtons.push('suspects')
-            mainButtons.push('case')
-            if (!isFailed && remainingAttempts > 0) mainButtons.push('accusation')
-            mainButtons.push('back')
-            return mainButtons.length - 1 === selectedButtonIndex
-          })() && (
+          {titleAnimationComplete && focusableItems[selectedFocusIndex]?.id === 'back' && (
             <span className="cursor-blink" style={{
               color: '#00FF66',
               animation: 'blink 1s step-end infinite',

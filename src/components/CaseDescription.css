@@ -1,3 +1,17 @@
 .case-description {
   font-family: 'IBM Plex Mono', monospace;
 }
+
+/* Separador preenche toda a largura no mobile (edge a edge) */
+.separator-full-width {
+  overflow: hidden;
+  white-space: nowrap;
+}
+
+@media (max-width: 768px) {
+  .case-description .separator-full-width {
+    width: 100vw;
+    margin-left: calc(50% - 50vw);
+    box-sizing: border-box;
+  }
+}

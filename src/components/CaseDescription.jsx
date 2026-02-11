@@ -198,11 +198,11 @@ function CaseDescription({ crime, onAccept, onBack }) {
       }}
     >
       <div className="terminal-header">
-        <div className="separator" style={{
+        <div className="separator separator-full-width" style={{
           color: '#007A33',
           fontSize: '14px',
           margin: '12px 0'
-        }}>░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░</div>
+        }}>{'░'.repeat(150)}</div>
         <div className="title" style={{
           fontFamily: "'PxPlus IBM VGA8', monospace",
           fontSize: '32px',
@@ -211,11 +211,11 @@ function CaseDescription({ crime, onAccept, onBack }) {
         }}>
           NOVA MISSÃO
         </div>
-        <div className="separator" style={{
+        <div className="separator separator-full-width" style={{
           color: '#007A33',
           fontSize: '14px',
           margin: '12px 0'
-        }}>░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░</div>
+        }}>{'░'.repeat(150)}</div>
       </div>
 
       <div 

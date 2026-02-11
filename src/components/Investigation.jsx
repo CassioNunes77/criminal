@@ -1,7 +1,9 @@
 import { useState, useEffect, useRef } from 'react'
+import { TypewriterSound } from '../utils/typewriterSound'
 import './Investigation.css'
 
 function Investigation({ crime, state, onDiscoverClue, onMakeAccusation, onViewCase, onBack, onViewResult }) {
+  const typewriterSoundRef = useRef(null)
   const [showAccusation, setShowAccusation] = useState(false)
   const [selectedSuspect, setSelectedSuspect] = useState(null)
   const [selectedLocation, setSelectedLocation] = useState(null)
@@ -17,6 +19,96 @@ function Investigation({ crime, state, onDiscoverClue, onMakeAccusation, onViewC
   const [selectedLocationIndex, setSelectedLocationIndex] = useState(0)
   const [selectedMethodIndex, setSelectedMethodIndex] = useState(0)
   const [currentSection, setCurrentSection] = useState('main') // main, clues, witnesses, suspects, accusation
+
+  // Title animation state (typewriter like Home screen)
+  const [titleLine1, setTitleLine1] = useState('')
+  const [titleLine2, setTitleLine2] = useState('')
+  const [titleLine3, setTitleLine3] = useState('')
+  const [titleAnimationComplete, setTitleAnimationComplete] = useState(false)
+  const [dateGlitched, setDateGlitched] = useState(false)
+  const [dateGlitchAnim, setDateGlitchAnim] = useState(false)
+
+  // Title animation - typewriter effect like Home screen
+  useEffect(() => {
+    if (!typewriterSoundRef.current) {
+      typewriterSoundRef.current = new TypewriterSound()
+      typewriterSoundRef.current.init()
+    }
+
+    const caseNum = String(crime.id).slice(-3)
+    const line1 = `Caso #${caseNum}`
+    const line2 = `${crime.type} EM ${crime.location}`
+    const today = new Date()
+    const day = String(today.getDate()).padStart(2, '0')
+    const month = String(today.getMonth() + 1).padStart(2, '0')
+    const year = today.getFullYear()
+    const line3Current = `${day}/${month}/${year}`
+    const line3Glitched = `${day}/${month}/1987`
+
+    setTitleLine1('')
+    setTitleLine2('')
+    setTitleLine3('')
+    setTitleAnimationComplete(false)
+    setDateGlitched(false)
+    setDateGlitchAnim(false)
+
+    let phase = 0
+    let charIndex = 0
+    let timeoutId = null
+
+    const typeNext = () => {
+      if (phase === 0) {
+        // Line 1: Caso #XXX
+        if (charIndex < line1.length) {
+          if (line1[charIndex] !== ' ') typewriterSoundRef.current?.play()
+          setTitleLine1(line1.slice(0, charIndex + 1))
+          charIndex++
+          timeoutId = setTimeout(typeNext, 30)
+        } else {
+          phase = 1
+          charIndex = 0
+          timeoutId = setTimeout(typeNext, 400)
+        }
+      } else if (phase === 1) {
+        // Line 2: FURTO EM VIDEOLOCADORA
+        if (charIndex < line2.length) {
+          if (line2[charIndex] !== ' ') typewriterSoundRef.current?.play()
+          setTitleLine2(line2.slice(0, charIndex + 1))
+          charIndex++
+          timeoutId = setTimeout(typeNext, 30)
+        } else {
+          phase = 2
+          charIndex = 0
+          timeoutId = setTimeout(typeNext, 400)
+        }
+      } else if (phase === 2) {
+        // Line 3: date (current)
+        if (charIndex < line3Current.length) {
+          if (line3Current[charIndex] !== '/') typewriterSoundRef.current?.play()
+          setTitleLine3(line3Current.slice(0, charIndex + 1))
+          charIndex++
+          timeoutId = setTimeout(typeNext, 30)
+        } else {
+          // Wait 1 second, then glitch to 1987
+          timeoutId = setTimeout(() => {
+            setDateGlitchAnim(true)
+            setTimeout(() => {
+              setTitleLine3(line3Glitched)
+              setDateGlitched(true)
+              setDateGlitchAnim(false)
+              setTitleAnimationComplete(true)
+            }, 150)
+          }, 1000)
+        }
+      }
+    }
+
+    timeoutId = setTimeout(() => typeNext(), 500)
+
+    return () => {
+      if (timeoutId) clearTimeout(timeoutId)
+    }
+  }, [crime.id, crime.type, crime.location])
 
   // Get available clues that haven't been revealed yet
   const availableClues = crime.clues.filter(clue => !clue.revealed)
@@ -160,7 +252,26 @@ function Investigation({ crime, state, onDiscoverClue, onMakeAccusation, onViewC
     <div className="investigation">
       <div className="terminal-header">
         <div className="separator">====================================</div>
-        <div className="title">CASO #{String(crime.id).slice(-3)}</div>
+        <div className="case-title-animated" style={{
+          fontFamily: "'PxPlus IBM VGA8', monospace",
+          fontSize: '28px',
+          padding: '8px 0',
+          color: '#00FF66',
+          lineHeight: 1.6
+        }}>
+          <div>
+            {titleLine1}
+            {titleLine2 === '' && titleLine1 && <span className="cursor-blink" style={{ animation: 'blink 1s step-end infinite' }}>█</span>}
+          </div>
+          <div>
+            {titleLine2}
+            {titleLine2 && titleLine3 === '' && <span className="cursor-blink" style={{ animation: 'blink 1s step-end infinite' }}>█</span>}
+          </div>
+          <div className={dateGlitchAnim ? 'date-glitch' : ''}>
+            {titleLine3}
+            {titleLine3 && !dateGlitchAnim && <span className="cursor-blink" style={{ animation: 'blink 1s step-end infinite' }}>█</span>}
+          </div>
+        </div>
         <div className="separator">====================================</div>
       </div>
 

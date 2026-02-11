@@ -6,6 +6,20 @@
   text-rendering: optimizeSpeed;
 }
 
+/* Date glitch effect - year 2026 -> 1987 */
+.date-glitch {
+  animation: dateGlitch 0.15s ease-out;
+}
+
+@keyframes dateGlitch {
+  0% { filter: brightness(1); transform: translateX(0); opacity: 1; }
+  20% { filter: brightness(1.6); transform: translateX(-2px); opacity: 0.8; }
+  40% { filter: brightness(0.5); transform: translateX(2px); opacity: 0.9; }
+  60% { filter: brightness(1.4); transform: translateX(-1px); opacity: 0.85; }
+  80% { filter: brightness(0.7); transform: translateX(1px); opacity: 0.95; }
+  100% { filter: brightness(1); transform: translateX(0); opacity: 1; }
+}
+
 .section-title {
   font-size: 16px;
   font-weight: 600;

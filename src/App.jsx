@@ -100,13 +100,28 @@ function App() {
     setScreen('investigation')
   }
 
-  const discoverClue = () => {
+  const viewWitness = (witnessIndex) => {
+    if (!currentCrime) return
+    if (investigationState.solved) return
+    const viewed = investigationState.witnessesViewed || []
+    if (viewed.includes(witnessIndex)) return
+    const newState = {
+      ...investigationState,
+      witnessesViewed: [...viewed, witnessIndex]
+    }
+    setInvestigationState(newState)
+    saveState(newState)
+  }
+
+  const discoverClue = (clueType) => {
     if (!currentCrime) return
     if (investigationState.solved) return // Não altera estatísticas se já solucionou
+    if (investigationState.cluesRevealed?.includes(clueType)) return // Já revelada
     
     const newState = {
       ...investigationState,
-      cluesDiscovered: investigationState.cluesDiscovered + 1
+      cluesDiscovered: investigationState.cluesDiscovered + 1,
+      cluesRevealed: [...(investigationState.cluesRevealed || []), clueType]
     }
     setInvestigationState(newState)
     saveState(newState)
@@ -220,6 +235,7 @@ function App() {
           crime={currentCrime}
           state={investigationState}
           onDiscoverClue={discoverClue}
+          onViewWitness={viewWitness}
           onMakeAccusation={makeAccusation}
           onViewCase={() => setScreen('caseView')}
           onViewResult={() => setScreen('result')}

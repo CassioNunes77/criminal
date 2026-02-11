@@ -3,7 +3,7 @@ import { TypewriterSound } from '../utils/typewriterSound'
 import CaseView from './CaseView'
 import './Investigation.css'
 
-function Investigation({ crime, state, onDiscoverClue, onMakeAccusation, onViewCase, onBack, onViewResult }) {
+function Investigation({ crime, state, onDiscoverClue, onViewWitness, onMakeAccusation, onViewCase, onBack, onViewResult }) {
   const typewriterSoundRef = useRef(null)
   const [showAccusation, setShowAccusation] = useState(false)
   const [selectedSuspect, setSelectedSuspect] = useState(null)
@@ -11,7 +11,7 @@ function Investigation({ crime, state, onDiscoverClue, onMakeAccusation, onViewC
   const [selectedMethod, setSelectedMethod] = useState(null)
   const [feedback, setFeedback] = useState(null)
   const [showWitnesses, setShowWitnesses] = useState(false)
-  const [witnessesViewed, setWitnessesViewed] = useState([])
+  const witnessesViewed = state.witnessesViewed || []
   const [showSuspects, setShowSuspects] = useState(false)
   const [showCaseView, setShowCaseView] = useState(false)
   const [selectedFocusIndex, setSelectedFocusIndex] = useState(0)
@@ -113,9 +113,10 @@ function Investigation({ crime, state, onDiscoverClue, onMakeAccusation, onViewC
     }
   }, [crime.id, crime.type, crime.location])
 
-  // Get available clues that haven't been revealed yet (deve vir antes dos useEffects que usam)
-  const availableClues = crime.clues.filter(clue => !clue.revealed)
-  const revealedClues = crime.clues.filter(clue => clue.revealed)
+  // Get available and revealed clues (usar state.cluesRevealed para re-render correto)
+  const cluesRevealed = state.cluesRevealed || []
+  const availableClues = crime.clues.filter(clue => !cluesRevealed.includes(clue.type))
+  const revealedClues = crime.clues.filter(clue => cluesRevealed.includes(clue.type))
   const canDiscoverMore = availableClues.length > 0
   const maxAttempts = 10
   const currentAttempts = Math.max(0, Math.min(state.attempts || 0, maxAttempts)) // Ensure valid range
@@ -166,17 +167,17 @@ function Investigation({ crime, state, onDiscoverClue, onMakeAccusation, onViewC
 
   const handleDiscoverClue = (clueType) => {
     if (state.solved) return // Não altera quando já solucionou
-    const clue = crime.clues.find(c => c.type === clueType && !c.revealed)
+    if (cluesRevealed.includes(clueType)) return
+    const clue = crime.clues.find(c => c.type === clueType)
     if (clue) {
-      clue.revealed = true
-      onDiscoverClue()
+      onDiscoverClue(clueType)
     }
   }
 
   const handleViewWitness = (witnessIndex) => {
     if (state.solved) return // Não altera quando já solucionou
     if (!witnessesViewed.includes(witnessIndex)) {
-      setWitnessesViewed([...witnessesViewed, witnessIndex])
+      onViewWitness(witnessIndex)
     }
   }
 
@@ -321,7 +322,7 @@ function Investigation({ crime, state, onDiscoverClue, onMakeAccusation, onViewC
     return () => {
       window.removeEventListener('keydown', handleKeyPress)
     }
-  }, [showAccusation, accusationFocusIndex, selectedSuspect, selectedLocation, selectedMethod, selectedWitnessIndex, suspectsWithRecords, crime, canDiscoverMore, showWitnesses, showSuspects, isFailed, remainingAttempts, witnessesViewed, selectedFocusIndex, focusableItems, availableClues, handleAccusation, handleViewWitness, onViewCase, onBack])
+  }, [showAccusation, accusationFocusIndex, selectedSuspect, selectedLocation, selectedMethod, selectedWitnessIndex, suspectsWithRecords, crime, canDiscoverMore, showWitnesses, showSuspects, isFailed, remainingAttempts, witnessesViewed, selectedFocusIndex, focusableItems, availableClues, handleAccusation, handleViewWitness, onViewWitness, onViewCase, onBack])
 
   return (
     <div className="investigation">

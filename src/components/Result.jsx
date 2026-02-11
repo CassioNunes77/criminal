@@ -56,6 +56,7 @@ function Result({ crime, state, onBack }) {
   
   const shareText = `CASO #${String(crime.id).slice(-3)} - ${statusText}
 
+${accuracy}% DE PRECISAO
 PISTAS: ${cluesBar}
 TESTEMUNHAS: ${witnessesBar}
 ACUSAÇÃO: ${attemptText}

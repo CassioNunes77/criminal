@@ -54,6 +54,8 @@ function Home({ crime, streak, onStart }) {
   }
 
   const INFO_LINES = [
+    'The Nexo Personal Computer DOS Version 1.00 (C)Copyright Nexo Corp 1981',
+    '',
     'REGRAS DO JOGO',
     '',
     'Todo dia um novo caso de crime da decada de 80.',

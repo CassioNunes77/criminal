@@ -202,7 +202,7 @@ function CaseDescription({ crime, onAccept, onBack }) {
           color: '#007A33',
           fontSize: '14px',
           margin: '12px 0'
-        }}>====================================</div>
+        }}>░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░</div>
         <div className="title" style={{
           fontFamily: "'PxPlus IBM VGA8', monospace",
           fontSize: '32px',
@@ -215,7 +215,7 @@ function CaseDescription({ crime, onAccept, onBack }) {
           color: '#007A33',
           fontSize: '14px',
           margin: '12px 0'
-        }}>====================================</div>
+        }}>░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░</div>
       </div>
 
       <div 

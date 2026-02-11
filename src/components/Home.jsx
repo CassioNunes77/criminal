@@ -57,6 +57,7 @@ function Home({ crime, streak, onStart }) {
     'The Nexo Personal Computer DOS Version 1.00 (C)Copyright Nexo Corp 1981',
     '',
     '',
+    '',
     'INFORMATIVO',
     '',
     'Todo dia voce sera responsavel por investigar um novo caso da decada de 80.',

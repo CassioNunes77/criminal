@@ -37,14 +37,15 @@ function Result({ crime, state, onBack, onBackToInvestigation }) {
   const cluesBar = renderCluesBar()
   const witnessesBar = renderWitnessesBar()
 
-  // Precisão: começa em 100% e diminui conforme pistas, testemunhas e tentativas usadas
-  // Maior peso para tentativas: Tentativas 55% | Pistas 25% | Testemunhas 20%
+  // Precisão: 100% base. Maior peso para tentativas (55%), depois pistas (25%), testemunhas (20%)
+  // 1ª tentativa correta + 0 pistas + 0 testemunhas = 100%
   const totalClues = crime.clues ? crime.clues.length : 6
   const totalWitnesses = 3
   const maxAttempts = 3
   const penaltyClues = cluesRevealed * (25 / totalClues)
   const penaltyWitnesses = witnessesCount * (20 / totalWitnesses)
-  const penaltyAttempts = displayStats.attempts * (55 / maxAttempts)
+  const extraAttempts = Math.max(0, displayStats.attempts - 1) // 1ª tentativa não penaliza
+  const penaltyAttempts = extraAttempts * (55 / (maxAttempts - 1)) // 2ª e 3ª dividem os 55%
   const accuracy = Math.max(0, Math.min(100, Math.round(100 - penaltyClues - penaltyWitnesses - penaltyAttempts)))
 
   const renderAccuracyBar = () => {

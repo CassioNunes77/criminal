@@ -75,11 +75,11 @@ https://nexoterminal.netlify.app`
   return (
     <div className="result">
       <div className="terminal-header">
-        <div className="separator">====================================</div>
+        <div className="separator separator-full-width">{'═'.repeat(150)}</div>
         <div className={`title ${state.solved ? 'flash-green' : 'error'}`}>
           {state.solved ? 'CASO RESOLVIDO' : 'CASO ENCERRADO'}
         </div>
-        <div className="separator">====================================</div>
+        <div className="separator separator-full-width">{'═'.repeat(150)}</div>
       </div>
 
       <div className="terminal-content">

@@ -68,3 +68,11 @@ Para deploy (Netlify): adicione as variáveis `VITE_FIREBASE_*` nas configuraç�
 ## Fallback
 
 Se o Firebase falhar ou não houver crime para o dia, o app usa o banco local (`dailySeed.js`).
+
+## Modo offline
+
+O crime do dia é armazenado em cache (localStorage) ao ser carregado com sucesso. Isso permite:
+
+- **Continuar jogando sem internet**: se o usuário já carregou o app online no mesmo dia, o crime fica em cache e é usado quando estiver offline.
+- **Chave de cache**: `nexo_crime_cache_YYYY-MM-DD`
+- **Fluxo**: Firebase → (erro) → cache do dia → (não encontrado) → dailySeed local

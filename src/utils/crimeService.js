@@ -2,20 +2,71 @@ import { getDoc, doc } from 'firebase/firestore'
 import { db } from '../firebase'
 import { getDailyCrime as getLocalCrime } from './dailySeed'
 
+const CACHE_PREFIX = 'nexo_crime_cache_'
+
+function getDateId() {
+  const today = new Date()
+  return `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`
+}
+
+function getCachedCrime(dateId) {
+  try {
+    const cached = localStorage.getItem(CACHE_PREFIX + dateId)
+    if (cached) {
+      const crime = JSON.parse(cached)
+      return normalizeCachedCrime(crime)
+    }
+  } catch (e) {
+    console.warn('Cache read failed:', e.message)
+  }
+  return null
+}
+
+function cacheCrime(dateId, crime) {
+  try {
+    const toStore = { ...crime }
+    delete toStore.date
+    localStorage.setItem(CACHE_PREFIX + dateId, JSON.stringify(toStore))
+  } catch (e) {
+    console.warn('Cache write failed:', e.message)
+  }
+}
+
+function normalizeCachedCrime(crime) {
+  const suspects = crime.suspects || []
+  const suspectsWithRecords = crime.suspectsWithRecords || suspects.map(s =>
+    typeof s === 'object' ? s : { name: s, criminalRecord: 'Sem antecedentes' }
+  )
+  return {
+    ...crime,
+    suspects: suspectsWithRecords.map(s => (typeof s === 'object' ? s.name : s)),
+    suspectsWithRecords,
+    clues: (crime.clues || []).map(c => ({
+      type: c.type,
+      text: c.text,
+      revealed: false
+    }))
+  }
+}
+
 /**
  * Busca o crime do dia no Firestore.
  * Coleção: crimes
  * Documento: YYYY-MM-DD (ex: 2026-02-12)
  *
- * Se não encontrar ou Firebase falhar, usa o fallback local (dailySeed).
+ * Modo offline: se Firebase falhar, usa crime em cache (do mesmo dia).
+ * Se não houver cache, usa dailySeed local.
  */
 export async function getDailyCrimeFromFirebase() {
-  if (!db || !import.meta.env.VITE_FIREBASE_API_KEY) {
-    return getLocalCrime()
-  }
+  const dateId = getDateId()
 
-  const today = new Date()
-  const dateId = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`
+  if (!db || !import.meta.env.VITE_FIREBASE_API_KEY) {
+    const cached = getCachedCrime(dateId)
+    if (cached) return cached
+    const crime = getLocalCrime()
+    cacheCrime(dateId, crime)
+    return crime
+  }
 
   try {
     const docRef = doc(db, 'crimes', dateId)
@@ -23,13 +74,20 @@ export async function getDailyCrimeFromFirebase() {
 
     if (snapshot.exists()) {
       const data = snapshot.data()
-      return transformFirestoreCrime(data, dateId)
+      const crime = transformFirestoreCrime(data, dateId)
+      cacheCrime(dateId, crime)
+      return crime
     }
   } catch (err) {
-    console.warn('Firebase crime fetch failed, using local:', err.message)
+    console.warn('Firebase crime fetch failed, trying cache:', err.message)
   }
 
-  return getLocalCrime()
+  const cached = getCachedCrime(dateId)
+  if (cached) return cached
+
+  const crime = getLocalCrime()
+  cacheCrime(dateId, crime)
+  return crime
 }
 
 /**

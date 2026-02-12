@@ -271,10 +271,22 @@ function Investigation({ crime, state, onDiscoverClue, onViewWitness, onMakeAccu
           .filter(i => !witnessesViewed.includes(i))
         if (e.key === 'ArrowDown') {
           e.preventDefault()
-          setSelectedWitnessIndex(prev => Math.min(prev + 1, witnessButtons.length - 1))
+          if (selectedWitnessIndex >= witnessButtons.length - 1) {
+            setShowWitnesses(false)
+            const suspectsIdx = availableClues.length + 1
+            setSelectedFocusIndex(Math.min(suspectsIdx, focusableItems.length - 1))
+          } else {
+            setSelectedWitnessIndex(prev => prev + 1)
+          }
         } else if (e.key === 'ArrowUp') {
           e.preventDefault()
-          setSelectedWitnessIndex(prev => Math.max(prev - 1, 0))
+          if (selectedWitnessIndex === 0) {
+            setShowWitnesses(false)
+            const cluesIdx = Math.max(0, availableClues.length - 1)
+            setSelectedFocusIndex(cluesIdx)
+          } else {
+            setSelectedWitnessIndex(prev => prev - 1)
+          }
         } else if (e.key === 'Enter' && witnessButtons[selectedWitnessIndex] !== undefined) {
           e.preventDefault()
           handleViewWitness(witnessButtons[selectedWitnessIndex])

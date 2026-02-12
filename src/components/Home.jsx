@@ -708,7 +708,7 @@ function Home({ crime, streak, onStart }) {
             if (selectedButton !== 0) e.target.style.color = '#00CC55'
           }}
         >
-          &gt; INICIAR INVESTIGACAO
+          &gt; INICIAR INVESTIGAÇÃO
           {selectedButton === 0 && titleAnimationComplete && (
             <span className="cursor-blink" style={{
               color: '#00FF66',

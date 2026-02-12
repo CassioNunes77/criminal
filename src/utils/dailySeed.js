@@ -123,6 +123,60 @@ const CRIMES_DATABASE = [
       location: 'Caixa Registradora',
       method: 'Distração'
     }
+  },
+  {
+    id: 3,
+    type: 'FURTO',
+    location: 'LANCHONETE',
+    time: '14:30',
+    description: [
+      'CASO #003 - FURTO EM LANCHONETE',
+      '',
+      'O caixa de uma lanchonete foi furtado durante o horario de almoco.',
+      'O dinheiro do dia foi levado. A porta nao apresentava sinais de arrombamento.',
+      '',
+      'Sua missao: identificar o responsavel, o local exato do crime e o metodo utilizado.',
+      '',
+      'Analise as pistas e testemunhas com cuidado. Algumas informacoes podem ser falsas.'
+    ],
+    suspects: [
+      { name: 'Bruno Ferreira', criminalRecord: 'Passagem por furto em 1983' },
+      { name: 'Camila Rocha', criminalRecord: 'Sem antecedentes' },
+      { name: 'Diego Martins', criminalRecord: 'Passagem por furto em 1982' },
+      { name: 'Elena Campos', criminalRecord: 'Sem antecedentes' }
+    ],
+    locations: ['Caixa', 'Cozinha', 'Area de Estoque', 'Banheiro'],
+    methods: ['Chave falsa', 'Aproveitou descuido', 'Ajuda de cumplice', 'Janela dos fundos'],
+    clues: [
+      { type: 'HORARIO', text: 'Crime ocorreu as 14:30', revealed: false },
+      { type: 'LOCAL', text: 'Local exato: Caixa', revealed: false },
+      { type: 'ACESSO', text: 'Fechadura do caixa estava intacta, sem sinais de forca', revealed: false },
+      { type: 'ALIBI', text: 'Bruno Ferreira estava no almoco (confirmado por vizinho)', revealed: false },
+      { type: 'COMPORTAMENTO', text: 'Suspeito deixou pegadas de chinelo no local', revealed: false },
+      { type: 'EVIDENCIA', text: 'Fio de cabelo encontrado no cofre', revealed: false }
+    ],
+    witnesses: [
+      {
+        name: 'Roberto, Garcom',
+        statement: 'Vi uma pessoa alta saindo pela cozinha com um saco as 14:35. Era o Bruno.',
+        isTruthful: true
+      },
+      {
+        name: 'Sonia, Cozinheira',
+        statement: 'Bruno estava no almoco comigo as 14:30. Nao saiu da mesa.',
+        isTruthful: false
+      },
+      {
+        name: 'Gilberto, Gerente',
+        statement: 'O caixa estava fechado quando saí para o banheiro as 14:25',
+        isTruthful: true
+      }
+    ],
+    solution: {
+      suspect: 'Bruno Ferreira',
+      location: 'Caixa',
+      method: 'Chave falsa'
+    }
   }
 ]
 

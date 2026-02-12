@@ -204,7 +204,7 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 8px;
+  margin-bottom: 0;
 }
 
 .witness-name {
@@ -230,7 +230,7 @@
   font-size: 14px;
   color: var(--text-primary);
   line-height: 1.6;
-  margin-top: 4px;
+  margin-top: 0;
 }
 
 .suspects-section {

@@ -2,6 +2,30 @@
   font-family: 'IBM Plex Mono', monospace;
 }
 
+.case-code-section {
+  margin-bottom: 16px;
+}
+
+.case-code-line {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px;
+  margin-top: 8px;
+}
+
+.copy-code-btn {
+  width: auto;
+  padding: 4px 0;
+  margin: 0;
+  font-size: 14px;
+  color: var(--text-secondary);
+}
+
+.copy-code-btn:hover {
+  color: var(--text-highlight);
+}
+
 /* Edge-to-edge: header quebra o padding do .app */
 .result .terminal-header {
   margin-left: -16px;

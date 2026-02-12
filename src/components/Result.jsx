@@ -1,8 +1,11 @@
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import './Result.css'
 
 function Result({ crime, state, onBack }) {
   const [showShare, setShowShare] = useState(false)
+  const [showCodeCopied, setShowCodeCopied] = useState(false)
+
+  const caseCode = String(crime.id)
 
   const cluesRevealed = state.cluesDiscovered || (crime.clues ? crime.clues.filter(c => c.revealed).length : 0)
   const witnessesViewed = state.witnessesViewed || []
@@ -72,6 +75,12 @@ https://nexoterminal.netlify.app`
     setTimeout(() => setShowShare(false), 2000)
   }
 
+  const copyCaseCode = () => {
+    navigator.clipboard.writeText(caseCode)
+    setShowCodeCopied(true)
+    setTimeout(() => setShowCodeCopied(false), 2000)
+  }
+
   return (
     <div className="result">
       <div className="terminal-header">
@@ -83,6 +92,26 @@ https://nexoterminal.netlify.app`
       </div>
 
       <div className="terminal-content">
+        <div className="case-code-section">
+          <div className="section-title">CODIGO DO CASO:</div>
+          <div className="case-code-line">
+            <span className="highlight">{caseCode}</span>
+            <button 
+              className="terminal-button copy-code-btn"
+              onClick={copyCaseCode}
+            >
+              &gt; COPIA CODIGO
+            </button>
+          </div>
+          {showCodeCopied && (
+            <div className="share-feedback">
+              COPIADO PARA AREA DE TRANSFERENCIA!
+            </div>
+          )}
+        </div>
+
+        <div className="separator">------------------------------------</div>
+
         <div className="solution-section">
           <div className="section-title">SOLUCAO:</div>
           <div className="solution-item">

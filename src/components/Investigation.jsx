@@ -554,8 +554,6 @@ function Investigation({ crime, state, onDiscoverClue, onViewWitness, onMakeAccu
           </div>
         </div>
 
-        <div className="separator">------------------------------------</div>
-
         {/* Accusation Form */}
         {!showAccusation && !isFailed ? (
           <button 

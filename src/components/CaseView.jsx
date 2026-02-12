@@ -33,7 +33,7 @@ function CaseView({ crime, onBack }) {
           color: '#007A33',
           fontSize: '14px',
           margin: '12px 0'
-        }}>{'░'.repeat(150)}</div>
+        }}>{'═'.repeat(150)}</div>
         <div className="title" style={{
           fontFamily: "'PxPlus IBM VGA8', monospace",
           fontSize: '32px',
@@ -46,7 +46,7 @@ function CaseView({ crime, onBack }) {
           color: '#007A33',
           fontSize: '14px',
           margin: '12px 0'
-        }}>{'░'.repeat(150)}</div>
+        }}>{'═'.repeat(150)}</div>
       </div>
 
       <div className="terminal-content" style={{

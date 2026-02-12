@@ -380,8 +380,6 @@ function Investigation({ crime, state, onDiscoverClue, onViewWitness, onMakeAccu
             {renderProgressBar(revealedClues.length, crime.clues.length)}
           </div>
 
-          <div className="separator">------------------------------------</div>
-
           {canDiscoverMore && !isFailed && (
             <div className="clue-selection">
               <div className="form-label">ESCOLHA QUAL PISTA REVELAR:</div>

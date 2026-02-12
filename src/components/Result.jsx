@@ -30,13 +30,13 @@ function Result({ crime, state, onBack }) {
   const witnessesBar = renderWitnessesBar()
 
   // Precisão: começa em 100% e diminui conforme pistas, testemunhas e tentativas usadas
-  // Cada pista: -5% (máx 6 = -30%) | Cada testemunha: -10% (máx 3 = -30%) | Cada tentativa: -4% (máx 10 = -40%)
+  // Maior peso para tentativas: Tentativas 55% | Pistas 25% | Testemunhas 20%
   const totalClues = crime.clues ? crime.clues.length : 6
   const totalWitnesses = 3
-  const maxAttempts = 10
-  const penaltyClues = cluesRevealed * (30 / totalClues)
-  const penaltyWitnesses = witnessesCount * (30 / totalWitnesses)
-  const penaltyAttempts = state.attempts * (40 / maxAttempts)
+  const maxAttempts = 3
+  const penaltyClues = cluesRevealed * (25 / totalClues)
+  const penaltyWitnesses = witnessesCount * (20 / totalWitnesses)
+  const penaltyAttempts = state.attempts * (55 / maxAttempts)
   const accuracy = Math.max(0, Math.min(100, Math.round(100 - penaltyClues - penaltyWitnesses - penaltyAttempts)))
 
   const renderAccuracyBar = () => {
@@ -52,16 +52,18 @@ function Result({ crime, state, onBack }) {
                       state.attempts === 3 ? '3º Tentativa' : 
                       `${state.attempts}º Tentativa`
 
-  const statusText = state.solved ? 'RESOLVIDO' : 'ENCERRADO'
+  const shareCluesBar = '█'.repeat(Math.min(cluesRevealed || 0, totalClues)) + '░'.repeat(Math.max(0, totalClues - (cluesRevealed || 0)))
+  const shareWitnessesBar = '█'.repeat(Math.min(witnessesCount || 0, totalWitnesses)) + '░'.repeat(Math.max(0, totalWitnesses - (witnessesCount || 0)))
+  const shareAttemptsBar = '█'.repeat(Math.min(state.attempts || 0, maxAttempts)) + '░'.repeat(Math.max(0, maxAttempts - (state.attempts || 0)))
   
-  const shareText = `CASO #${String(crime.id).slice(-3)} - ${statusText}
+  const shareText = `CASO #${String(crime.id).slice(-3)}
 
-${accuracy}% DE PRECISAO
-PISTAS: ${cluesBar}
-TESTEMUNHAS: ${witnessesBar}
-ACUSAÇÃO: ${attemptText}
+${accuracy}% de precisão. 
+PISTAS: ${shareCluesBar}
+TESTEMUNHAS: ${shareWitnessesBar}
+TENTATIVAS: ${shareAttemptsBar}
 
-http://nexoterminal.netlify.app`
+https://nexoterminal.netlify.app/`
 
   const copyToClipboard = () => {
     navigator.clipboard.writeText(shareText)

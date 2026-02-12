@@ -118,7 +118,7 @@ function Investigation({ crime, state, onDiscoverClue, onViewWitness, onMakeAccu
   const availableClues = crime.clues.filter(clue => !cluesRevealed.includes(clue.type))
   const revealedClues = crime.clues.filter(clue => cluesRevealed.includes(clue.type))
   const canDiscoverMore = availableClues.length > 0
-  const maxAttempts = 10
+  const maxAttempts = 3
   const currentAttempts = Math.max(0, Math.min(state.attempts || 0, maxAttempts)) // Ensure valid range
   const remainingAttempts = Math.max(0, maxAttempts - currentAttempts)
   const isFailed = remainingAttempts <= 0 && !state.solved

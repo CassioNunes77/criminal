@@ -4,7 +4,7 @@ import CaseDescription from './components/CaseDescription'
 import CaseView from './components/CaseView'
 import Investigation from './components/Investigation'
 import Result from './components/Result'
-import { getDailyCrime } from './utils/dailySeed'
+import { getDailyCrimeFromFirebase } from './utils/crimeService'
 import './App.css'
 
 function App() {
@@ -30,10 +30,11 @@ function App() {
     const startTime = Date.now()
     const minLoadTime = 1000 // Minimum 1 second
 
-    try {
-      // Load daily crime
-      const crime = getDailyCrime()
-      setCurrentCrime(crime)
+    const load = async () => {
+      try {
+        // Load daily crime (Firebase ou fallback local)
+        const crime = await getDailyCrimeFromFirebase()
+        setCurrentCrime(crime)
       
       // Load saved state from localStorage (but always start at home screen)
       try {
@@ -45,7 +46,7 @@ function App() {
             cluesDiscovered: parsed.cluesDiscovered || 0,
             cluesRevealed: parsed.cluesRevealed || [],
             witnessesViewed: parsed.witnessesViewed || [],
-            attempts: Math.max(0, Math.min(parsed.attempts || 0, 10)), // Ensure between 0 and 10
+            attempts: Math.max(0, Math.min(parsed.attempts || 0, 3)), // Ensure between 0 and 3
             hypothesis: parsed.hypothesis || {
               suspect: null,
               location: null,
@@ -77,19 +78,22 @@ function App() {
         })
       }
 
-      // Ensure minimum loading time of 1 second
-      const elapsed = Date.now() - startTime
-      const remainingTime = Math.max(0, minLoadTime - elapsed)
-      
-      setTimeout(() => {
-        setIsLoading(false)
-      }, remainingTime)
-    } catch (error) {
-      console.error('Error loading crime:', error)
-      setTimeout(() => {
-        setIsLoading(false)
-      }, minLoadTime)
+        // Ensure minimum loading time of 1 second
+        const elapsed = Date.now() - startTime
+        const remainingTime = Math.max(0, minLoadTime - elapsed)
+
+        setTimeout(() => {
+          setIsLoading(false)
+        }, remainingTime)
+      } catch (error) {
+        console.error('Error loading crime:', error)
+        setTimeout(() => {
+          setIsLoading(false)
+        }, minLoadTime)
+      }
     }
+
+    load()
   }, [])
 
   const startInvestigation = () => {
@@ -134,7 +138,7 @@ function App() {
       return true
     }
     
-    const maxAttempts = 10
+    const maxAttempts = 3
     const currentAttempts = investigationState.attempts + 1
     
     // Check if already failed

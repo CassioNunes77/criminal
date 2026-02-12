@@ -658,7 +658,7 @@ function Home({ crime, streak, onStart }) {
           fontSize: '14px',
           margin: '12px 0',
           fontFamily: "'PxPlus IBM VGA8', monospace"
-        }}>═══════════════════</div>
+        }}>{'═'.repeat(150)}</div>
         <div className="title terminal-text" style={{
           fontFamily: "'PxPlus IBM VGA8', monospace",
           fontSize: '32px',
@@ -676,7 +676,7 @@ function Home({ crime, streak, onStart }) {
           fontSize: '14px',
           margin: '12px 0',
           fontFamily: "'PxPlus IBM VGA8', monospace"
-        }}>═══════════════════</div>
+        }}>{'═'.repeat(150)}</div>
       </div>
 
       <div className="terminal-content" style={{

@@ -713,8 +713,6 @@ function Investigation({ crime, state, onDiscoverClue, onViewWitness, onMakeAccu
           })()
         ) : null}
 
-        <div className="separator">------------------------------------</div>
-
         <button 
           className="terminal-button secondary"
           onClick={onBack}

@@ -102,7 +102,6 @@ function App() {
 
   const viewWitness = (witnessIndex) => {
     if (!currentCrime) return
-    if (investigationState.solved) return
     const viewed = investigationState.witnessesViewed || []
     if (viewed.includes(witnessIndex)) return
     const newState = {
@@ -110,21 +109,20 @@ function App() {
       witnessesViewed: [...viewed, witnessIndex]
     }
     setInvestigationState(newState)
-    saveState(newState)
+    if (!investigationState.solved) saveState(newState) // Só persiste se não concluiu
   }
 
   const discoverClue = (clueType) => {
     if (!currentCrime) return
-    if (investigationState.solved) return // Não altera estatísticas se já solucionou
     if (investigationState.cluesRevealed?.includes(clueType)) return // Já revelada
     
     const newState = {
       ...investigationState,
-      cluesDiscovered: investigationState.cluesDiscovered + 1,
+      cluesDiscovered: investigationState.solved ? investigationState.cluesDiscovered : investigationState.cluesDiscovered + 1, // Não altera contagem se já concluiu
       cluesRevealed: [...(investigationState.cluesRevealed || []), clueType]
     }
     setInvestigationState(newState)
-    saveState(newState)
+    if (!investigationState.solved) saveState(newState) // Só persiste se não concluiu
   }
 
   const makeAccusation = (suspect, location, method) => {

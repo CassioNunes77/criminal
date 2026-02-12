@@ -111,6 +111,14 @@
   padding: 6px 0;
   text-align: left;
   transition: color 0.2s ease;
+  touch-action: manipulation; /* Remove 300ms delay no mobile */
+}
+
+@media (max-width: 768px) {
+  .option-button {
+    min-height: 44px;
+    padding: 12px 0;
+  }
 }
 
 .option-button:hover {

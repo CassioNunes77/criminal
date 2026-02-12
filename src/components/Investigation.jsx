@@ -166,7 +166,6 @@ function Investigation({ crime, state, onDiscoverClue, onViewWitness, onMakeAccu
   }, [showWitnesses, witnessesViewed.length, crime.witnesses.length])
 
   const handleDiscoverClue = (clueType) => {
-    if (state.solved) return // Não altera quando já solucionou
     if (cluesRevealed.includes(clueType)) return
     const clue = crime.clues.find(c => c.type === clueType)
     if (clue) {
@@ -175,7 +174,6 @@ function Investigation({ crime, state, onDiscoverClue, onViewWitness, onMakeAccu
   }
 
   const handleViewWitness = (witnessIndex) => {
-    if (state.solved) return // Não altera quando já solucionou
     if (!witnessesViewed.includes(witnessIndex)) {
       onViewWitness(witnessIndex)
     }

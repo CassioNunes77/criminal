@@ -55,6 +55,17 @@
   font-family: 'PxPlus IBM VGA8', monospace;
 }
 
+.progress-inline {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.progress-inline .progress-bar {
+  margin: 0;
+}
+
 .clue-selection .option-button {
   padding: 0;
   margin: 0;
@@ -125,6 +136,11 @@
   .option-button {
     min-height: 44px;
     padding: 12px 0;
+  }
+  .clue-selection .option-button {
+    min-height: auto;
+    padding: 0;
+    margin: 0;
   }
 }
 

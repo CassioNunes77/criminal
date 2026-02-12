@@ -373,11 +373,9 @@ function Investigation({ crime, state, onDiscoverClue, onViewWitness, onMakeAccu
 
         {/* Clues Section */}
         <div className="clues-section">
-          <div className="section-title">
+          <div className="section-title progress-inline">
             PISTAS DISPONIVEIS: {revealedClues.length}/{crime.clues.length}
-          </div>
-          <div className="progress-bar">
-            {renderProgressBar(revealedClues.length, crime.clues.length)}
+            <span className="progress-bar">{renderProgressBar(revealedClues.length, crime.clues.length)}</span>
           </div>
 
           {canDiscoverMore && !isFailed && (
@@ -423,11 +421,9 @@ function Investigation({ crime, state, onDiscoverClue, onViewWitness, onMakeAccu
 
         {/* Witnesses Section */}
         <div className="witnesses-section">
-          <div className="section-title">
+          <div className="section-title progress-inline">
             TESTEMUNHAS: {witnessesViewed.length}/{crime.witnesses.length}
-          </div>
-          <div className="progress-bar">
-            {renderProgressBar(witnessesViewed.length, crime.witnesses.length)}
+            <span className="progress-bar">{renderProgressBar(witnessesViewed.length, crime.witnesses.length)}</span>
           </div>
 
           {!showWitnesses && witnessesViewed.length < crime.witnesses.length && !isFailed && (

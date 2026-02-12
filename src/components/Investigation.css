@@ -142,6 +142,11 @@
     padding: 0;
     margin: 0;
   }
+  .accusation-form .option-button {
+    min-height: auto;
+    padding: 0;
+    margin: 0;
+  }
 }
 
 .option-button:hover {

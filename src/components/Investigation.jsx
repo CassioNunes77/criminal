@@ -454,7 +454,7 @@ function Investigation({ crime, state, onDiscoverClue, onViewWitness, onMakeAccu
             </button>
           )}
 
-          {showWitnesses && (() => {
+          {(showWitnesses || witnessesViewed.length === crime.witnesses.length) && (() => {
             const witnessButtons = crime.witnesses
               .map((_, i) => i)
               .filter(i => !witnessesViewed.includes(i))

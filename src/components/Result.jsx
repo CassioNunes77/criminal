@@ -55,19 +55,19 @@ function Result({ crime, state, onBack }) {
                       state.attempts === 3 ? '3º Tentativa' : 
                       `${state.attempts}º Tentativa`
 
-  const shareCluesBar = '█'.repeat(Math.min(cluesRevealed || 0, totalClues)) + '░'.repeat(Math.max(0, totalClues - (cluesRevealed || 0)))
-  const shareWitnessesBar = '█'.repeat(Math.min(witnessesCount || 0, totalWitnesses)) + '░'.repeat(Math.max(0, totalWitnesses - (witnessesCount || 0)))
-  const shareAttemptsBar = '█'.repeat(Math.min(state.attempts || 0, maxAttempts)) + '░'.repeat(Math.max(0, maxAttempts - (state.attempts || 0)))
+  const shareCluesBar = '[' + '■'.repeat(Math.min(cluesRevealed || 0, totalClues)) + '□'.repeat(Math.max(0, totalClues - (cluesRevealed || 0))) + ']'
+  const shareWitnessesBar = '[' + '■'.repeat(Math.min(witnessesCount || 0, totalWitnesses)) + '□'.repeat(Math.max(0, totalWitnesses - (witnessesCount || 0))) + ']'
+  const shareAttemptsBar = '[' + '■'.repeat(Math.min(state.attempts || 0, maxAttempts)) + '□'.repeat(Math.max(0, maxAttempts - (state.attempts || 0))) + ']'
   
   const statusShare = state.solved ? 'RESOLVIDO' : 'ENCERRADO'
   const shareText = `CASO #${String(crime.id).slice(-3)} - ${statusShare}
 
-${accuracy}% DE PRECISÃO. 
+${accuracy}% DE PRECISÃO.
 PISTAS: ${shareCluesBar}
 TESTEMUNHAS: ${shareWitnessesBar}
 TENTATIVAS: ${shareAttemptsBar}
 
-https://nexoterminal.netlify.app`
+https://nexoterminal.netlify.app/`
 
   const copyToClipboard = () => {
     navigator.clipboard.writeText(shareText)

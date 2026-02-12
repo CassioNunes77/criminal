@@ -3,7 +3,10 @@
 }
 
 .case-code-section {
-  margin-bottom: 16px;
+  margin-top: 24px;
+  padding-top: 16px;
+  font-size: 13px;
+  color: var(--text-secondary);
 }
 
 .case-code-line {
@@ -11,19 +14,28 @@
   flex-wrap: wrap;
   align-items: center;
   gap: 12px;
-  margin-top: 8px;
+}
+
+.case-code-line .highlight {
+  color: var(--text-primary);
 }
 
 .copy-code-btn {
   width: auto;
-  padding: 4px 0;
+  padding: 2px 0;
   margin: 0;
-  font-size: 14px;
+  font-size: 12px;
   color: var(--text-secondary);
 }
 
 .copy-code-btn:hover {
   color: var(--text-highlight);
+}
+
+.case-code-feedback {
+  font-size: 11px;
+  color: var(--text-secondary);
+  margin-left: 8px;
 }
 
 /* Edge-to-edge: header quebra o padding do .app */

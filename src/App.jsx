@@ -54,7 +54,12 @@ function App() {
             },
             streak: parsed.streak || 0,
             solved: parsed.solved || false,
-            failed: parsed.failed || false
+            failed: parsed.failed || false,
+            solvedStats: parsed.solvedStats || (parsed.solved ? {
+              attempts: parsed.attempts || 0,
+              cluesDiscovered: parsed.cluesDiscovered || 0,
+              witnessesViewed: parsed.witnessesViewed || []
+            } : null)
           }
           setInvestigationState(sanitizedState)
           // Always start at home screen, regardless of saved state
@@ -157,7 +162,14 @@ function App() {
       hypothesis: { suspect, location, method },
       solved: isCorrect,
       failed: !isCorrect && currentAttempts >= maxAttempts,
-      streak: isCorrect ? investigationState.streak + 1 : investigationState.streak
+      streak: isCorrect ? investigationState.streak + 1 : investigationState.streak,
+      ...(isCorrect && {
+        solvedStats: {
+          attempts: currentAttempts,
+          cluesDiscovered: investigationState.cluesDiscovered || 0,
+          witnessesViewed: [...(investigationState.witnessesViewed || [])]
+        }
+      })
     }
     
     setInvestigationState(newState)
@@ -249,6 +261,7 @@ function App() {
           crime={currentCrime}
           state={investigationState}
           onBack={() => setScreen('home')}
+          onBackToInvestigation={() => setScreen('investigation')}
         />
       )}
     </div>

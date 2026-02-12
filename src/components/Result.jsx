@@ -1,14 +1,19 @@
 import { useState } from 'react'
 import './Result.css'
 
-function Result({ crime, state, onBack }) {
+function Result({ crime, state, onBack, onBackToInvestigation }) {
   const [showShare, setShowShare] = useState(false)
   const [showCodeCopied, setShowCodeCopied] = useState(false)
 
   const caseCode = String(crime.id)
 
-  const cluesRevealed = state.cluesDiscovered || (crime.clues ? crime.clues.filter(c => c.revealed).length : 0)
-  const witnessesViewed = state.witnessesViewed || []
+  // Usar stats congeladas quando caso já resolvido (não altera se jogador explorar mais)
+  const displayStats = state.solved && state.solvedStats
+    ? state.solvedStats
+    : { attempts: state.attempts, cluesDiscovered: state.cluesDiscovered, witnessesViewed: state.witnessesViewed || [] }
+
+  const cluesRevealed = displayStats.cluesDiscovered || (crime.clues ? crime.clues.filter(c => c.revealed).length : 0)
+  const witnessesViewed = displayStats.witnessesViewed || []
   const witnessesCount = witnessesViewed.length || (crime.witnesses ? crime.witnesses.length : 0)
   
   const renderCluesBar = () => {
@@ -39,7 +44,7 @@ function Result({ crime, state, onBack }) {
   const maxAttempts = 3
   const penaltyClues = cluesRevealed * (25 / totalClues)
   const penaltyWitnesses = witnessesCount * (20 / totalWitnesses)
-  const penaltyAttempts = state.attempts * (55 / maxAttempts)
+  const penaltyAttempts = displayStats.attempts * (55 / maxAttempts)
   const accuracy = Math.max(0, Math.min(100, Math.round(100 - penaltyClues - penaltyWitnesses - penaltyAttempts)))
 
   const renderAccuracyBar = () => {
@@ -57,7 +62,7 @@ function Result({ crime, state, onBack }) {
 
   const shareCluesBar = '[' + '■'.repeat(Math.min(cluesRevealed || 0, totalClues)) + '□'.repeat(Math.max(0, totalClues - (cluesRevealed || 0))) + ']'
   const shareWitnessesBar = '[' + '■'.repeat(Math.min(witnessesCount || 0, totalWitnesses)) + '□'.repeat(Math.max(0, totalWitnesses - (witnessesCount || 0))) + ']'
-  const shareAttemptsBar = '[' + '■'.repeat(Math.min(state.attempts || 0, maxAttempts)) + '□'.repeat(Math.max(0, maxAttempts - (state.attempts || 0))) + ']'
+  const shareAttemptsBar = '[' + '■'.repeat(Math.min(displayStats.attempts || 0, maxAttempts)) + '□'.repeat(Math.max(0, maxAttempts - (displayStats.attempts || 0))) + ']'
   
   const statusShare = state.solved ? 'RESOLVIDO' : 'ENCERRADO'
   const shareText = `CASO #${String(crime.id).slice(-3)} - ${statusShare}
@@ -92,26 +97,6 @@ https://nexoterminal.netlify.app/`
       </div>
 
       <div className="terminal-content">
-        <div className="case-code-section">
-          <div className="section-title">CODIGO DO CASO:</div>
-          <div className="case-code-line">
-            <span className="highlight">{caseCode}</span>
-            <button 
-              className="terminal-button copy-code-btn"
-              onClick={copyCaseCode}
-            >
-              &gt; COPIA CODIGO
-            </button>
-          </div>
-          {showCodeCopied && (
-            <div className="share-feedback">
-              COPIADO PARA AREA DE TRANSFERENCIA!
-            </div>
-          )}
-        </div>
-
-        <div className="separator">------------------------------------</div>
-
         <div className="solution-section">
           <div className="section-title">SOLUCAO:</div>
           <div className="solution-item">
@@ -129,10 +114,10 @@ https://nexoterminal.netlify.app/`
 
         <div className="stats-section">
           <div className="stat-item">
-            TENTATIVAS: {state.attempts}
+            TENTATIVAS: {displayStats.attempts}
           </div>
           <div className="stat-item">
-            PISTAS USADAS: {state.cluesDiscovered}
+            PISTAS USADAS: {displayStats.cluesDiscovered}
           </div>
           <div className="stat-item">
             TESTEMUNHAS: {witnessesCount}
@@ -165,12 +150,40 @@ https://nexoterminal.netlify.app/`
 
         <div className="separator">------------------------------------</div>
 
+        {state.solved && (3 - displayStats.attempts) > 0 && onBackToInvestigation && (
+          <>
+            <button 
+              className="terminal-button secondary"
+              onClick={onBackToInvestigation}
+            >
+              &gt; CONTINUAR INVESTIGANDO
+            </button>
+            <div className="separator">------------------------------------</div>
+          </>
+        )}
+
         <button 
           className="terminal-button"
           onClick={onBack}
         >
           &gt; VOLTAR AO INICIO
         </button>
+
+        <div className="case-code-section">
+          <div className="case-code-line">
+            CODIGO: <span className="highlight">{caseCode}</span>
+            <button 
+              className="terminal-button copy-code-btn"
+              onClick={copyCaseCode}
+              title="Copiar codigo"
+            >
+              &gt; COPIA CODIGO
+            </button>
+          </div>
+          {showCodeCopied && (
+            <span className="case-code-feedback">COPIADO</span>
+          )}
+        </div>
       </div>
     </div>
   )

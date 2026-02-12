@@ -74,6 +74,8 @@ function Home({ crime, streak, onStart }) {
     '',
     'PRECISAO: Comeca em 100%. Diminui conforme usa pistas, testemunhas e tentativas.',
     '',
+    'MODO OFFLINE: Continuar jogando sem internet (caso do dia em cache).',
+    '',
     'BOM TRABALHO, AGENTE.'
   ]
 

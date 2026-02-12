@@ -149,6 +149,16 @@ function Investigation({ crime, state, onDiscoverClue, onViewWitness, onMakeAccu
     setSelectedFocusIndex(prev => (prev > max ? max : prev))
   }, [focusableItems.length])
 
+  // Desktop: scroll para manter o item focado visível ao navegar com setas
+  useEffect(() => {
+    if (window.innerWidth < 769) return
+    const scrollToFocused = () => {
+      const el = document.querySelector('.investigation .terminal-content .cursor-blink')?.closest('button')
+      if (el) el.scrollIntoView({ behavior: 'smooth', block: 'nearest' })
+    }
+    requestAnimationFrame(() => requestAnimationFrame(scrollToFocused))
+  }, [selectedFocusIndex, accusationFocusIndex, selectedWitnessIndex, showWitnesses, showAccusation])
+
   // Reset accusationFocusIndex ao abrir formulário de acusação
   useEffect(() => {
     if (showAccusation) setAccusationFocusIndex(0)

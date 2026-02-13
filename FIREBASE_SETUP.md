@@ -1,13 +1,25 @@
 # Firebase - Nexo Terminal
 
+## Checklist – O que falta?
+
+| Etapa | Comando/Ação | Status |
+|-------|--------------|--------|
+| 1. Deploy Firestore Rules | `firebase deploy --only firestore:rules` | ⬜ |
+| 2. Service Account | Firebase Console → Service accounts → Gerar nova chave | ⬜ |
+| 3. Netlify Env Vars | `OPENAI_API_KEY`, `FIREBASE_SERVICE_ACCOUNT` (JSON) | ⬜ |
+| 4. App `.env.local` | Variáveis `VITE_FIREBASE_*` do Console | ⬜ |
+| 5. Deploy Netlify | Push para repositório conectado | ⬜ |
+
+---
+
 ## Arquitetura
 
 ```
-[Cloud Scheduler] → [Cloud Function] → [OpenAI API] → [Firestore]
-     (diário 00:00)     (Node.js)         (GPT-4o-mini)    (crimes)
+[Netlify Scheduled] → [Netlify Function] → [OpenAI API] → [Firestore]
+   (0 3 * * * UTC)      (Node.js)           (GPT-4o-mini)    (crimes)
 ```
 
-Um caso novo é gerado por IA todo dia às 00:00 (America/Sao_Paulo). O mesmo caso para todos os jogadores globalmente.
+Um caso novo é gerado por IA todo dia às 00:00 (America/Sao_Paulo). O mesmo caso para todos os jogadores globalmente. Usa **Netlify Scheduled Functions** (gratuito), sem necessidade de plano Blaze.
 
 ---
 
@@ -66,37 +78,40 @@ Um caso novo é gerado por IA todo dia às 00:00 (America/Sao_Paulo). O mesmo ca
 
 ---
 
-## Firebase Cloud Functions
-
-### Deploy
-
-```bash
-cd criminal
-firebase login
-firebase use <seu-projeto>
-cd functions
-npm install
-firebase deploy --only functions
-```
-
-### Variáveis de ambiente (Functions)
-
-Configure a chave da OpenAI como secret:
-
-```bash
-firebase functions:secrets:set OPENAI_API_KEY
-```
-
-(O valor será solicitado interativamente. Use sua chave da API OpenAI.)
-
-A variável ficará disponível como `process.env.OPENAI_API_KEY` na função.
+## Netlify Scheduled Functions
 
 ### Função agendada
 
-- **Nome:** `generateDailyCase`
-- **Schedule:** `0 0 * * *` (00:00 diário)
-- **TimeZone:** America/Sao_Paulo
-- **Region:** us-central1
+- **Arquivo:** `netlify/functions/generate-daily-case.mjs`
+- **Schedule:** `0 3 * * *` (03:00 UTC = 00:00 America/Sao_Paulo)
+- **Custo:** Gratuito
+
+### Variáveis de ambiente (Netlify)
+
+Configure no Netlify: **Site settings → Environment variables**:
+
+| Nome | Valor | Sensível |
+|------|-------|----------|
+| `OPENAI_API_KEY` | Chave da API OpenAI | Sim |
+| `FIREBASE_SERVICE_ACCOUNT` | JSON completo da service account (Firebase Console → Project settings → Service accounts → Generate new private key) | Sim |
+
+O JSON da service account deve ser colado inteiro em uma única linha (remova quebras de linha do arquivo baixado). Exemplo do formato:
+```json
+{"type":"service_account","project_id":"...","private_key_id":"...","private_key":"...","client_email":"...","client_id":"...","auth_uri":"...","token_uri":"...","auth_provider_x509_cert_url":"...","client_x509_cert_url":"..."}
+```
+
+### Como testar
+
+1. **Netlify UI:** Site → Functions → `generate-daily-case` → **Run now**
+2. **CLI:** `netlify dev` e depois `netlify functions:invoke generate-daily-case`
+
+### Deploy Firestore Rules (apenas uma vez)
+
+```bash
+firebase login
+firebase use <seu-projeto>
+firebase deploy --only firestore:rules
+```
 
 ---
 
@@ -117,7 +132,7 @@ service cloud.firestore {
 }
 ```
 
-A escrita em `crimes` e `_meta` é feita apenas pela Cloud Function (Admin SDK).
+A escrita em `crimes` e `_meta` é feita apenas pela Netlify Function (Firebase Admin SDK).
 
 ---
 

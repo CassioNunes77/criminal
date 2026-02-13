@@ -134,6 +134,7 @@ function Investigation({ crime, state, onDiscoverClue, onViewWitness, onMakeAccu
     !showSuspects && 'suspects',
     'case',
     (!isFailed && remainingAttempts > 0) && 'accusation',
+    isFailed && 'viewResult',
     'back'
   ].filter(Boolean)
 
@@ -331,6 +332,8 @@ function Investigation({ crime, state, onDiscoverClue, onViewWitness, onMakeAccu
             setShowWitnesses(true)
           } else if (item.id === 'suspects') {
             setShowSuspects(true)
+          } else if (item.id === 'viewResult') {
+            onViewResult()
           } else if (item.id === 'back') {
             onBack()
           }
@@ -342,7 +345,7 @@ function Investigation({ crime, state, onDiscoverClue, onViewWitness, onMakeAccu
     return () => {
       window.removeEventListener('keydown', handleKeyPress)
     }
-  }, [showAccusation, accusationFocusIndex, selectedSuspect, selectedLocation, selectedMethod, selectedWitnessIndex, suspectsWithRecords, crime, canDiscoverMore, showWitnesses, showSuspects, isFailed, remainingAttempts, witnessesViewed, selectedFocusIndex, focusableItems, availableClues, handleAccusation, handleViewWitness, onViewWitness, onViewCase, onBack])
+  }, [showAccusation, accusationFocusIndex, selectedSuspect, selectedLocation, selectedMethod, selectedWitnessIndex, suspectsWithRecords, crime, canDiscoverMore, showWitnesses, showSuspects, isFailed, remainingAttempts, witnessesViewed, selectedFocusIndex, focusableItems, availableClues, handleAccusation, handleViewWitness, onViewWitness, onViewCase, onViewResult, onBack])
 
   return (
     <div className="investigation">
@@ -378,19 +381,9 @@ function Investigation({ crime, state, onDiscoverClue, onViewWitness, onMakeAccu
         </div>
 
         {isFailed && (
-          <>
-            <div className="feedback error">
-              CASO ENCERRADO. VOCE FALHOU.
-            </div>
-            <div style={{ marginTop: '16px' }}>
-              <button 
-                className="terminal-button highlight"
-                onClick={onViewResult}
-              >
-                &gt; VER RESULTADO E COMPARTILHAR
-              </button>
-            </div>
-          </>
+          <div className="feedback error">
+            CASO ENCERRADO. VOCE FALHOU.
+          </div>
         )}
 
         {/* Clues Section */}
@@ -726,6 +719,26 @@ function Investigation({ crime, state, onDiscoverClue, onViewWitness, onMakeAccu
             )
           })()
         ) : null}
+
+        {/* Ver resultado - ao final, quando tentativas esgotadas */}
+        {isFailed && (
+          <>
+            <button 
+              className="terminal-button highlight"
+              onClick={onViewResult}
+            >
+              &gt; VER RESULTADO
+              {titleAnimationComplete && !showWitnesses && !showAccusation && focusableItems[selectedFocusIndex]?.id === 'viewResult' && (
+                <span className="cursor-blink" style={{
+                  color: '#00FF66',
+                  animation: 'blink 1s step-end infinite',
+                  marginLeft: '4px'
+                }}>█</span>
+              )}
+            </button>
+            <div className="separator">------------------------------------</div>
+          </>
+        )}
 
         <button 
           className="terminal-button secondary"

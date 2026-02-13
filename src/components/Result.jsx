@@ -5,7 +5,7 @@ function Result({ crime, state, onBack, onBackToInvestigation }) {
   const [showShare, setShowShare] = useState(false)
   const [showCodeCopied, setShowCodeCopied] = useState(false)
 
-  const caseCode = String(crime.id)
+  const caseCode = crime.caseCode || String(crime.id)
 
   // Usar stats congeladas quando caso já resolvido (não altera se jogador explorar mais)
   const displayStats = state.solved && state.solvedStats
@@ -66,7 +66,7 @@ function Result({ crime, state, onBack, onBackToInvestigation }) {
   const shareAttemptsBar = '[' + '■'.repeat(Math.min(displayStats.attempts || 0, maxAttempts)) + '□'.repeat(Math.max(0, maxAttempts - (displayStats.attempts || 0))) + ']'
   
   const statusShare = state.solved ? 'RESOLVIDO' : 'ENCERRADO'
-  const shareText = `CASO #${String(crime.id).slice(-3)} - ${statusShare}
+  const shareText = `CASO #${crime.caseNumber || String(crime.id).slice(-3)} - ${statusShare}
 
 ${accuracy}% DE PRECISÃO.
 PISTAS: ${shareCluesBar}

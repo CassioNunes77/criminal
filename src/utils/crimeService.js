@@ -101,12 +101,16 @@ function transformFirestoreCrime(data, dateId) {
     typeof s === 'object' ? s : { name: s, criminalRecord: 'Sem antecedentes' }
   )
 
+  const description = data.description || []
+
   return {
     id: crimeId,
+    caseCode: data.caseCode || String(crimeId),
+    caseNumber: data.caseNumber,
     type: data.type || 'CRIME',
     location: data.location || '',
     time: data.time || '',
-    description: data.description || [],
+    description,
     suspects: suspectsWithRecords.map(s => s.name),
     suspectsWithRecords,
     locations: data.locations || [],

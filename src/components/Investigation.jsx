@@ -37,7 +37,7 @@ function Investigation({ crime, state, onDiscoverClue, onViewWitness, onMakeAccu
       typewriterSoundRef.current.init()
     }
 
-    const caseNum = String(crime.id).slice(-3)
+    const caseNum = crime.caseNumber || String(crime.id).slice(-3)
     const line1 = `Caso #${caseNum}`
     const line2 = `${crime.type} EM ${crime.location}`
     const today = new Date()

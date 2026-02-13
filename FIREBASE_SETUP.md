@@ -94,16 +94,36 @@ Configure no Netlify: **Site settings → Environment variables**:
 |------|-------|----------|
 | `OPENAI_API_KEY` | Chave da API OpenAI | Sim |
 | `FIREBASE_SERVICE_ACCOUNT` | JSON completo da service account (Firebase Console → Project settings → Service accounts → Generate new private key) | Sim |
+| `TRIGGER_SECRET` | Token secreto para forçar geração manual (ex: `openssl rand -hex 32`) | Sim |
 
 O JSON da service account deve ser colado inteiro em uma única linha (remova quebras de linha do arquivo baixado). Exemplo do formato:
 ```json
 {"type":"service_account","project_id":"...","private_key_id":"...","private_key":"...","client_email":"...","client_id":"...","auth_uri":"...","token_uri":"...","auth_provider_x509_cert_url":"...","client_x509_cert_url":"..."}
 ```
 
+### Como forçar um novo caso (manual)
+
+Endpoint HTTP para gerar caso na hora:
+
+```bash
+curl -X POST https://SEU-SITE.netlify.app/.netlify/functions/trigger-daily-case \
+  -H "Authorization: Bearer SEU_TRIGGER_SECRET"
+```
+
+Ou com header alternativo:
+
+```bash
+curl -X POST https://SEU-SITE.netlify.app/.netlify/functions/trigger-daily-case \
+  -H "X-Trigger-Secret: SEU_TRIGGER_SECRET"
+```
+
+Configure `TRIGGER_SECRET` nas variáveis de ambiente do Netlify (pode gerar com `openssl rand -hex 32`).
+
 ### Como testar
 
 1. **Netlify UI:** Site → Functions → `generate-daily-case` → **Run now**
-2. **CLI:** `netlify dev` e depois `netlify functions:invoke generate-daily-case`
+2. **Trigger manual:** `curl -X POST .../trigger-daily-case -H "Authorization: Bearer SEU_SECRET"`
+3. **CLI:** `netlify dev` e depois `netlify functions:invoke generate-daily-case`
 
 ### Deploy Firestore Rules (apenas uma vez)
 

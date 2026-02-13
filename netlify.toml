@@ -2,6 +2,9 @@
   command = "npm run build"
   publish = "dist"
 
+[functions]
+  included_files = ["netlify/functions/lib/**"]
+
 [functions."generate-daily-case"]
   schedule = "0 3 * * *"  # 00:00 America/Sao_Paulo = 03:00 UTC
 

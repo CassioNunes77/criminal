@@ -560,13 +560,13 @@ function Investigation({ crime, state, onDiscoverClue, onViewWitness, onMakeAccu
         <div className="hypothesis-section">
           <div className="section-title">HIPOTESE ATUAL:</div>
           <div className="hypothesis-line">
-            SUSPEITO: {selectedSuspect || '?'}
+            SUSPEITO: {showViewResult && state.hypothesis?.suspect ? state.hypothesis.suspect : (selectedSuspect || '?')}
           </div>
           <div className="hypothesis-line">
-            LOCAL: {selectedLocation || '?'}
+            LOCAL: {showViewResult && state.hypothesis?.location ? state.hypothesis.location : (selectedLocation || '?')}
           </div>
           <div className="hypothesis-line">
-            METODO: {selectedMethod || '?'}
+            METODO: {showViewResult && state.hypothesis?.method ? state.hypothesis.method : (selectedMethod || '?')}
           </div>
         </div>
 

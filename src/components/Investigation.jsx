@@ -122,6 +122,7 @@ function Investigation({ crime, state, onDiscoverClue, onViewWitness, onMakeAccu
   const currentAttempts = Math.max(0, Math.min(state.attempts || 0, maxAttempts)) // Ensure valid range
   const remainingAttempts = Math.max(0, maxAttempts - currentAttempts)
   const isFailed = remainingAttempts <= 0 && !state.solved
+  const showViewResult = state.solved || isFailed
 
   // Get suspects with records
   const suspectsWithRecords = crime.suspectsWithRecords || crime.suspects.map(s =>
@@ -130,17 +131,17 @@ function Investigation({ crime, state, onDiscoverClue, onViewWitness, onMakeAccu
 
   // Main menu buttons - ordem única para cursor e teclado
   const mainButtons = [
-    (!showWitnesses && witnessesViewed.length < crime.witnesses.length && !isFailed) && 'witnesses',
+    (!showWitnesses && witnessesViewed.length < crime.witnesses.length && !showViewResult) && 'witnesses',
     !showSuspects && 'suspects',
     'case',
     (!isFailed && remainingAttempts > 0) && 'accusation',
-    isFailed && 'viewResult',
+    showViewResult && 'viewResult',
     'back'
   ].filter(Boolean)
 
   // Itens focáveis: pistas (se houver) + botões do menu. Ordem visual para setas cima/baixo
   const focusableItems = [
-    ...(canDiscoverMore && !isFailed ? availableClues.map((c, i) => ({ type: 'clue', index: i })) : []),
+    ...(canDiscoverMore && !showViewResult ? availableClues.map((c, i) => ({ type: 'clue', index: i })) : []),
     ...mainButtons.map(id => ({ type: 'button', id }))
   ]
 
@@ -380,9 +381,9 @@ function Investigation({ crime, state, onDiscoverClue, onViewWitness, onMakeAccu
           TENTATIVAS: {currentAttempts}/{maxAttempts} {remainingAttempts > 0 ? `(${remainingAttempts} RESTANTES)` : '(ESGOTADAS)'}
         </div>
 
-        {isFailed && (
-          <div className="feedback error">
-            CASO ENCERRADO. VOCE FALHOU.
+        {showViewResult && (
+          <div className={`feedback ${state.solved ? 'success' : 'error'}`}>
+            {state.solved ? 'CASO RESOLVIDO!' : 'CASO ENCERRADO. VOCE FALHOU.'}
           </div>
         )}
 
@@ -393,7 +394,7 @@ function Investigation({ crime, state, onDiscoverClue, onViewWitness, onMakeAccu
             <span className="progress-bar">{renderProgressBar(revealedClues.length, crime.clues.length)}</span>
           </div>
 
-          {canDiscoverMore && !isFailed && (
+          {canDiscoverMore && !showViewResult && (
             <div className="clue-selection">
               <div className="form-label">ESCOLHA QUAL PISTA REVELAR:</div>
               <div className="form-options">
@@ -441,7 +442,7 @@ function Investigation({ crime, state, onDiscoverClue, onViewWitness, onMakeAccu
             <span className="progress-bar">{renderProgressBar(witnessesViewed.length, crime.witnesses.length)}</span>
           </div>
 
-          {!showWitnesses && witnessesViewed.length < crime.witnesses.length && !isFailed && (
+          {!showWitnesses && witnessesViewed.length < crime.witnesses.length && !showViewResult && (
             <button 
               className="terminal-button" 
               onClick={() => setShowWitnesses(true)}
@@ -570,7 +571,7 @@ function Investigation({ crime, state, onDiscoverClue, onViewWitness, onMakeAccu
         </div>
 
         {/* Accusation Form */}
-        {!showAccusation && !isFailed ? (
+        {!showAccusation && !showViewResult ? (
           <button 
             className="terminal-button"
             onClick={() => remainingAttempts > 0 && setShowAccusation(true)}
@@ -588,7 +589,7 @@ function Investigation({ crime, state, onDiscoverClue, onViewWitness, onMakeAccu
               }}>█</span>
             )}
           </button>
-        ) : showAccusation && !isFailed ? (
+        ) : showAccusation && !showViewResult ? (
           (() => {
             const confirmIdx = suspectsWithRecords.length + crime.locations.length + crime.methods.length
             const cancelIdx = confirmIdx + 1
@@ -720,8 +721,8 @@ function Investigation({ crime, state, onDiscoverClue, onViewWitness, onMakeAccu
           })()
         ) : null}
 
-        {/* Ver resultado - ao final, quando tentativas esgotadas */}
-        {isFailed && (
+        {/* Ver resultado - ao final, quando caso resolvido ou tentativas esgotadas */}
+        {showViewResult && (
           <>
             <button 
               className="terminal-button highlight"

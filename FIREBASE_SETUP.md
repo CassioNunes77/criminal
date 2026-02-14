@@ -6,7 +6,7 @@
 |-------|--------------|--------|
 | 1. Deploy Firestore Rules | `firebase deploy --only firestore:rules` | ⬜ |
 | 2. Service Account | Firebase Console → Service accounts → Gerar nova chave | ⬜ |
-| 3. Netlify Env Vars | `OPENAI_API_KEY`, `FIREBASE_SERVICE_ACCOUNT` (JSON) | ⬜ |
+| 3. Netlify Env Vars | `GROQ_API_KEY`, `FIREBASE_SERVICE_ACCOUNT` (JSON) | ⬜ |
 | 4. App `.env.local` | Variáveis `VITE_FIREBASE_*` do Console | ⬜ |
 | 5. Deploy Netlify | Push para repositório conectado | ⬜ |
 
@@ -15,8 +15,8 @@
 ## Arquitetura
 
 ```
-[Netlify Scheduled] → [Netlify Function] → [OpenAI API] → [Firestore]
-   (0 3 * * * UTC)      (Node.js)           (GPT-4o-mini)    (crimes)
+[Netlify Scheduled] → [Netlify Function] → [Groq API] → [Firestore]
+   (0 3 * * * UTC)      (Node.js)           (llama-3.1-8b)   (crimes)
 ```
 
 Um caso novo é gerado por IA todo dia às 00:00 (America/Sao_Paulo). O mesmo caso para todos os jogadores globalmente. Usa **Netlify Scheduled Functions** (gratuito), sem necessidade de plano Blaze.
@@ -92,7 +92,7 @@ Configure no Netlify: **Site settings → Environment variables**:
 
 | Nome | Valor | Sensível |
 |------|-------|----------|
-| `OPENAI_API_KEY` | Chave da API OpenAI | Sim |
+| `GROQ_API_KEY` | Chave da API Groq (https://console.groq.com) | Sim |
 | `FIREBASE_SERVICE_ACCOUNT` | JSON completo da service account (Firebase Console → Project settings → Service accounts → Generate new private key) | Sim |
 | `TRIGGER_SECRET` | Token secreto para forçar geração manual (ex: `openssl rand -hex 32`) | Sim |
 
@@ -199,4 +199,4 @@ O crime do dia é armazenado em cache (localStorage) ao ser carregado com sucess
 
 ## Prompt de IA
 
-O prompt completo está em `prompts/generateDailyCase.js`. A função usa OpenAI (GPT-4o-mini) e segue as regras de ouro do game.
+O prompt completo está em `prompts/generateDailyCase.js`. A função usa Groq (llama-3.1-8b-instant) e segue as regras de ouro do game.

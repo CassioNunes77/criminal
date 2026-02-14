@@ -83,7 +83,7 @@ export async function runGenerateCase() {
   })
 
   const completion = await openai.chat.completions.create({
-    model: 'llama-3.1-8b-instruct',
+    model: 'llama-3.1-8b-instant',
     messages: [
       {
         role: 'system',

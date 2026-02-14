@@ -10,7 +10,7 @@ function App() {
   const [screen, setScreen] = useState('home')
   const [currentCrime, setCurrentCrime] = useState(null)
   const [isLoading, setIsLoading] = useState(true)
-  const [offlineNoCache, setOfflineNoCache] = useState(false)
+  const [errorNoCrime, setErrorNoCrime] = useState(false)
   const [x7, setX7] = useState(false)
   const [investigationState, setInvestigationState] = useState({
     cluesDiscovered: 0,
@@ -31,12 +31,12 @@ function App() {
     const startTime = Date.now()
     const minLoadTime = 1000
     try {
-      setOfflineNoCache(false)
+      setErrorNoCrime(false)
       setIsLoading(true)
       const crime = await getDailyCrimeFromFirebase()
       setCurrentCrime(crime)
       if (!crime) {
-        setOfflineNoCache(true)
+        setErrorNoCrime(true)
         setIsLoading(false)
         return
       }
@@ -79,7 +79,7 @@ function App() {
       setTimeout(() => setIsLoading(false), remainingTime)
     } catch (error) {
       console.error('Error loading crime:', error)
-      setOfflineNoCache(true)
+      setErrorNoCrime(true)
       setTimeout(() => setIsLoading(false), minLoadTime)
     }
   }
@@ -181,7 +181,7 @@ function App() {
     }
   }
 
-  if (offlineNoCache) {
+  if (errorNoCrime) {
     return (
       <div className="app" style={{
         minHeight: '100vh',
@@ -207,15 +207,7 @@ function App() {
           textAlign: 'center',
           maxWidth: '500px'
         }}>
-          *** NO CARRIER ***
-          <br /><br />
-          CONEXAO REMOTA INDISPONIVEL.
-          <br />
-          Caso do dia nao disponivel (sem internet, caso nao gerado ou falha de conexao).
-          <br /><br />
-          <span style={{ color: '#00CC55', fontSize: '13px' }}>
-            Verifique sua conexao e tente novamente.
-          </span>
+          CASO DO DIA NAO DISPONIVEL.
         </div>
         <button
           onClick={load}

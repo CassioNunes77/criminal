@@ -1,8 +1,6 @@
 import { getDoc, doc } from 'firebase/firestore/lite'
 import { db } from '../firebase'
 
-const CACHE_PREFIX = 'nexo_crime_cache_'
-
 function decodeFirestoreValue(v) {
   if (!v) return null
   if (v.stringValue !== undefined) return v.stringValue
@@ -44,44 +42,7 @@ function getDateId() {
   return `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`
 }
 
-function getStorage() {
-  try {
-    if (typeof localStorage !== 'undefined') return localStorage
-  } catch (_) {}
-  try {
-    if (typeof sessionStorage !== 'undefined') return sessionStorage
-  } catch (_) {}
-  return null
-}
-
-function getCachedCrime(dateId) {
-  const storage = getStorage()
-  if (!storage) return null
-  try {
-    const cached = storage.getItem(CACHE_PREFIX + dateId)
-    if (cached) {
-      const crime = JSON.parse(cached)
-      return normalizeCachedCrime(crime)
-    }
-  } catch (e) {
-    console.warn('Cache read failed:', e.message)
-  }
-  return null
-}
-
-function cacheCrime(dateId, crime) {
-  const storage = getStorage()
-  if (!storage) return
-  try {
-    const toStore = { ...crime }
-    delete toStore.date
-    storage.setItem(CACHE_PREFIX + dateId, JSON.stringify(toStore))
-  } catch (e) {
-    console.warn('Cache write failed:', e.message)
-  }
-}
-
-function normalizeCachedCrime(crime) {
+function normalizeCrime(crime) {
   const suspects = crime.suspects || []
   const suspectsWithRecords = crime.suspectsWithRecords || suspects.map(s =>
     typeof s === 'object' ? s : { name: s, criminalRecord: 'Sem antecedentes' }
@@ -139,11 +100,7 @@ export async function getDailyCrimeFromFirebase() {
 
   try {
     const crime = await fetchViaNetlifyFunction(dateId)
-    if (crime) {
-      const normalized = normalizeCachedCrime(crime)
-      cacheCrime(dateId, normalized)
-      return normalized
-    }
+    if (crime) return normalizeCrime(crime)
   } catch (err) {
     console.warn('[Nexo] Netlify function falhou:', err.message)
   }
@@ -158,9 +115,7 @@ export async function getDailyCrimeFromFirebase() {
         const snapshot = await getDoc(docRef)
         if (snapshot.exists()) {
           const data = snapshot.data()
-          const crime = transformFirestoreCrime(data, dateId)
-          cacheCrime(dateId, crime)
-          return crime
+          return transformFirestoreCrime(data, dateId)
         }
       }
     } catch (err) {
@@ -170,17 +125,12 @@ export async function getDailyCrimeFromFirebase() {
     try {
       const data = await fetchViaRestApi(dateId)
       if (data && Object.keys(data).length > 0) {
-        const crime = transformFirestoreCrime(data, dateId)
-        cacheCrime(dateId, crime)
-        return crime
+        return transformFirestoreCrime(data, dateId)
       }
     } catch (restErr) {
       console.warn('[Nexo] REST fallback falhou:', restErr.message)
     }
   }
-
-  const cached = getCachedCrime(dateId)
-  if (cached) return cached
 
   return null
 }

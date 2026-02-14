@@ -1,6 +1,5 @@
 import { getDoc, doc } from 'firebase/firestore'
 import { db } from '../firebase'
-import { getDailyCrime as getLocalCrime } from './dailySeed'
 
 const CACHE_PREFIX = 'nexo_crime_cache_'
 
@@ -26,7 +25,6 @@ function cacheCrime(dateId, crime) {
   try {
     const toStore = { ...crime }
     delete toStore.date
-    delete toStore.offlineNoCache
     localStorage.setItem(CACHE_PREFIX + dateId, JSON.stringify(toStore))
   } catch (e) {
     console.warn('Cache write failed:', e.message)
@@ -56,7 +54,7 @@ function normalizeCachedCrime(crime) {
  * Documento: YYYY-MM-DD (ex: 2026-02-12)
  *
  * Modo offline: se Firebase falhar, usa crime em cache (do mesmo dia).
- * Se não houver cache, usa dailySeed local.
+ * Se não houver cache, retorna null (não usa casos mockados).
  */
 export async function getDailyCrimeFromFirebase() {
   const dateId = getDateId()
@@ -64,10 +62,7 @@ export async function getDailyCrimeFromFirebase() {
   if (!db || !import.meta.env.VITE_FIREBASE_API_KEY) {
     const cached = getCachedCrime(dateId)
     if (cached) return cached
-    const crime = getLocalCrime()
-    crime.offlineNoCache = true
-    cacheCrime(dateId, crime)
-    return crime
+    return null
   }
 
   try {
@@ -87,10 +82,7 @@ export async function getDailyCrimeFromFirebase() {
   const cached = getCachedCrime(dateId)
   if (cached) return cached
 
-  const crime = getLocalCrime()
-  crime.offlineNoCache = true
-  cacheCrime(dateId, crime)
-  return crime
+  return null
 }
 
 /**

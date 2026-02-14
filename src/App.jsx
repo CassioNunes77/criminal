@@ -11,6 +11,7 @@ function App() {
   const [screen, setScreen] = useState('home')
   const [currentCrime, setCurrentCrime] = useState(null)
   const [isLoading, setIsLoading] = useState(true)
+  const [offlineNoCache, setOfflineNoCache] = useState(false)
   const [investigationState, setInvestigationState] = useState({
     cluesDiscovered: 0,
     cluesRevealed: [],
@@ -26,32 +27,29 @@ function App() {
     failed: false
   })
 
-  useEffect(() => {
+  const load = async () => {
     const startTime = Date.now()
-    const minLoadTime = 1000 // Minimum 1 second
-
-    const load = async () => {
-      try {
-        // Load daily crime (Firebase ou fallback local)
-        const crime = await getDailyCrimeFromFirebase()
-        setCurrentCrime(crime)
-      
-      // Load saved state from localStorage (but always start at home screen)
+    const minLoadTime = 1000
+    try {
+      setOfflineNoCache(false)
+      setIsLoading(true)
+      const crime = await getDailyCrimeFromFirebase()
+      setCurrentCrime(crime)
+      if (!crime) {
+        setOfflineNoCache(true)
+        setIsLoading(false)
+        return
+      }
       try {
         const savedState = localStorage.getItem(`crime_${crime.id}`)
         if (savedState) {
           const parsed = JSON.parse(savedState)
-          // Validate and sanitize saved state
           const sanitizedState = {
             cluesDiscovered: parsed.cluesDiscovered || 0,
             cluesRevealed: parsed.cluesRevealed || [],
             witnessesViewed: parsed.witnessesViewed || [],
-            attempts: Math.max(0, Math.min(parsed.attempts || 0, 3)), // Ensure between 0 and 3
-            hypothesis: parsed.hypothesis || {
-              suspect: null,
-              location: null,
-              method: null
-            },
+            attempts: Math.max(0, Math.min(parsed.attempts || 0, 3)),
+            hypothesis: parsed.hypothesis || { suspect: null, location: null, method: null },
             streak: parsed.streak || 0,
             solved: parsed.solved || false,
             failed: parsed.failed || false,
@@ -62,42 +60,31 @@ function App() {
             } : null)
           }
           setInvestigationState(sanitizedState)
-          // Always start at home screen, regardless of saved state
         }
       } catch (e) {
         console.warn('Error loading saved state:', e)
-        // Reset to initial state on error
         setInvestigationState({
           cluesDiscovered: 0,
           cluesRevealed: [],
           witnessesViewed: [],
           attempts: 0,
-          hypothesis: {
-            suspect: null,
-            location: null,
-            method: null
-          },
+          hypothesis: { suspect: null, location: null, method: null },
           streak: 0,
           solved: false,
           failed: false
         })
       }
-
-        // Ensure minimum loading time of 1 second
-        const elapsed = Date.now() - startTime
-        const remainingTime = Math.max(0, minLoadTime - elapsed)
-
-        setTimeout(() => {
-          setIsLoading(false)
-        }, remainingTime)
-      } catch (error) {
-        console.error('Error loading crime:', error)
-        setTimeout(() => {
-          setIsLoading(false)
-        }, minLoadTime)
-      }
+      const elapsed = Date.now() - startTime
+      const remainingTime = Math.max(0, minLoadTime - elapsed)
+      setTimeout(() => setIsLoading(false), remainingTime)
+    } catch (error) {
+      console.error('Error loading crime:', error)
+      setOfflineNoCache(true)
+      setTimeout(() => setIsLoading(false), minLoadTime)
     }
+  }
 
+  useEffect(() => {
     load()
   }, [])
 
@@ -194,6 +181,61 @@ function App() {
         date: new Date().toDateString()
       }))
     }
+  }
+
+  if (offlineNoCache) {
+    return (
+      <div className="app" style={{
+        minHeight: '100vh',
+        padding: '16px',
+        maxWidth: '1200px',
+        margin: '0 auto',
+        background: '#020403',
+        color: '#00CC55',
+        fontFamily: "'PxPlus IBM VGA8', monospace",
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        justifyContent: 'center'
+      }}>
+        <div style={{
+          padding: '24px 32px',
+          border: '2px solid #FF6600',
+          background: 'rgba(255, 102, 0, 0.06)',
+          color: '#FF6600',
+          fontFamily: "'PxPlus IBM VGA8', monospace",
+          fontSize: '14px',
+          lineHeight: 1.8,
+          textAlign: 'center',
+          maxWidth: '500px'
+        }}>
+          *** NO CARRIER ***
+          <br /><br />
+          CONEXAO REMOTA INDISPONIVEL.
+          <br />
+          CASO DO DIA NAO DISPONIVEL SEM INTERNET.
+          <br /><br />
+          <span style={{ color: '#00CC55', fontSize: '13px' }}>
+            Reconecte e tente novamente.
+          </span>
+        </div>
+        <button
+          onClick={load}
+          style={{
+            marginTop: '24px',
+            padding: '12px 24px',
+            background: 'none',
+            border: '1px solid #00FF66',
+            color: '#00FF66',
+            fontFamily: "'PxPlus IBM VGA8', monospace",
+            fontSize: '14px',
+            cursor: 'pointer'
+          }}
+        >
+          &gt; TENTAR NOVAMENTE
+        </button>
+      </div>
+    )
   }
 
   if (!currentCrime || isLoading) {

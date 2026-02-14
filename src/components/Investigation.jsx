@@ -41,10 +41,7 @@ function Investigation({ crime, state, onDiscoverClue, onViewWitness, onMakeAccu
 
     const caseNum = crime.caseNumber || String(crime.id).slice(-3)
     const line1 = `Caso #${caseNum}`
-    const firstDesc = crime.description?.[0] || ''
-    const titleMatch = firstDesc.match(/^CASO\s*#\d+\s*-\s*(.+)$/i)
-    const crimeTitle = crime.title || (titleMatch ? titleMatch[1].trim() : '') || `${crime.type || ''} ${crime.location || ''}`.trim()
-    const line2 = crimeTitle || `${crime.type} EM ${crime.location}`
+    const line2 = crime.type || crime.title || ''
     const today = new Date()
     const day = String(today.getDate()).padStart(2, '0')
     const month = String(today.getMonth() + 1).padStart(2, '0')
@@ -116,7 +113,7 @@ function Investigation({ crime, state, onDiscoverClue, onViewWitness, onMakeAccu
     return () => {
       if (timeoutId) clearTimeout(timeoutId)
     }
-  }, [crime.id, crime.type, crime.location, crime.description, crime.title])
+  }, [crime.id, crime.type, crime.title])
 
   // Get available and revealed clues (usar state.cluesRevealed para re-render correto)
   const cluesRevealed = state.cluesRevealed || []

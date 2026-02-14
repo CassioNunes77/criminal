@@ -19,7 +19,9 @@ export default async (req) => {
   }
 
   try {
-    const result = await runGenerateCase()
+    const url = new URL(req.url || '', `http://${req.headers.get('host') || 'localhost'}`)
+    const tema = url.searchParams.get('tema') || ''
+    const result = await runGenerateCase(tema ? { tema } : {})
     return Response.json({ ok: true, ...result })
   } catch (err) {
     console.error('trigger-daily-case failed:', err)

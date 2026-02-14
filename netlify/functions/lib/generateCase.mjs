@@ -23,10 +23,11 @@ function getDateSpecialInstructions(dateStr) {
   return 'NUNCA declare a data do caso em nenhum campo (descrição, pistas, depoimentos).'
 }
 
-function getPrompt(dateStr, caseNumber, caseCode) {
+function getPrompt(dateStr, caseNumber, caseCode, temaOverride) {
   const dateInstruction = getDateSpecialInstructions(dateStr)
+  const temaLine = temaOverride ? `\n## TEMA OBRIGATÓRIO (esta execução)\nO caso DEVE ser em uma ${temaOverride.toUpperCase()}. Local (location) no JSON deve refletir isso.\n\n` : ''
 
-  return `Gere um novo caso criminal para o jogo Nexo Terminal. Siga 100% a lógica do jogo.
+  return `Gere um novo caso criminal para o jogo Nexo Terminal. Siga 100% a lógica do jogo.${temaLine}
 
 ## REGRAS DE OURO (OBRIGATÓRIAS)
 - Solução única: Existe apenas UMA combinação correta: suspeito + local + método.
@@ -101,7 +102,8 @@ function generateCaseCode() {
   return code
 }
 
-export async function runGenerateCase() {
+export async function runGenerateCase(opts = {}) {
+  const { tema } = opts
   const apiKey = process.env.GROQ_API_KEY
   const serviceAccountJson = process.env.FIREBASE_SERVICE_ACCOUNT
 
@@ -148,7 +150,7 @@ export async function runGenerateCase() {
       },
       {
         role: 'user',
-        content: getPrompt(dateStr, caseNumber, caseCode)
+        content: getPrompt(dateStr, caseNumber, caseCode, tema)
       }
     ],
     temperature: 0.8,

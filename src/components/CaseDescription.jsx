@@ -212,7 +212,7 @@ function CaseDescription({ crime, onAccept, onBack }) {
           padding: '8px 0',
           color: '#00FF66'
         }}>
-          NOVA MISSÃO
+          MISSÃO
         </div>
         <div className="separator separator-full-width" style={{
           color: '#007A33',

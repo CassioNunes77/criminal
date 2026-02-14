@@ -64,9 +64,10 @@ function getPrompt(dateStr, caseNumber, caseCode, temaOverride) {
 - ${dateInstruction}
 
 ## TÍTULO E DESCRIÇÃO DO CASO
-- Título do caso deve ser apenas o nome do caso. Exemplo: FURTO DE FITAS RARAS EM VIDEOLOCADORA, Cibercrime em CPD de Banco, ROUBO EM LOJA DE ELETRÔNICOS. NÃO usar títulos como: (caso de furto, caso de...).
-- Crie uma narrativa de um caso (Mínimo 400 caracteres, Máximo 600 caracteres).
-- Crie narrativa em tom investigativo, misterioso, tenso, sentimento investigativo. A descrição do caso tem que ser uma sinopse de uma boa história, como um caso de Carmen Sandiego ou Sherlock Holmes, ambientado nos anos 80.
+- Título do caso deve ser apenas o nome do caso. Exemplo: (FURTO DE FITAS RARAS EM VIDEOLOCADORA, Cibercrime em CPD de Banco, ROUBO EM LOJA DE ELETRÔNICOS) NÃO usar títulos como: (caso de furto, caso de...).
+- É obrigado que o título seja coerente com a narrativa.
+- Crie uma descrição narrativa de um caso.
+- Crie descrição narrativa em tom investigativo, misterioso, tenso, sentimento investigativo. A descrição do caso tem que ser uma sinopse de uma boa história, como um caso de Carmen Sandiego ou Sherlock Holmes, ambientado nos anos 80.
 - NÃO ficar declarando depoimentos de testemunhas ou pistas na narrativa.
 - NÃO será permitido colocar data, nem dia, nem mês, nem ano na descrição do caso.
 - Crimes sempre da década de 80. Crie narrativa considerando apenas elementos que fazem sentido até o ano de 1987.

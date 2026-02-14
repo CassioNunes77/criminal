@@ -44,9 +44,21 @@ function getDateId() {
   return `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`
 }
 
-function getCachedCrime(dateId) {
+function getStorage() {
   try {
-    const cached = localStorage.getItem(CACHE_PREFIX + dateId)
+    if (typeof localStorage !== 'undefined') return localStorage
+  } catch (_) {}
+  try {
+    if (typeof sessionStorage !== 'undefined') return sessionStorage
+  } catch (_) {}
+  return null
+}
+
+function getCachedCrime(dateId) {
+  const storage = getStorage()
+  if (!storage) return null
+  try {
+    const cached = storage.getItem(CACHE_PREFIX + dateId)
     if (cached) {
       const crime = JSON.parse(cached)
       return normalizeCachedCrime(crime)
@@ -58,10 +70,12 @@ function getCachedCrime(dateId) {
 }
 
 function cacheCrime(dateId, crime) {
+  const storage = getStorage()
+  if (!storage) return
   try {
     const toStore = { ...crime }
     delete toStore.date
-    localStorage.setItem(CACHE_PREFIX + dateId, JSON.stringify(toStore))
+    storage.setItem(CACHE_PREFIX + dateId, JSON.stringify(toStore))
   } catch (e) {
     console.warn('Cache write failed:', e.message)
   }
@@ -84,13 +98,36 @@ function normalizeCachedCrime(crime) {
   }
 }
 
+const PRODUCTION_ORIGIN = 'https://nexoterminal.netlify.app'
+
 async function fetchViaNetlifyFunction(dateId) {
-  const base = typeof window !== 'undefined' ? window.location.origin : ''
-  const url = `${base}/.netlify/functions/get-crime?date=${encodeURIComponent(dateId)}`
-  const res = await fetch(url)
-  if (!res.ok) return null
-  const crime = await res.json()
-  return crime && crime.id ? crime : null
+  const origins = []
+  if (typeof window !== 'undefined') {
+    origins.push(window.location.origin)
+    if (window.location.origin !== PRODUCTION_ORIGIN) {
+      origins.push(PRODUCTION_ORIGIN)
+    }
+  } else {
+    origins.push(PRODUCTION_ORIGIN)
+  }
+
+  for (const base of origins) {
+    try {
+      const url = `${base}/.netlify/functions/get-crime?date=${encodeURIComponent(dateId)}`
+      const controller = new AbortController()
+      const timeout = setTimeout(() => controller.abort(), 15000)
+      const res = await fetch(url, { signal: controller.signal, credentials: 'omit' })
+      clearTimeout(timeout)
+      if (!res.ok) continue
+      const contentType = res.headers.get('content-type') || ''
+      if (!contentType.includes('application/json')) continue
+      const crime = await res.json()
+      if (crime && crime.id) return crime
+    } catch (_) {
+      continue
+    }
+  }
+  return null
 }
 
 /**

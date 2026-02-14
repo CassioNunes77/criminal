@@ -43,7 +43,7 @@ async function main() {
       name = rawName.slice(0, idx).trim()
       cargo = rawName.slice(idx + 1).trim()
     }
-    return { name, cargo, criminalRecord: s.criminalRecord || 'Sem antecedentes', caracteristica: s.caracteristica || '' }
+    return { name, cargo, criminalRecord: s.criminalRecord || 'Sem antecedentes', comportamento: s.comportamento || '', caracteristica: s.caracteristica || '', veiculo: s.veiculo || '' }
   }
 
   for (let i = 0; i < CASES_001_TO_005.length; i++) {

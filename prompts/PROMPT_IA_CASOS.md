@@ -1,12 +1,12 @@
 # Prompt para IA - Geração de Casos Nexo Terminal
 
-Use este prompt com qualquer IA para gerar casos criminais para o jogo. O caso deve ser escrito em pt-BR. **É de extrema importância que a lógica do game seja seguida em 100% – todos os detalhes.**
+Use este prompt com qualquer IA (Groq, Grok, Claude, etc.) para gerar casos criminais para o jogo. O caso deve ser escrito em pt-BR. **O caso gerado DEVE obedecer a TODOS os itens abaixo. Siga 100% a lógica do jogo. Nenhuma palavra deve ser ocultada.**
 
 ---
 
 ## Instrução para a IA
 
-Gere um novo caso criminal para o jogo Nexo Terminal. Siga 100% a lógica do jogo.
+Gere um novo caso criminal para o jogo Nexo Terminal. O caso gerado DEVE obedecer a TODOS os itens abaixo. Siga 100% a lógica do jogo. Nenhuma palavra deve ser ocultada.
 
 ---
 
@@ -27,72 +27,137 @@ Gere um novo caso criminal para o jogo Nexo Terminal. Siga 100% a lógica do jog
 
 ## EVIDÊNCIAS OBRIGATÓRIAS
 
-- **1 evidência física** (seja na descrição, em alguma testemunha ou pistas)
-- **1 evidência comportamental** (seja na descrição, em alguma testemunha ou pistas)
-- **1 evidência temporal** (seja na descrição, em alguma testemunha ou pistas)
+- Deve existir **1 evidência física** (seja na descrição, em alguma testemunha ou pistas).
+- Deve existir **1 evidência comportamental** (seja na descrição, em alguma testemunha ou pistas).
+- Deve existir **1 evidência temporal** (seja na descrição, em alguma testemunha ou pistas).
+- Sempre o caso tem que ter **mais de uma evidência** que prove o culpado.
 
 ---
 
 ## PROIBIÇÕES
 
-- Não pode existir 2 suspeitos possíveis
-- Não pode existir pista que elimina todos suspeitos
-- Não pode existir testemunha que resolve o caso sozinha
-- Sempre o caso tem que ter mais de uma evidência que prove o culpado
+- Não pode existir 2 suspeitos possíveis.
+- Não pode existir pista que elimina todos os suspeitos.
+- Não pode existir testemunha que resolve o caso sozinha.
+
+---
+
+## IDIOMA E QUALIDADE
+
+- Caso será escrito em pt-BR, sem erros gramaticais.
 
 ---
 
 ## DADOS DO CASO
 
-- **Número do caso:** sempre sequenciado #0001, #0002, #0003...
-- **Data do caso:** data real, para registro na base de dados
-- **Crimes especiais em datas comemorativas** (Halloween, Natal, etc.): nunca declare a data em nenhum campo, nem na descrição
-- **Nota 01/03:** sempre na data 01/03 de qualquer ano, o autor do crime sempre vai se chamar Cássio Nunes e sempre será um Cyber Crime ou crime relacionado com Aliens, falha na Matrix, volta no tempo
-- **Código do caso:** número, letras e caracteres randômicos gerado automaticamente
+- **Número do caso:** sempre sequenciado #0001 #0002 #0003.
+- **Data do caso:** data real, para registro na base de dados.
+- **Crimes especiais em datas comemorativas** (Halloween, Natal, etc.): Nunca declare a data em nenhum campo, nem na descrição.
+- **Nota 01/03:** sempre na data 01/03 de qualquer ano, o autor do crime sempre vai se chamar **Cássio Nunes** e sempre será um Cyber Crime ou crime relacionado com Aliens, falha na Matrix, volta no tempo. Característica: sempre usar roupa preta. Comportamento: algo relacionado a tomar Café. Veículo: Geralmente é avistado pilotando uma moto esportiva preta.
+- **Código do caso:** número, letras e caracteres randômicos gerado automaticamente para rever casos futuramente.
+- **Nunca declare a data do caso** em nenhum campo (descrição, pistas, depoimentos).
 
 ---
 
-## TÍTULO E DESCRIÇÃO
+## TÍTULO E DESCRIÇÃO DO CASO
 
-- Narrativa de um caso: **mínimo 350, máximo 500 caracteres**
-- **Não ficar declarando depoimentos de testemunhas ou pistas.** Use a narrativa como uma **história** que gere curiosidade, instigue e sentimento investigativo
-- Crimes sempre da década de 80. Elementos até 1987 (sem smartphones – não faz sentido pela data)
-- **Jamais citar a data do caso na descrição**
-- **Pista na descrição:** sempre ter algum elemento relevante na solução (ex: "dinheiro do caixa foram levados" indica local = caixa registradora). Deixar sempre uma **pista extra** na descrição
-- Sempre adicionar: *"Analise as pistas e testemunhas com cuidado. Algumas informações podem ser falsas."*
-
----
-
-## PISTAS (6 tipos – jogador escolhe qual revelar primeiro)
-
-- Horário
-- Local
-- Acesso
-- Álibi
-- Comportamento
-- Evidência
-
-Use informações soltas: "ouvi boatos que..", "registros incompletos", "por volta das 19:00".
+- **Título do caso** deve ser apenas o nome do caso. NÃO usar títulos como: (caso de furto, caso de...).
+- Crie uma **narrativa de um caso** (Mínimo 350, Máximo 500 caracteres).
+- Crie narrativa em tom **investigativo, misterioso, tenso**, sentimento investigativo.
+- **Não ficar declarando** depoimentos de testemunhas ou pistas na narrativa.
+- **Não será permitido** colocar data na descrição do caso.
+- Crimes sempre da **década de 80**. Crie narrativa considerando apenas elementos que fazem sentido até o ano de **1987**.
+- **Smartphones** não podem estar no caso, não faz sentido pela data.
+- **IMPORTANTE:** sempre na descrição da história, terá algum elemento relevante na solução do caso. Exemplo: "Dinheiro do caixa foram levados" indica que o local foi a caixa registradora – é uma **pista escondida na descrição**. Deixar sempre uma **pista extra** na descrição.
+- **Sempre adicionar** à descrição: *"Analise as pistas e testemunhas com cuidado. Algumas informações podem ser falsas."*
 
 ---
 
-## TESTEMUNHAS (3)
+## PISTAS (7 tipos – jogador escolhe qual revelar primeiro)
 
-- Sempre declarar **nome** e **cargo/função** (ex: cliente, morador, mãe de alguém)
-- Cada testemunha dá sua versão. Alguma versão pode ser falsa. Indicar **[VERDADEIRA]** ou **[PODE SER FALSA]**
-- Informações discretas: "Suspeito parecia um homem forte" (indica que provavelmente não é mulher)
-- Álibi ou testemunhas próximas (esposa, mãe, filhos) podem ou não estar falando a verdade
+Crie exatamente 7 pistas, uma de cada tipo: **HORARIO, LOCAL, ACESSO, ALIBI, COMPORTAMENTO, EVIDENCIA, VEICULO**.
+
+### 1. HORÁRIO
+Registros de tempo ligados ao crime (relógios, registros, câmeras, rotinas).
+Exemplos: "Registro de ponto indica que o último funcionário saiu às 18:45; o crime ocorreu entre 19:00 e 19:30." "Relógio de parede parado às 21:17." "Extrato do caixa mostra última operação às 14:22; o furto foi detectado às 15:00."
+Relação: O horário deve eliminar ou apontar suspeitos conforme seus álibis, rotinas ou possibilidade de estar no local.
+
+### 2. LOCAL
+Indícios do local exato do crime (vestígios, sinais, objetos, layout).
+Exemplos: "Marcas de sapato no pó atrás do balcão; só funcionários acessam essa área." "Fita cassete caída na seção de raros; o furto foi nessa prateleira."
+Relação: O local deve ser coerente com o método e com quem tinha acesso ou conhecimento do espaço.
+
+### 3. ACESSO
+Como o autor chegou ao local (chaves, entradas, conhecimento do lugar).
+Exemplos: "Fechadura intacta; só quem tinha chave ou conhecia o sistema de fechadura poderia entrar." "Porta dos fundos sem arrombamento; ex-funcionário sabia onde ficava a chave reserva."
+Relação: O acesso deve ligar-se a quem tinha chave, conhecimento ou oportunidade de entrar.
+
+### 4. ÁLIBI
+Registro de onde alguém dizia estar no momento do crime (documentos, confirmações, registros).
+Exemplos: "Registro de ligação telefônica da casa de Paulo às 20:35; a mãe confirma que ele estava em casa." "Recibo de cinema de Bruno às 21:00; sessão começava às 20:50."
+Relação: O álibi pode ser verdadeiro (elimina suspeito) ou falso (mantém suspeito). O jogador NÃO deve saber se é falso; isso só aparece no dossier.
+
+### 5. COMPORTAMENTO
+Ações ou hábitos do suspeito na cena ou antes/depois (modo de agir, rotina).
+Exemplos: "Suspeito foi direto à seção de fitas raras, sem procurar; indica conhecimento prévio do layout." "Quem furtou evitou as câmeras; conhecia os ângulos de vigilância."
+Relação: O comportamento deve ligar-se a um suspeito específico (ex-funcionário, cliente frequente, fornecedor).
+
+### 6. EVIDÊNCIA
+Vestígios materiais (impressões, objetos, marcas, resíduos).
+Exemplos: "Fio de cabelo longo encontrado na prateleira; análise compatível com suspeito de cabelos longos." "Impressão digital no caixa; não consta no cadastro de funcionários."
+Relação: A evidência deve apontar para características físicas ou objetos de um suspeito.
+
+### 7. VEÍCULO
+Indícios de veículo usado (marcas, descrições, registros).
+Exemplos: "Marcas de pneu de moto no barro atrás do estabelecimento; um suspeito possui moto vermelha." "Vizinho anotou placa parcial de um Fusca azul saindo às 21:30."
+Relação: O veículo deve coincidir com o de um suspeito (cor, modelo, uso).
+
+### REGRAS DE USO DAS PISTAS
+
+- **Pistas vêm da investigação:** registros, perícia, documentos, câmeras, vestígios.
+- **NÃO vêm de depoimentos:** não copiar ou parafrasear o que testemunhas disseram.
+- **Podem ser compatíveis:** uma pista pode reforçar um depoimento, mas deve ter origem própria.
+- Toda pista deve ter **relação direta com o caso:** horário, local, método ou suspeito.
+- Toda pista deve **ligar-se a pelo menos um suspeito:** eliminar, apontar ou manter como candidato.
+- **Nenhuma pista** pode eliminar todos os suspeitos.
+- **Álibi pode ser falso:** a pista pode registrar um álibi que depois se prova mentira. Não declarar na tela; o jogador vê só o registro (ex.: "confirmado pela mãe"); não há indicação de que é falso. O dossier revela a verdade.
+- Pistas = fontes da investigação (perícia, registros, vestígios). Testemunhas = depoimentos orais; podem coincidir com pistas, mas não são a origem delas.
+- Cada pista deve ter relação direta com o caso e com pelo menos um suspeito.
+- Pistas e depoimentos verdadeiros não podem contradizer a solução.
+- O jogador precisa cruzar pistas, depoimentos e descrição para chegar à solução.
+
+---
+
+## TESTEMUNHAS (5)
+
+- Crie 5 testemunhas relacionadas com o caso.
+- Sempre declarar **nome e sobrenome**.
+- Sempre declarar **cargo ou função** ou quem ele ou ela é na história (ex: cliente, morador, mãe de alguém).
+- Entre as testemunhas será permitido **no máximo 1 suspeito** como testemunha.
+- Cada testemunha dá sua versão (alguma versão pode ser falsa). Indicar **[VERDADEIRA]** ou **[PODE SER FALSA]**.
+- Use informações discretas: "Suspeito parecia um homem forte" (indica que provavelmente não é mulher).
+- **Falsos positivos:** depoimentos falsos podem indicar comportamento de outro suspeito.
+- Alguma testemunha com vínculo com o suspeito pode declarar depoimento falso ou verdadeiro.
+- Use elementos que simulem veracidade nos depoimentos.
+- Use tensão e mistério nos depoimentos: "ouvi boatos que..", "fiquei assustada..", "ouvi um barulho..".
+- Use registros incompletos. Use horários aproximados (ex: por volta de 19:00).
+- Álibi ou testemunhas próximas (esposa, mãe, filhos) podem ou não estar falando a verdade.
 
 ---
 
 ## SUSPEITOS (4)
 
-- Sempre declarar **nome** e **cargo/função** (ex: cliente, morador, funcionário, gerente, encanador)
-- **Histórico:** passagem pela polícia e motivo, ou "Sem antecedentes"
-- **Característica:** costuma usar azul, anda sempre de boné, tem cabelos longos (evite "usa calça jeans", "não é muito inteligente"; use "costuma usar calça jeans")
-- **Correlações:** características devem conectar a pistas, testemunhas e descrição
-- **Mínimo 3 suspeitos** citados na descrição, pistas ou depoimentos (1 por vez). Ex: suspeito visto por testemunha; na descrição fala de possível suspeito no local; em pista: "em tal horário foi visto tal pessoa". Álibi: "Paulo estava em casa (confirmado pela mãe)" – a mãe pode estar mentindo
-- Garanta a lógica: com todas as testemunhas, pistas e descrição será possível chegar a apenas um resultado correto. Faça de forma **sutil**, para não deixar o jogo simples demais
+- Sempre haverão **4 suspeitos**.
+- Suspeitos podem ser: funcionários, mãe, marido, estagiário, encanador, morador, turista, e qualquer outra coisa.
+- Sempre declarar **nome e sobrenome**.
+- Descrever **cargo ou função** ou quem ele é na história (ex: cliente, morador, funcionário, gerente, encanador).
+- **Histórico:** se já teve passagem pela polícia e o motivo, ou "Sem antecedentes".
+- **Todo suspeito terá uma Característica.** Exemplos: Cabelos longos até os ombros, Usa óculos de aro grosso, Costuma usar jaqueta de couro, Anda sempre de boné, Usa brincos grandes dourados, Costuma usar camisa azul, Usa tênis branco, Tem barba por fazer, Cabelo cacheado, Usa pulseira de prata. Crie característica de acordo com o caso. (Evite "usa calça jeans"; use "costuma usar calça jeans").
+- **Todo suspeito terá um Comportamento.** Exemplos: Foi direto ao local sem hesitar, Parecia nervoso perto do caixa, Saiu correndo após o crime, Ficou observando a vitrine antes de entrar, Pediu para trocar de nota várias vezes, Desviou o olhar quando questionado, Conhecia o layout da loja, Entrou e saiu em menos de 5 minutos, Foi ao banheiro antes do crime, Fingiu estar procurando algo na estante. Crie comportamento de acordo com o caso.
+- **Veículo:** Carro verde, bicicleta, moto esportiva ou outro meio de transporte, costuma andar a pé. Declare o veículo como comentário. Exemplo: "Geralmente avistado pilotando uma moto esportiva preta."
+- **Correlações:** características devem conectar a pistas, testemunhas e descrição. Alguma menção que conecta ao suspeito.
+- **Mencionar pelo menos 3 suspeitos** na descrição ou em depoimento de alguma testemunha ou em alguma pista. Pelo menos 3 suspeitos devem ser citados 1 por vez. Ex: suspeito visto por testemunha; na descrição fala de possível suspeito no local; em pista: "em tal horário foi visto tal pessoa". Álibi: "Paulo estava em casa (confirmado pela mãe)" – a mãe pode estar mentindo.
+- Garanta a lógica: com todas as testemunhas, pistas e descrição será possível chegar a **apenas um resultado correto**. Faça de forma **sutil**, para não deixar o jogo simples demais.
 
 ---
 
@@ -100,15 +165,66 @@ Use informações soltas: "ouvi boatos que..", "registros incompletos", "por vol
 
 ---
 
+## SOLUÇÃO
+
+- **suspect** no formato "Nome, cargo" (exatamente das listas).
+- **location** e **method** exatamente das listas.
+
+---
+
 ## DOSSIER DO CASO
 
-Texto completo: descrição, solução e dados que levam à prova do caso. **PROVE:**
-- Por que o culpado é o correto
-- Por que os outros 3 não são
-- Suspeito, Local e Método
+- Texto completo: descrição, solução e dados que levam à prova do caso.
+- **PROVE** por que o culpado é o correto e por que os outros 3 NÃO são.
+- **PROVE:** Suspeito, Local e Método.
+- **Declarar falsos positivos**, se houver.
 
 ---
 
 ## Formato de saída (JSON)
 
-Retorne APENAS JSON válido, sem markdown.
+Retorne APENAS JSON válido, sem markdown. clues: 7 itens (HORARIO, LOCAL, ACESSO, ALIBI, COMPORTAMENTO, EVIDENCIA, VEICULO). witnesses: 5 itens.
+
+```json
+{
+  "type": "",
+  "location": "",
+  "time": "",
+  "description": [],
+  "suspects": [
+    {
+      "name": "",
+      "cargo": "",
+      "criminalRecord": "",
+      "comportamento": "",
+      "caracteristica": "",
+      "veiculo": ""
+    }
+  ],
+  "locations": [],
+  "methods": [],
+  "clues": [
+    { "type": "HORARIO", "text": "" },
+    { "type": "LOCAL", "text": "" },
+    { "type": "ACESSO", "text": "" },
+    { "type": "ALIBI", "text": "" },
+    { "type": "COMPORTAMENTO", "text": "" },
+    { "type": "EVIDENCIA", "text": "" },
+    { "type": "VEICULO", "text": "" }
+  ],
+  "witnesses": [
+    {
+      "name": "",
+      "cargo": "",
+      "statement": "",
+      "isTruthful": false
+    }
+  ],
+  "solution": {
+    "suspect": "",
+    "location": "",
+    "method": ""
+  },
+  "dossier": ""
+}
+```

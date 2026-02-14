@@ -12,9 +12,14 @@ function Dossier({ crime, onBack }) {
 
   const caseNumber = crime.caseNumber || String(crime.id).slice(-4).padStart(4, '0')
   const titleLine = (crime.description && crime.description[0]) || `CASO #${caseNumber} - ${crime.type || 'CRIME'} EM ${crime.location || ''}`
-  const dateStr = crime.date || (() => {
+  const dateStr = (() => {
+    const raw = crime.date || ''
+    if (/^\d{4}-\d{2}-\d{2}$/.test(raw)) {
+      const [, m, d] = raw.split('-')
+      return `${d}/${m}/1987`
+    }
     const d = new Date()
-    return `${String(d.getDate()).padStart(2, '0')}/${String(d.getMonth() + 1).padStart(2, '0')}/${d.getFullYear()}`
+    return `${String(d.getDate()).padStart(2, '0')}/${String(d.getMonth() + 1).padStart(2, '0')}/1987`
   })()
 
   useEffect(() => {
@@ -129,6 +134,7 @@ function Dossier({ crime, onBack }) {
     <div
       className="dossier-screen"
       onClick={handleClick}
+      onTouchStart={(e) => { if (!dossierComplete) { e.preventDefault(); completeAnimation() } }}
       style={{
         fontFamily: "'PxPlus IBM VGA8', monospace",
         color: '#00CC55',
@@ -205,7 +211,7 @@ function Dossier({ crime, onBack }) {
                 width: '100%'
               }}
             >
-              &gt; VOLTAR AO RESULTADO
+              &gt; VOLTAR
             </button>
           </>
         )}

@@ -549,9 +549,19 @@ function Investigation({ crime, state, onDiscoverClue, onViewWitness, onMakeAccu
                   <div className="suspect-record-text">
                     HISTORICO: {suspect.criminalRecord}
                   </div>
+                  {suspect.comportamento && (
+                    <div className="suspect-record-text">
+                      COMPORTAMENTO: {suspect.comportamento}
+                    </div>
+                  )}
                   {suspect.caracteristica && (
                     <div className="suspect-record-text">
                       CARACTERISTICA: {suspect.caracteristica}
+                    </div>
+                  )}
+                  {suspect.veiculo && (
+                    <div className="suspect-record-text">
+                      VEICULO: {suspect.veiculo}
                     </div>
                   )}
                 </div>

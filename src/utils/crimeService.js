@@ -57,7 +57,7 @@ function ensureDescriptionArray(desc) {
 }
 
 function normalizeSuspect(s) {
-  if (typeof s !== 'object') return { name: String(s), cargo: '', criminalRecord: 'Sem antecedentes', caracteristica: '' }
+  if (typeof s !== 'object') return { name: String(s), cargo: '', criminalRecord: 'Sem antecedentes', comportamento: '', caracteristica: '', veiculo: '' }
   const rawName = (s.name || '').trim()
   let name = rawName
   let cargo = (s.cargo || '').trim()
@@ -72,7 +72,9 @@ function normalizeSuspect(s) {
     displayName: name,
     cargo,
     criminalRecord: s.criminalRecord || 'Sem antecedentes',
-    caracteristica: s.caracteristica || ''
+    comportamento: s.comportamento || '',
+    caracteristica: s.caracteristica || '',
+    veiculo: s.veiculo || ''
   }
 }
 

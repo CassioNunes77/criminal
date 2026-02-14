@@ -2,7 +2,7 @@
   font-family: 'IBM Plex Mono', monospace;
 }
 
-/* Edge-to-edge: header quebra o padding do .app */
+/* Edge-to-edge: header e separadores quebram o padding do .app */
 .case-description .terminal-header {
   margin-left: -16px;
   margin-right: -16px;
@@ -11,9 +11,17 @@
   box-sizing: border-box;
 }
 
-.separator-full-width {
+.case-description .separator-full-width {
   overflow: hidden;
   white-space: nowrap;
   width: 100%;
   box-sizing: border-box;
+}
+
+@media (max-width: 768px) {
+  .case-description .terminal-header {
+    margin-left: -12px;
+    margin-right: -12px;
+    width: calc(100% + 24px);
+  }
 }

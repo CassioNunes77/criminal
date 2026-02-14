@@ -40,24 +40,32 @@ Um caso novo é gerado por IA todo dia às 00:00 (America/Sao_Paulo). O mesmo ca
   "time": "23:15",
   "description": ["CASO #0001 - ROUBO EM...", "", "..."],
   "suspects": [
-    { "name": "João Silva", "criminalRecord": "Passagem por furto em 1982" }
+    {
+      "name": "João Silva",
+      "cargo": "encanador",
+      "criminalRecord": "Passagem por furto em 1982",
+      "comportamento": "foi direto ao local",
+      "caracteristica": "costuma usar boné",
+      "veiculo": "Fusca azul"
+    }
   ],
   "locations": ["Porta dos Fundos", "Vitrine Principal", "Depósito", "Escritório"],
   "methods": ["Arrombamento", "Chave falsa", "Ajuda interna", "Janela lateral"],
   "clues": [
-    { "type": "HORARIO", "text": "Crime ocorreu às 23:15" },
-    { "type": "LOCAL", "text": "Local exato: Porta dos Fundos" },
+    { "type": "HORARIO", "text": "..." },
+    { "type": "LOCAL", "text": "..." },
     { "type": "ACESSO", "text": "..." },
     { "type": "ALIBI", "text": "..." },
     { "type": "COMPORTAMENTO", "text": "..." },
-    { "type": "EVIDENCIA", "text": "..." }
+    { "type": "EVIDENCIA", "text": "..." },
+    { "type": "...", "text": "..." }
   ],
   "witnesses": [
-    {
-      "name": "Roberto, Segurança Noturno",
-      "statement": "Vi uma pessoa alta saindo...",
-      "isTruthful": true
-    }
+    { "name": "Roberto", "cargo": "Segurança Noturno", "statement": "...", "isTruthful": true },
+    { "name": "...", "cargo": "...", "statement": "...", "isTruthful": false },
+    { "name": "...", "cargo": "...", "statement": "...", "isTruthful": true },
+    { "name": "...", "cargo": "...", "statement": "...", "isTruthful": false },
+    { "name": "...", "cargo": "...", "statement": "...", "isTruthful": true }
   ],
   "solution": {
     "suspect": "João Silva",
@@ -75,6 +83,9 @@ Um caso novo é gerado por IA todo dia às 00:00 (America/Sao_Paulo). O mesmo ca
 - **caseNumber**: Sequencial (#0001, #0002...)
 - **caseCode**: Código alfanumérico randômico (8 chars) para referência futura
 - **dossier**: Dados internos, não expostos ao jogador
+- **clues**: 7 pistas
+- **witnesses**: 5 testemunhas
+- **suspects**: cada um com name, cargo, criminalRecord, comportamento, caracteristica, veiculo (opcional)
 
 ---
 
@@ -100,6 +111,16 @@ O JSON da service account deve ser colado inteiro em uma única linha (remova qu
 ```json
 {"type":"service_account","project_id":"...","private_key_id":"...","private_key":"...","client_email":"...","client_id":"...","auth_uri":"...","token_uri":"...","auth_provider_x509_cert_url":"...","client_x509_cert_url":"..."}
 ```
+
+### Atualizar caso de hoje (com nova lógica do jogo)
+
+O prompt em `netlify/functions/lib/generateCase.mjs` contém a lógica completa do jogo. Após alterações no prompt, faça deploy e dispare o trigger para regenerar o caso:
+
+```bash
+TRIGGER_SECRET=seu_secret ./scripts/trigger-case.sh
+```
+
+O caso será gerado via Groq API (llama-3.1-8b-instant) e salvo no Firebase para a data atual.
 
 ### Como forçar um novo caso (manual)
 

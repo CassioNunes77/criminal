@@ -2,6 +2,7 @@
 # Gera o caso do dia manualmente (quando o agendamento não rodou)
 # Uso: TRIGGER_SECRET=seu_secret ./scripts/trigger-case.sh
 # Com tema: TRIGGER_SECRET=xxx TEMA=videolocadora ./scripts/trigger-case.sh
+# Caso #0001: TRIGGER_SECRET=xxx CASE_NUMBER=1 TEMA=videolocadora ./scripts/trigger-case.sh
 
 if [ -z "$TRIGGER_SECRET" ]; then
   echo "Erro: defina TRIGGER_SECRET"

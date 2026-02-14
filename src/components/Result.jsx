@@ -17,7 +17,7 @@ function Result({ crime, state, onBack, onBackToInvestigation, onViewDossier }) 
   const witnessesCount = witnessesViewed.length || (crime.witnesses ? crime.witnesses.length : 0)
   
   const renderCluesBar = () => {
-    const total = crime.clues ? crime.clues.length : 6
+    const total = crime.clues ? crime.clues.length : 7
     const safeRevealed = Math.max(0, Math.min(cluesRevealed || 0, total))
     const safeRemaining = Math.max(0, total - safeRevealed)
     const filled = '■'.repeat(safeRevealed)
@@ -26,7 +26,7 @@ function Result({ crime, state, onBack, onBackToInvestigation, onViewDossier }) 
   }
   
   const renderWitnessesBar = () => {
-    const total = 3
+    const total = crime.witnesses ? crime.witnesses.length : 5
     const safeCount = Math.max(0, Math.min(witnessesCount || 0, total))
     const safeRemaining = Math.max(0, total - safeCount)
     const filled = '■'.repeat(safeCount)
@@ -40,8 +40,8 @@ function Result({ crime, state, onBack, onBackToInvestigation, onViewDossier }) 
   // Precisão: 100% base. Maior peso para tentativas (55%), depois pistas (25%), testemunhas (20%)
   // 1ª tentativa correta + 0 pistas + 0 testemunhas = 100%
   // 3 tentativas sem resolver = 0%
-  const totalClues = crime.clues ? crime.clues.length : 6
-  const totalWitnesses = 3
+  const totalClues = crime.clues ? crime.clues.length : 7
+  const totalWitnesses = crime.witnesses ? crime.witnesses.length : 5
   const maxAttempts = 3
   const isFailed = !state.solved && (displayStats.attempts || 0) >= maxAttempts
   const accuracy = isFailed
@@ -200,15 +200,12 @@ https://nexoterminal.netlify.app/`
         <div className="case-code-section">
           <div className="case-code-line">
             CODIGO: <span 
-              className="highlight case-code-clickable" 
+              className={`highlight case-code-clickable ${showCodeCopied ? 'case-code-glitch' : ''}`}
               onClick={copyCaseCode}
               title="Clique para copiar"
             >
-              {caseCode}
+              {showCodeCopied ? 'COPIADO' : caseCode}
             </span>
-            {showCodeCopied && (
-              <span className="case-code-feedback">&gt; Codigo Copiado</span>
-            )}
           </div>
         </div>
       </div>

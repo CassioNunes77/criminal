@@ -15,7 +15,7 @@ function Home({ crime, streak, onStart }) {
   const [dots, setDots] = useState('')
   const [aboutComplete, setAboutComplete] = useState(false)
   const [infoComplete, setInfoComplete] = useState(false)
-  const [selectedButton, setSelectedButton] = useState(0) // 0 = iniciar, 1 = sobre, 2 = info
+  const [selectedButton, setSelectedButton] = useState(0) // 0 = iniciar, 1 = arquivo, 2 = info
   const [crtGlitch, setCrtGlitch] = useState(false)
   const [crtFlicker, setCrtFlicker] = useState(false)
   const [crtDistortion, setCrtDistortion] = useState(0)
@@ -63,9 +63,9 @@ function Home({ crime, streak, onStart }) {
     '',
     'Um novo caso foi atribuido a voce. Apresente-se ao terminal.',
     '',
-    'PISTAS: Sao 6 tipos. Voce escolhe qual revelar primeiro: Horario, Local, Acesso, Alibi, Comportamento, Evidencia.',
+    'PISTAS: Sao 7 tipos. Voce escolhe qual revelar primeiro.',
     '',
-    'TESTEMUNHAS: 3 depoimentos. Alguns podem ser falsos. Analise com cuidado.',
+    'TESTEMUNHAS: 5 depoimentos. Alguns podem ser falsos. Analise com cuidado.',
     '',
     'SUSPEITOS: 4 suspeitos com nome e historico criminal. Um é o culpado.',
     '',
@@ -760,7 +760,7 @@ function Home({ crime, streak, onStart }) {
             if (selectedButton !== 1) e.target.style.color = '#00CC55'
           }}
         >
-          &gt; SOBRE
+          &gt; ARQUIVO
           {selectedButton === 1 && titleAnimationComplete && (
             <span className="cursor-blink" style={{
               color: '#00FF66',

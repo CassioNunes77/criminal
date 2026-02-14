@@ -46,7 +46,7 @@ export default async (req) => {
     const suspects = data.suspects || []
 
     const normalizeSuspect = (s) => {
-      if (typeof s !== 'object') return { name: String(s), cargo: '', criminalRecord: 'Sem antecedentes', caracteristica: '' }
+      if (typeof s !== 'object') return { name: String(s), cargo: '', criminalRecord: 'Sem antecedentes', comportamento: '', caracteristica: '', veiculo: '' }
       const rawName = (s.name || '').trim()
       let name = rawName
       let cargo = (s.cargo || '').trim()
@@ -56,7 +56,7 @@ export default async (req) => {
         cargo = rawName.slice(idx + 1).trim()
       }
       const fullName = cargo ? `${name}, ${cargo}` : name
-      return { name: fullName, displayName: name, cargo, criminalRecord: s.criminalRecord || 'Sem antecedentes', caracteristica: s.caracteristica || '' }
+      return { name: fullName, displayName: name, cargo, criminalRecord: s.criminalRecord || 'Sem antecedentes', comportamento: s.comportamento || '', caracteristica: s.caracteristica || '', veiculo: s.veiculo || '' }
     }
     const normalizeWitness = (w) => {
       if (!w || typeof w !== 'object') return { name: '', cargo: '', statement: '', isTruthful: false }

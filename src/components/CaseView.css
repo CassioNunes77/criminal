@@ -6,7 +6,7 @@
   text-rendering: optimizeSpeed;
 }
 
-/* Edge-to-edge: header quebra o padding do .app */
+/* Edge-to-edge: header e separadores quebram o padding do .app */
 .case-view .terminal-header {
   margin-left: -16px;
   margin-right: -16px;
@@ -20,4 +20,12 @@
   white-space: nowrap;
   width: 100%;
   box-sizing: border-box;
+}
+
+@media (max-width: 768px) {
+  .case-view .terminal-header {
+    margin-left: -12px;
+    margin-right: -12px;
+    width: calc(100% + 24px);
+  }
 }

@@ -61,11 +61,11 @@ Gere um novo caso criminal para o jogo Nexo Terminal. O caso gerado DEVE obedece
 
 ## TÍTULO E DESCRIÇÃO DO CASO
 
-- **Título do caso** deve ser apenas o nome do caso. NÃO usar títulos como: (caso de furto, caso de...).
-- Crie uma **narrativa de um caso** (Mínimo 350, Máximo 500 caracteres).
-- Crie narrativa em tom **investigativo, misterioso, tenso**, sentimento investigativo.
+- **Título do caso** deve ser apenas o nome do caso. Exemplo(FURTO DE FITAS RARAS EM VIDEOLOCADORA, Cibercrime em CPD de Banco, ROUBO EM LOJA DE ELETRÔNICOS) NÃO usar títulos como: (caso de furto, caso de...).
+- Crie uma **narrativa de um caso** (Mínimo 400 caracteres, Máximo 600 caracteres).
+- Crie narrativa em tom **investigativo, misterioso, tenso**, sentimento investigativo, a descrição do caso tem que ser uma sinopse de uma boa história, como um caso de carmen sandiego ou sherlok holmes, ambientado nos anos 80.
 - **Não ficar declarando** depoimentos de testemunhas ou pistas na narrativa.
-- **Não será permitido** colocar data na descrição do caso.
+- **Não será permitido** colocar data, nem dia, nem mês, nem ano na descrição do caso.
 - Crimes sempre da **década de 80**. Crie narrativa considerando apenas elementos que fazem sentido até o ano de **1987**.
 - **Smartphones** não podem estar no caso, não faz sentido pela data.
 - **IMPORTANTE:** sempre na descrição da história, terá algum elemento relevante na solução do caso. Exemplo: "Dinheiro do caixa foram levados" indica que o local foi a caixa registradora – é uma **pista escondida na descrição**. Deixar sempre uma **pista extra** na descrição.

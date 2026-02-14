@@ -20,9 +20,13 @@ if (firebaseConfig.apiKey) {
   try {
     app = initializeApp(firebaseConfig)
     db = getFirestore(app)
-    analytics = typeof window !== 'undefined' ? getAnalytics(app) : null
   } catch (err) {
     console.warn('Firebase init failed:', err.message)
+  }
+  try {
+    analytics = typeof window !== 'undefined' && app ? getAnalytics(app) : null
+  } catch (_) {
+    analytics = null
   }
 }
 

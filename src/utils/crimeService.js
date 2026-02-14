@@ -3,6 +3,42 @@ import { db } from '../firebase'
 
 const CACHE_PREFIX = 'nexo_crime_cache_'
 
+function decodeFirestoreValue(v) {
+  if (!v) return null
+  if (v.stringValue !== undefined) return v.stringValue
+  if (v.integerValue !== undefined) return parseInt(v.integerValue, 10)
+  if (v.booleanValue !== undefined) return v.booleanValue
+  if (v.doubleValue !== undefined) return v.doubleValue
+  if (v.nullValue !== undefined) return null
+  if (v.timestampValue !== undefined) return v.timestampValue
+  if (v.arrayValue?.values) return v.arrayValue.values.map(decodeFirestoreValue)
+  if (v.mapValue?.fields) {
+    const o = {}
+    for (const [k, val] of Object.entries(v.mapValue.fields)) o[k] = decodeFirestoreValue(val)
+    return o
+  }
+  return null
+}
+
+function decodeFirestoreDoc(fields) {
+  if (!fields) return {}
+  const o = {}
+  for (const [k, v] of Object.entries(fields)) o[k] = decodeFirestoreValue(v)
+  return o
+}
+
+async function fetchViaRestApi(dateId) {
+  const projectId = import.meta.env.VITE_FIREBASE_PROJECT_ID
+  const apiKey = import.meta.env.VITE_FIREBASE_API_KEY
+  if (!projectId || !apiKey) return null
+  const url = `https://firestore.googleapis.com/v1/projects/${projectId}/databases/(default)/documents/crimes/${dateId}?key=${apiKey}`
+  const res = await fetch(url)
+  if (!res.ok) return null
+  const json = await res.json()
+  if (!json.fields) return null
+  return decodeFirestoreDoc(json.fields)
+}
+
 function getDateId() {
   const today = new Date()
   return `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`
@@ -59,26 +95,41 @@ function normalizeCachedCrime(crime) {
 export async function getDailyCrimeFromFirebase() {
   const dateId = getDateId()
 
-  if (!db || !import.meta.env.VITE_FIREBASE_API_KEY) {
-    console.warn('[Nexo] Firebase não configurado (db ou VITE_FIREBASE_API_KEY ausente). Verifique variáveis no Netlify.')
+  const apiKey = import.meta.env.VITE_FIREBASE_API_KEY
+  const projectId = import.meta.env.VITE_FIREBASE_PROJECT_ID
+
+  if (!apiKey || !projectId) {
+    console.warn('[Nexo] Firebase não configurado (VITE_FIREBASE_* ausente). Verifique variáveis no Netlify.')
     const cached = getCachedCrime(dateId)
     if (cached) return cached
     return null
   }
 
   try {
-    const docRef = doc(db, 'crimes', dateId)
-    const snapshot = await getDoc(docRef)
+    if (db) {
+      const docRef = doc(db, 'crimes', dateId)
+      const snapshot = await getDoc(docRef)
+      if (snapshot.exists()) {
+        const data = snapshot.data()
+        const crime = transformFirestoreCrime(data, dateId)
+        cacheCrime(dateId, crime)
+        return crime
+      }
+      console.warn(`[Nexo] Caso do dia ${dateId} não encontrado no Firestore. Execute o trigger para gerar.`)
+    }
+  } catch (err) {
+    console.warn('[Nexo] Firebase SDK falhou:', err.code || err.name, err.message)
+  }
 
-    if (snapshot.exists()) {
-      const data = snapshot.data()
+  try {
+    const data = await fetchViaRestApi(dateId)
+    if (data && Object.keys(data).length > 0) {
       const crime = transformFirestoreCrime(data, dateId)
       cacheCrime(dateId, crime)
       return crime
     }
-    console.warn(`[Nexo] Caso do dia ${dateId} não encontrado no Firestore. Execute o trigger para gerar.`)
-  } catch (err) {
-    console.warn('[Nexo] Firebase fetch falhou:', err.code || err.name, err.message)
+  } catch (restErr) {
+    console.warn('[Nexo] REST fallback falhou:', restErr.message)
   }
 
   const cached = getCachedCrime(dateId)

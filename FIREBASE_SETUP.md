@@ -123,7 +123,15 @@ Configure `TRIGGER_SECRET` nas variáveis de ambiente do Netlify (pode gerar com
 
 1. **Netlify UI:** Site → Functions → `generate-daily-case` → **Run now**
 2. **Trigger manual:** `curl -X POST .../trigger-daily-case -H "Authorization: Bearer SEU_SECRET"`
-3. **CLI:** `netlify dev` e depois `netlify functions:invoke generate-daily-case`
+3. **Script:** `TRIGGER_SECRET=seu_secret ./scripts/trigger-case.sh`
+4. **CLI:** `netlify dev` e depois `netlify functions:invoke generate-daily-case`
+
+### Troubleshooting: caso não gerado após 00:00
+
+- **Scheduled functions só rodam em deploy publicado** (não em preview/branch)
+- **Proteção por senha no site** desativa as funções agendadas
+- **Gerar manualmente agora:** Netlify → Functions → `generate-daily-case` → **Run now**
+- Ou: `TRIGGER_SECRET=xxx ./scripts/trigger-case.sh`
 
 ### Deploy Firestore Rules (apenas uma vez)
 

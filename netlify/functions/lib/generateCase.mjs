@@ -26,7 +26,7 @@ function getDateSpecialInstructions(dateStr) {
 function getPrompt(dateStr, caseNumber, caseCode) {
   const dateInstruction = getDateSpecialInstructions(dateStr)
 
-  return `Gere um novo caso criminal para o jogo Nexo Terminal.
+  return `Gere um novo caso criminal para o jogo Nexo Terminal. Siga 100% a lógica do jogo.
 
 ## REGRAS DE OURO (OBRIGATÓRIAS)
 - Solução única: Existe apenas UMA combinação correta: suspeito + local + método.
@@ -36,57 +36,57 @@ function getPrompt(dateStr, caseNumber, caseCode) {
 - Sem ambiguidade: O jogador NÃO pode chegar, de forma lógica, a mais de uma solução válida.
 - Sem duplicidade: Nomes, locais e métodos ÚNICOS (não repetir entre si).
 - Crimes leves: Furto, roubo, arrombamento, cyber crimes década de 80, apropriação indevida. SEM violência grave.
-- Caso fechado: Começo, meio e fim; todas as pistas contribuem para a solução.
+- Caso fechado: O caso tem começo, meio e fim; todas as pistas contribuem para a solução.
 - Lógica interna: Horários, locais e eventos consistentes entre si.
-- Jogo em primeiro lugar: Jogável e divertido, não realista demais.
-
-## PROIBIÇÕES
-- NÃO pode existir 2 suspeitos possíveis.
-- NÃO pode existir pista que elimina todos os suspeitos.
-- NÃO pode existir testemunha que resolve o caso sozinha.
+- Jogo em primeiro lugar: O caso é pensado para ser jogável e divertido, não realista demais.
 
 ## EVIDÊNCIAS OBRIGATÓRIAS (distribuir na descrição, pistas ou depoimentos)
 - 1 evidência FÍSICA (objeto, impressão, vestígio material).
 - 1 evidência COMPORTAMENTAL (ação, hábito, modo de agir do culpado).
 - 1 evidência TEMPORAL (horário, sequência de eventos, alibi quebrado).
 
-## DADOS DO CASO (uso interno, NUNCA incluir data em campos do JSON)
-- Data para registro: ${dateStr}
+## PROIBIÇÕES
+- NÃO pode existir 2 suspeitos possíveis.
+- NÃO pode existir pista que elimina todos os suspeitos.
+- NÃO pode existir testemunha que resolve o caso sozinha.
+- Sempre o caso tem que ter mais de uma evidência que prove o culpado.
+
+## DADOS DO CASO (uso interno)
+- Data do caso (real, para registro): ${dateStr}
 - Número do caso: #${String(caseNumber).padStart(4, '0')}
 - Código do caso: ${caseCode}
 - ${dateInstruction}
 
 ## TÍTULO E DESCRIÇÃO
-- Máx 500 caracteres. Crimes década de 80. Elementos até 1987 apenas (sem smartphones).
+- Mínimo 350, máximo 500 caracteres.
+- Crimes da década de 80. Elementos até 1987 apenas (sem smartphones).
 - Incluir pista escondida na descrição (ex: "dinheiro do caixa foram levados" indica local = caixa).
 - Sempre terminar com: "Analise as pistas e testemunhas com cuidado. Algumas informações podem ser falsas."
 
-## PISTAS (6 tipos, jogador escolhe qual revelar primeiro)
+## PISTAS (6 tipos – jogador escolhe qual revelar primeiro)
 HORARIO, LOCAL, ACESSO, ALIBI, COMPORTAMENTO, EVIDENCIA
 - Use informações soltas: "ouvi boatos que..", "registros incompletos", "por volta das 19:00".
 
 ## TESTEMUNHAS (3)
-- name: apenas o nome completo.
-- cargo: cargo, função ou quem é na história (ex: cliente, morador, funcionário, vigilante, mãe do acusado, esposa, vizinha). OBRIGATÓRIO.
-- statement: depoimento. isTruthful (true/false). Indicar [VERDADEIRA] ou [PODE SER FALSA].
-- Informações discretas: "suspeito parecia um homem forte" (indica que não é mulher).
+- name + cargo: sempre declarar nome e cargo/função (ex: cliente, morador, funcionário, mãe de alguém).
+- statement: depoimento. isTruthful: true ou false. Indicar [VERDADEIRA] ou [PODE SER FALSA].
+- Informações discretas: "suspeito parecia um homem forte" (indica que provavelmente não é mulher).
 - Álibi ou testemunhas próximas (esposa, mãe, filhos) podem ou não estar falando a verdade.
 
 ## SUSPEITOS (4)
-- name: apenas o nome completo (ex: Marcos Lima).
-- cargo: cargo, função ou quem é na história (ex: operador de terminal, cliente, morador, funcionário, gerente, encanador). OBRIGATÓRIO.
+- name + cargo: sempre declarar nome e cargo/função (ex: cliente, morador, funcionário, gerente).
 - criminalRecord: passagem pela polícia ou "Sem antecedentes".
-- caracteristica: física ou comportamental (ex: costuma usar azul, anda de boné, cabelos longos).
+- caracteristica: física ou comportamental (ex: costuma usar azul, anda de boné, cabelos longos). Evite termos genéricos como "usa calça jeans".
 - Correlações: a característica deve aparecer em pistas, testemunhas ou descrição para conectar ao culpado.
 - Mencionar pelo menos 3 suspeitos na descrição, pistas ou depoimentos (1 por vez).
 
 ## LOCAIS (4 opções), MÉTODOS (4 opções)
 
 ## SOLUÇÃO
-suspect no formato "Nome, cargo" (ex: "Marcos Lima, operador de terminal"), location, method (exatamente das listas).
+suspect no formato "Nome, cargo", location e method (exatamente das listas).
 
 ## DOSSIER
-Texto completo: caso + solução + provas. PROVE por que o culpado é o correto E por que os outros 3 NÃO são.
+Texto completo: descrição, solução e dados que levam à prova do caso. PROVE por que o culpado é o correto E por que os outros 3 NÃO são. Prove: Suspeito, Local e Método.
 
 Retorne APENAS um JSON válido, sem markdown ou texto extra. Formato:
 {"type":"","location":"","time":"","description":[],"suspects":[{"name":"","cargo":"","criminalRecord":"","caracteristica":""}],"locations":[],"methods":[],"clues":[{"type":"","text":""}],"witnesses":[{"name":"","cargo":"","statement":"","isTruthful":false}],"solution":{"suspect":"","location":"","method":""},"dossier":""}`

@@ -1,94 +1,53 @@
 /**
  * Prompt para geração diária de casos do Nexo Terminal.
- * Usado pela Cloud Function que chama a API de IA.
+ * Usado pela função que chama a API de IA (netlify/functions/lib/generateCase.mjs).
+ * Siga 100% a lógica do jogo.
  */
 
-export const SYSTEM_PROMPT = `Você é um criador de casos criminais para o jogo Nexo Terminal. Crie casos investigativos da década de 80, jogáveis e com lógica fechada.`
+export const SYSTEM_PROMPT = `Você é um criador de casos criminais para o jogo Nexo Terminal. Crie casos investigativos da década de 80, jogáveis e com lógica fechada. Siga 100% as regras do prompt. Retorne APENAS JSON válido, sem markdown.`
 
-export const USER_PROMPT_TEMPLATE = (dateStr, caseNumber, caseCode) => `Gere um novo caso criminal para o jogo Nexo Terminal.
-
+export const GAME_LOGIC = `
 ## REGRAS DE OURO (OBRIGATÓRIAS)
-- Solução única: Apenas UMA combinação correta: suspeito + local + método.
+- Solução única: Existe apenas UMA combinação correta: suspeito + local + método.
 - Tudo converge: Descrição, pistas e testemunhas verdadeiras devem apoiar a MESMA solução.
 - Nada contradiz: Pistas e testemunhas verdadeiras NÃO podem contradizer a solução.
-- Falsos coerentes: Testemunhas falsas podem errar, mas o caso continua claro e resolvível.
-- Sem ambiguidade: O jogador NÃO pode chegar a mais de uma solução válida.
-- Sem duplicidade: Nomes, locais e métodos ÚNICOS (não repetir).
-- Crimes leves: Furto, roubo, arrombamento, apropriação indevida. SEM violência grave.
-- Caso fechado: Começo, meio e fim; todas as pistas contribuem.
-- Lógica interna: Horários, locais e eventos consistentes.
-- Jogo em primeiro lugar: Jogável e divertido.
+- Falsos coerentes: Testemunhas falsas podem errar ou mentir, mas o caso continua claro e resolvível.
+- Sem ambiguidade: O jogador NÃO pode chegar, de forma lógica, a mais de uma solução válida.
+- Sem duplicidade: Nomes, locais e métodos ÚNICOS (não repetir entre si).
+- Crimes leves: Furto, roubo, arrombamento, cyber crimes década de 80, apropriação indevida. SEM violência grave.
+- Caso fechado: O caso tem começo, meio e fim; todas as pistas contribuem para a solução.
+- Lógica interna: Horários, locais e eventos consistentes entre si.
+- Jogo em primeiro lugar: O caso é pensado para ser jogável e divertido, não realista demais.
 
-## DADOS DO CASO
-- Data do caso: ${dateStr}
-- Número do caso: #${caseNumber}
-- Código do caso: ${caseCode}
+## EVIDÊNCIAS OBRIGATÓRIAS
+- 1 evidência FÍSICA (objeto, impressão, vestígio material).
+- 1 evidência COMPORTAMENTAL (ação, hábito, modo de agir do culpado).
+- 1 evidência TEMPORAL (horário, sequência de eventos, alibi quebrado).
 
-## ESTRUTURA OBRIGATÓRIA
+## PROIBIÇÕES
+- NÃO pode existir 2 suspeitos possíveis.
+- NÃO pode existir pista que elimina todos os suspeitos.
+- NÃO pode existir testemunha que resolve o caso sozinha.
+- Sempre o caso tem que ter mais de uma evidência que prove o culpado.
+`
 
-### Título e Descrição (máx 500 caracteres)
-- Crimes da década de 80. APENAS elementos até 1987 (sem smartphones, internet moderna, etc).
-- Incluir pista escondida na descrição (ex: "dinheiro do caixa foram levados" indica local = caixa).
-- Sempre incluir: "Analise as pistas e testemunhas com cuidado. Algumas informações podem ser falsas."
+export const STRUCTURE = `
+## TÍTULO E DESCRIÇÃO
+- Mínimo 350, máximo 500 caracteres.
+- Crimes década de 80. Elementos até 1987 apenas (sem smartphones).
+- Incluir pista escondida na descrição.
+- Sempre terminar com: "Analise as pistas e testemunhas com cuidado. Algumas informações podem ser falsas."
 
-### Pistas (6 tipos – jogador escolhe qual revelar primeiro)
-- HORARIO
-- LOCAL
-- ACESSO
-- ALIBI
-- COMPORTAMENTO
-- EVIDENCIA
+## PISTAS (6 tipos)
+HORARIO, LOCAL, ACESSO, ALIBI, COMPORTAMENTO, EVIDENCIA
 
-### Testemunhas (3)
-- Nome + cargo/função (ex: "Roberto, Segurança Noturno")
-- Versão com isTruthful: true ou false
-- Informações discretas (ex: "parecia um homem forte" indica que não é mulher)
-- Indicar [VERDADEIRA] ou [PODE SER FALSA]
+## TESTEMUNHAS (3)
+- name + cargo. isTruthful: true/false. [VERDADEIRA] ou [PODE SER FALSA].
 
-### Suspeitos (4)
-- Nome + cargo/função (ex: "João Silva, encanador")
-- Histórico: "Passagem por X" ou "Sem antecedentes"
-- Mencionar pelo menos 3 suspeitos na descrição, pistas ou depoimentos (1 por vez)
+## SUSPEITOS (4)
+- name + cargo, criminalRecord, caracteristica.
+- Mencionar pelo menos 3 suspeitos na descrição, pistas ou depoimentos.
 
-### Locais (4 opções)
-### Métodos (4 opções)
-
-### Solução
-- suspect: nome exato do suspeito
-- location: exatamente uma das opções de locais
-- method: exatamente uma das opções de métodos
-
-### Dossier do Caso (interno, não para jogador)
-- Caso completo, solução, provas e dados que levam à conclusão.
-
-## FORMATO JSON DE SAÍDA
-Retorne APENAS um JSON válido, sem markdown ou texto extra. Use este formato exato:
-
-{
-  "type": "ROUBO",
-  "location": "LOJA DE ELETRÔNICOS",
-  "time": "23:15",
-  "description": ["linha1", "linha2", ""],
-  "suspects": [
-    { "name": "Nome Completo", "criminalRecord": "texto" }
-  ],
-  "locations": ["opção1", "opção2", "opção3", "opção4"],
-  "methods": ["opção1", "opção2", "opção3", "opção4"],
-  "clues": [
-    { "type": "HORARIO", "text": "texto" },
-    { "type": "LOCAL", "text": "texto" },
-    { "type": "ACESSO", "text": "texto" },
-    { "type": "ALIBI", "text": "texto" },
-    { "type": "COMPORTAMENTO", "text": "texto" },
-    { "type": "EVIDENCIA", "text": "texto" }
-  ],
-  "witnesses": [
-    { "name": "Nome, Cargo", "statement": "depoimento", "isTruthful": true }
-  ],
-  "solution": {
-    "suspect": "Nome exato",
-    "location": "Local exato",
-    "method": "Método exato"
-  },
-  "dossier": "texto completo do dossier interno"
-}`
+## DOSSIER
+PROVE por que o culpado é o correto E por que os outros 3 NÃO são.
+`

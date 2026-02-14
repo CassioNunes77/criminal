@@ -2,10 +2,11 @@
  * 5 casos criminais para Nexo Terminal (#0001 a #0005)
  * Seguem 100% a lógica do game.
  *
- * #0001 - Cybercrime anos 80 (acesso não autorizado via modem/BBS)
+ * #0001 - Furto de fitas raras em videolocadora (caso especial - primeiro)
  * #0002 a #0005 - Outros crimes leves da década de 80
  *
- * Suspeitos: nome + cargo + histórico + característica (correlacionada a pistas/testemunhas)
+ * Evidências: 1 física, 1 comportamental, 1 temporal.
+ * Suspeitos: nome + cargo + histórico + característica (correlacionada a pistas/testemunhas).
  * Mínimo 3 suspeitos citados na descrição, pistas ou depoimentos.
  */
 
@@ -13,41 +14,54 @@ export const CASES_001_TO_005 = [
   {
     caseNumber: '0001',
     caseCode: 'NX7K2M9P',
-    type: 'CYBERCRIME',
-    location: 'CENTRO DE PROCESSAMENTO DE DADOS',
-    time: '03:15',
+    type: 'FURTO',
+    location: 'VIDEOLOCADORA',
+    time: '21:00',
     description: [
-      'CASO #0001 - ACESSO NÃO AUTORIZADO A SISTEMA',
+      'CASO #0001 - FURTO DE FITAS RARAS EM VIDEOLOCADORA',
       '',
-      'O CPD de uma empresa foi invadido via modem na madrugada. Dados de clientes foram copiados para disquetes. O acesso ocorreu na sala do terminal, único ponto com linha telefônica para modem. Um operador foi visto no prédio fora do expediente.',
+      'Uma videolocadora foi furtada durante o horário de funcionamento. Fitas raras da seção de colecionadores foram levadas. O culpado conhecia o layout e foi direto ao local. Um ex-funcionário de cabelos longos foi visto no estabelecimento. Ricardo, entregador de fitas, passou pela loja antes do crime. Claudia, cliente colecionadora, estava na área de novidades.',
       '',
       'Sua missão: identificar o responsável, o local exato do crime e o método utilizado.',
       '',
       'Analise as pistas e testemunhas com cuidado. Algumas informações podem ser falsas.'
     ],
     suspects: [
-      { name: 'Marcos Lima, operador de terminal', criminalRecord: 'Passagem por acesso não autorizado em 1984', caracteristica: 'Costuma usar camisa azul' },
-      { name: 'Carla Mendes, programadora do sistema', criminalRecord: 'Sem antecedentes', caracteristica: 'Cabelos longos, sempre presos' },
-      { name: 'Ricardo Torres, técnico de rede', criminalRecord: 'Passagem por furto de equipamentos em 1983', caracteristica: 'Anda sempre de boné' },
-      { name: 'Paula Santos, secretária do CPD', criminalRecord: 'Sem antecedentes', caracteristica: 'Usa óculos de grau escuros' }
+      { name: 'Bruno Costa, ex-funcionário da videolocadora', criminalRecord: 'Passagem por furto em 1983', caracteristica: 'Cabelos longos até os ombros' },
+      { name: 'Claudia Mendes, cliente colecionadora', criminalRecord: 'Sem antecedentes', caracteristica: 'Usa óculos de aro grosso' },
+      { name: 'Ricardo Farias, entregador de fitas', criminalRecord: 'Passagem por furto em 1982', caracteristica: 'Costuma usar jaqueta de couro' },
+      { name: 'Tereza Santos, vizinha do dono', criminalRecord: 'Sem antecedentes', caracteristica: 'Usa brincos grandes dourados' }
     ],
-    locations: ['Sala do Terminal', 'Sala do Servidor', 'Cabine de Modem', 'Escritório do Gerente'],
-    methods: ['Senha roubada', 'Modem externo', 'Ajuda interna', 'Engenharia social'],
+    locations: ['Seção de Colecionadores', 'Balcão de Atendimento', 'Entrada', 'Depósito de Fitas'],
+    methods: ['Aproveitou descuido', 'Distração', 'Ajuda de cúmplice', 'Chave dos fundos'],
     clues: [
-      { type: 'HORARIO', text: 'Acesso ocorreu às 03:15' },
-      { type: 'LOCAL', text: 'Local exato: Sala do Terminal' },
-      { type: 'ACESSO', text: 'Log indica login com senha válida, não forçada' },
-      { type: 'ALIBI', text: 'Marcos Lima estava em casa (confirmado por esposa)', revealed: false },
-      { type: 'COMPORTAMENTO', text: 'Suspeito deixou fio de tecido azul na cadeira' },
-      { type: 'EVIDENCIA', text: 'Disquete com dados encontrado na gaveta' }
+      { type: 'HORARIO', text: 'Crime ocorreu por volta das 21:00' },
+      { type: 'LOCAL', text: 'Local exato: Seção de Colecionadores' },
+      { type: 'ACESSO', text: 'Conhecia o layout da loja, foi direto à seção de raros' },
+      { type: 'ALIBI', text: 'Bruno Costa estava em casa (confirmado pela irmã)' },
+      { type: 'COMPORTAMENTO', text: 'Suspeito foi direto à seção de fitas raras, sem hesitar' },
+      { type: 'EVIDENCIA', text: 'Fio de cabelo longo encontrado na prateleira de raros' }
     ],
     witnesses: [
-      { name: 'Wilson, vigilante noturno', statement: 'Vi um homem de camisa azul saindo do CPD às 03:45. Conheço o Marcos, era a cor dele.', isTruthful: true },
-      { name: 'Helena, esposa do operador', statement: 'Marcos dormiu a noite toda. Acordou às 07:00 como sempre.', isTruthful: false },
-      { name: 'Oswaldo, gerente do CPD', statement: 'A sala do terminal é o único lugar com modem. Só operadores têm senha. Marcos pediu a senha da Carla na semana passada.', isTruthful: true }
+      { name: 'Marcos, cliente da locadora', statement: 'Vi um homem de cabelo longo na seção de raros às 20:55. Parecia conhecer o lugar.', isTruthful: true },
+      { name: 'Helena, irmã do ex-funcionário', statement: 'Bruno estava em casa comigo a noite toda. Assistimos TV até tarde.', isTruthful: false },
+      { name: 'Oswaldo, dono da videolocadora', statement: 'A seção de colecionadores fica no fundo. Só quem conhece vai direto. Bruno trabalhava aqui e sabia onde ficavam as fitas raras.', isTruthful: true }
     ],
-    solution: { suspect: 'Marcos Lima, operador de terminal', location: 'Sala do Terminal', method: 'Senha roubada' },
-    dossier: 'CASO #0001 - CYBERCRIME. Marcos Lima (operador) acessou ilegalmente o sistema na Sala do Terminal às 03:15 usando Senha roubada (da Carla). Wilson viu homem de camisa azul (característica do Marcos). Helena mentiu no álibi. Fio azul e disquete no local. Solução: Marcos Lima + Sala do Terminal + Senha roubada.'
+    solution: { suspect: 'Bruno Costa, ex-funcionário da videolocadora', location: 'Seção de Colecionadores', method: 'Aproveitou descuido' },
+    dossier: `CASO #0001 - FURTO DE FITAS RARAS EM VIDEOLOCADORA
+
+SOLUÇÃO: Bruno Costa (ex-funcionário) + Seção de Colecionadores + Aproveitou descuido
+
+PROVA DO CULPADO:
+- Evidência física: Fio de cabelo longo na prateleira (Bruno tem cabelos longos até os ombros).
+- Evidência comportamental: Suspeito foi direto à seção de raros sem hesitar (só ex-funcionário conhecia o layout).
+- Evidência temporal: Helena (irmã) mentiu no álibi; Marcos viu homem de cabelo longo às 20:55.
+- Oswaldo confirmou: Bruno trabalhava na loja e sabia onde ficavam as fitas raras.
+
+POR QUE OS OUTROS NÃO SÃO:
+- Claudia: Estava na área de novidades; óculos de aro grosso não conectam às pistas; sem evidência física.
+- Ricardo: Usa jaqueta de couro, não cabelo longo; evidência física aponta para cabelo longo.
+- Tereza: Brincos grandes não aparecem em nenhuma pista; não tinha conhecimento do layout interno.`
   },
   {
     caseNumber: '0002',

@@ -442,8 +442,6 @@ function Investigation({ crime, state, onDiscoverClue, onViewWitness, onMakeAccu
           )}
         </div>
 
-        <div className="separator">------------------------------------</div>
-
         {/* Witnesses Section */}
         <div className="witnesses-section">
           <div className="section-title progress-inline">
@@ -513,8 +511,6 @@ function Investigation({ crime, state, onDiscoverClue, onViewWitness, onMakeAccu
           })()}
         </div>
 
-        <div className="separator">------------------------------------</div>
-
         {/* Suspects Database */}
         <div className="suspects-section">
           {!showSuspects ? (
@@ -547,8 +543,6 @@ function Investigation({ crime, state, onDiscoverClue, onViewWitness, onMakeAccu
           )}
         </div>
 
-        <div className="separator">------------------------------------</div>
-
         {/* Case Description Section */}
         <div className="case-section">
           <button 
@@ -566,8 +560,6 @@ function Investigation({ crime, state, onDiscoverClue, onViewWitness, onMakeAccu
             )}
           </button>
         </div>
-
-        <div className="separator">------------------------------------</div>
 
         {/* Hypothesis Section */}
         <div className="hypothesis-section">
@@ -691,8 +683,6 @@ function Investigation({ crime, state, onDiscoverClue, onViewWitness, onMakeAccu
                   </div>
                 </div>
 
-                <div className="separator">------------------------------------</div>
-
                 {feedback && (
                   <div className={`feedback ${feedback.includes('CORRETA') ? 'success' : feedback.includes('PERTO') ? 'warning' : 'error'}`}>
                     {feedback}
@@ -757,7 +747,6 @@ function Investigation({ crime, state, onDiscoverClue, onViewWitness, onMakeAccu
                 }}>█</span>
               )}
             </button>
-            <div className="separator">------------------------------------</div>
           </>
         )}
 

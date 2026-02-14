@@ -37,11 +37,16 @@ export default async (req) => {
   }
 
   const data = doc.data()
-  const description = (data.description || []).map(line =>
-    typeof line === 'string' && line.includes('#0002') ? line.replace(/#0002/g, '#0001') : line
-  )
+  const update = { caseNumber: '0001' }
+  const desc = data.description
+  const descArr = Array.isArray(desc) ? desc : (desc && typeof desc === 'object' ? Object.values(desc) : [])
+  if (descArr.length > 0) {
+    update.description = descArr.map(line =>
+      typeof line === 'string' && line.includes('#0002') ? line.replace(/#0002/g, '#0001') : line
+    )
+  }
 
-  await docRef.update({ caseNumber: '0001', description })
+  await docRef.update(update)
   await metaRef.set({ lastCaseNumber: 1 }, { merge: true })
 
   return Response.json({ ok: true, caseNumber: '0001', date: dateStr })

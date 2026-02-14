@@ -10,7 +10,10 @@ if [ -z "$TRIGGER_SECRET" ]; then
 fi
 
 URL="https://nexoterminal.netlify.app/.netlify/functions/trigger-daily-case"
-[ -n "$TEMA" ] && URL="${URL}?tema=${TEMA}"
+PARAMS=""
+[ -n "$TEMA" ] && PARAMS="${PARAMS}${PARAMS:+&}tema=${TEMA}"
+[ -n "$CASE_NUMBER" ] && PARAMS="${PARAMS}${PARAMS:+&}caseNumber=${CASE_NUMBER}"
+[ -n "$PARAMS" ] && URL="${URL}?${PARAMS}"
 
 curl -sS -X POST "$URL" \
   -H "Authorization: Bearer $TRIGGER_SECRET" \

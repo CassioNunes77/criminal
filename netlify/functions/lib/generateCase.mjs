@@ -106,7 +106,7 @@ function generateCaseCode() {
 }
 
 export async function runGenerateCase(opts = {}) {
-  const { tema } = opts
+  const { tema, forceCaseNumber } = opts
   const apiKey = process.env.GROQ_API_KEY
   const serviceAccountJson = process.env.FIREBASE_SERVICE_ACCOUNT
 
@@ -128,14 +128,16 @@ export async function runGenerateCase(opts = {}) {
   const crimesRef = db.collection('crimes')
   const metaRef = db.collection('_meta').doc('counters')
 
-  let caseNumber = 1
-  try {
-    const metaDoc = await metaRef.get()
-    if (metaDoc.exists) {
-      caseNumber = (metaDoc.data().lastCaseNumber || 0) + 1
+  let caseNumber = forceCaseNumber || 1
+  if (!forceCaseNumber) {
+    try {
+      const metaDoc = await metaRef.get()
+      if (metaDoc.exists) {
+        caseNumber = (metaDoc.data().lastCaseNumber || 0) + 1
+      }
+    } catch (e) {
+      console.warn('Could not read case counter:', e.message)
     }
-  } catch (e) {
-    console.warn('Could not read case counter:', e.message)
   }
 
   const caseCode = generateCaseCode()

@@ -21,7 +21,11 @@ export default async (req) => {
   try {
     const url = new URL(req.url || '', `http://${req.headers.get('host') || 'localhost'}`)
     const tema = url.searchParams.get('tema') || ''
-    const result = await runGenerateCase(tema ? { tema } : {})
+    const caseNum = url.searchParams.get('caseNumber') || url.searchParams.get('case_number') || ''
+    const opts = {}
+    if (tema) opts.tema = tema
+    if (caseNum) opts.forceCaseNumber = parseInt(caseNum, 10) || 1
+    const result = await runGenerateCase(Object.keys(opts).length ? opts : {})
     return Response.json({ ok: true, ...result })
   } catch (err) {
     console.error('trigger-daily-case failed:', err)

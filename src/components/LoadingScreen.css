@@ -6,7 +6,10 @@
   padding: 24px 32px;
   font-size: 14px;
   color: #00CC55;
-  font-family: "'PxPlus IBM VGA8', monospace";
+  font-family: 'PxPlus IBM VGA8', monospace;
+  -webkit-font-smoothing: none;
+  -moz-osx-font-smoothing: unset;
+  font-smooth: never;
   background: #020403;
   text-align: left;
 }

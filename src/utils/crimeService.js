@@ -26,6 +26,7 @@ function cacheCrime(dateId, crime) {
   try {
     const toStore = { ...crime }
     delete toStore.date
+    delete toStore.offlineNoCache
     localStorage.setItem(CACHE_PREFIX + dateId, JSON.stringify(toStore))
   } catch (e) {
     console.warn('Cache write failed:', e.message)
@@ -64,6 +65,7 @@ export async function getDailyCrimeFromFirebase() {
     const cached = getCachedCrime(dateId)
     if (cached) return cached
     const crime = getLocalCrime()
+    crime.offlineNoCache = true
     cacheCrime(dateId, crime)
     return crime
   }
@@ -86,6 +88,7 @@ export async function getDailyCrimeFromFirebase() {
   if (cached) return cached
 
   const crime = getLocalCrime()
+  crime.offlineNoCache = true
   cacheCrime(dateId, crime)
   return crime
 }

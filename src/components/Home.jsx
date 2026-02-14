@@ -684,6 +684,27 @@ function Home({ crime, streak, onStart }) {
       <div className="terminal-content" style={{
         lineHeight: '1.6'
       }}>
+        {crime?.offlineNoCache && (
+          <div style={{
+            padding: '12px 16px',
+            marginBottom: '16px',
+            border: '1px solid #FF6600',
+            background: 'rgba(255, 102, 0, 0.08)',
+            color: '#FF6600',
+            fontFamily: "'PxPlus IBM VGA8', monospace",
+            fontSize: '13px',
+            lineHeight: 1.5
+          }}>
+            *** NO CARRIER ***
+            <br />
+            CONEXAO REMOTA INDISPONIVEL. MODO BACKUP ATIVO.
+            <br />
+            <span style={{ color: '#00CC55', fontSize: '12px' }}>
+              Reconecte para acessar o caso do dia.
+            </span>
+          </div>
+        )}
+
         <button 
           className="terminal-button" 
           onClick={onStart}

@@ -1,4 +1,4 @@
-import { getDoc, doc } from 'firebase/firestore'
+import { getDoc, doc } from 'firebase/firestore/lite'
 import { db } from '../firebase'
 
 const CACHE_PREFIX = 'nexo_crime_cache_'

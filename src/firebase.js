@@ -1,5 +1,5 @@
 import { initializeApp } from 'firebase/app'
-import { getFirestore, initializeFirestore } from 'firebase/firestore'
+import { getFirestore } from 'firebase/firestore/lite'
 import { getAnalytics } from 'firebase/analytics'
 
 const firebaseConfig = {
@@ -16,17 +16,10 @@ let app = null
 let db = null
 let analytics = null
 
-const isSafari = typeof navigator !== 'undefined' &&
-  (navigator.vendor?.includes('Apple') || /^((?!chrome|android).)*safari/i.test(navigator.userAgent || ''))
-
 if (firebaseConfig.apiKey) {
   try {
     app = initializeApp(firebaseConfig)
-    if (isSafari) {
-      db = initializeFirestore(app, { experimentalForceLongPolling: true })
-    } else {
-      db = getFirestore(app)
-    }
+    db = getFirestore(app)
     analytics = typeof window !== 'undefined' ? getAnalytics(app) : null
   } catch (err) {
     console.warn('Firebase init failed:', err.message)

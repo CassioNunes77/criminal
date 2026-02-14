@@ -45,11 +45,11 @@ function generateCaseCode() {
 }
 
 export async function runGenerateCase() {
-  const apiKey = process.env.OPENAI_API_KEY
+  const apiKey = process.env.GROQ_API_KEY
   const serviceAccountJson = process.env.FIREBASE_SERVICE_ACCOUNT
 
   if (!apiKey) {
-    throw new Error('OPENAI_API_KEY not configured')
+    throw new Error('GROQ_API_KEY not configured')
   }
   if (!serviceAccountJson) {
     throw new Error('FIREBASE_SERVICE_ACCOUNT not configured')
@@ -77,10 +77,13 @@ export async function runGenerateCase() {
   }
 
   const caseCode = generateCaseCode()
-  const openai = new OpenAI({ apiKey })
+  const openai = new OpenAI({
+    apiKey,
+    baseURL: 'https://api.groq.com/openai/v1'
+  })
 
   const completion = await openai.chat.completions.create({
-    model: 'gpt-4o-mini',
+    model: 'llama-3.1-8b-instruct',
     messages: [
       {
         role: 'system',

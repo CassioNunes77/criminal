@@ -60,6 +60,7 @@ export async function getDailyCrimeFromFirebase() {
   const dateId = getDateId()
 
   if (!db || !import.meta.env.VITE_FIREBASE_API_KEY) {
+    console.warn('[Nexo] Firebase não configurado (db ou VITE_FIREBASE_API_KEY ausente). Verifique variáveis no Netlify.')
     const cached = getCachedCrime(dateId)
     if (cached) return cached
     return null
@@ -75,8 +76,9 @@ export async function getDailyCrimeFromFirebase() {
       cacheCrime(dateId, crime)
       return crime
     }
+    console.warn(`[Nexo] Caso do dia ${dateId} não encontrado no Firestore. Execute o trigger para gerar.`)
   } catch (err) {
-    console.warn('Firebase crime fetch failed, trying cache:', err.message)
+    console.warn('[Nexo] Firebase fetch falhou:', err.code || err.name, err.message)
   }
 
   const cached = getCachedCrime(dateId)

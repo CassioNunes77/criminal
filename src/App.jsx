@@ -211,10 +211,10 @@ function App() {
           <br /><br />
           CONEXAO REMOTA INDISPONIVEL.
           <br />
-          CASO DO DIA NAO DISPONIVEL SEM INTERNET.
+          Caso do dia nao disponivel (sem internet, caso nao gerado ou falha de conexao).
           <br /><br />
           <span style={{ color: '#00CC55', fontSize: '13px' }}>
-            Reconecte e tente novamente.
+            Verifique sua conexao e tente novamente.
           </span>
         </div>
         <button

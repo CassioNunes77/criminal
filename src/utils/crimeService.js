@@ -84,52 +84,62 @@ function normalizeCachedCrime(crime) {
   }
 }
 
+async function fetchViaNetlifyFunction(dateId) {
+  const base = typeof window !== 'undefined' ? window.location.origin : ''
+  const url = `${base}/.netlify/functions/get-crime?date=${encodeURIComponent(dateId)}`
+  const res = await fetch(url)
+  if (!res.ok) return null
+  const crime = await res.json()
+  return crime && crime.id ? crime : null
+}
+
 /**
- * Busca o crime do dia no Firestore.
- * Coleção: crimes
- * Documento: YYYY-MM-DD (ex: 2026-02-12)
- *
- * Modo offline: se Firebase falhar, usa crime em cache (do mesmo dia).
- * Se não houver cache, retorna null (não usa casos mockados).
+ * Busca o crime do dia.
+ * Prioridade: 1) Netlify function (evita Safari) 2) Firebase SDK 3) REST API 4) cache
  */
 export async function getDailyCrimeFromFirebase() {
   const dateId = getDateId()
 
+  try {
+    const crime = await fetchViaNetlifyFunction(dateId)
+    if (crime) {
+      const normalized = normalizeCachedCrime(crime)
+      cacheCrime(dateId, normalized)
+      return normalized
+    }
+  } catch (err) {
+    console.warn('[Nexo] Netlify function falhou:', err.message)
+  }
+
   const apiKey = import.meta.env.VITE_FIREBASE_API_KEY
   const projectId = import.meta.env.VITE_FIREBASE_PROJECT_ID
 
-  if (!apiKey || !projectId) {
-    console.warn('[Nexo] Firebase não configurado (VITE_FIREBASE_* ausente). Verifique variáveis no Netlify.')
-    const cached = getCachedCrime(dateId)
-    if (cached) return cached
-    return null
-  }
+  if (apiKey && projectId) {
+    try {
+      if (db) {
+        const docRef = doc(db, 'crimes', dateId)
+        const snapshot = await getDoc(docRef)
+        if (snapshot.exists()) {
+          const data = snapshot.data()
+          const crime = transformFirestoreCrime(data, dateId)
+          cacheCrime(dateId, crime)
+          return crime
+        }
+      }
+    } catch (err) {
+      console.warn('[Nexo] Firebase SDK falhou:', err.code || err.name, err.message)
+    }
 
-  try {
-    if (db) {
-      const docRef = doc(db, 'crimes', dateId)
-      const snapshot = await getDoc(docRef)
-      if (snapshot.exists()) {
-        const data = snapshot.data()
+    try {
+      const data = await fetchViaRestApi(dateId)
+      if (data && Object.keys(data).length > 0) {
         const crime = transformFirestoreCrime(data, dateId)
         cacheCrime(dateId, crime)
         return crime
       }
-      console.warn(`[Nexo] Caso do dia ${dateId} não encontrado no Firestore. Execute o trigger para gerar.`)
+    } catch (restErr) {
+      console.warn('[Nexo] REST fallback falhou:', restErr.message)
     }
-  } catch (err) {
-    console.warn('[Nexo] Firebase SDK falhou:', err.code || err.name, err.message)
-  }
-
-  try {
-    const data = await fetchViaRestApi(dateId)
-    if (data && Object.keys(data).length > 0) {
-      const crime = transformFirestoreCrime(data, dateId)
-      cacheCrime(dateId, crime)
-      return crime
-    }
-  } catch (restErr) {
-    console.warn('[Nexo] REST fallback falhou:', restErr.message)
   }
 
   const cached = getCachedCrime(dateId)

@@ -11,6 +11,7 @@ function Investigation({ crime, state, onDiscoverClue, onViewWitness, onMakeAccu
   const [selectedMethod, setSelectedMethod] = useState(null)
   const [feedback, setFeedback] = useState(null)
   const [showWitnesses, setShowWitnesses] = useState(false)
+  const [witnessNavActive, setWitnessNavActive] = useState(false)
   const witnessesViewed = state.witnessesViewed || []
   const [showSuspects, setShowSuspects] = useState(false)
   const [showCaseView, setShowCaseView] = useState(false)
@@ -151,14 +152,15 @@ function Investigation({ crime, state, onDiscoverClue, onViewWitness, onMakeAccu
     setSelectedFocusIndex(prev => (prev > max ? max : prev))
   }, [focusableItems.length])
 
-  // Desktop: scroll para manter o item focado visível ao navegar com setas
+  // Desktop: scroll sincronizado com o cursor ao navegar com setas
   useEffect(() => {
     if (window.innerWidth < 769) return
-    const scrollToFocused = () => {
-      const el = document.querySelector('.investigation .terminal-content .cursor-blink')?.closest('button')
-      if (el) el.scrollIntoView({ behavior: 'smooth', block: 'nearest' })
+    const el = document.querySelector('.investigation .terminal-content [data-focused="true"]')
+    if (el) {
+      requestAnimationFrame(() => {
+        el.scrollIntoView({ behavior: 'smooth', block: 'center' })
+      })
     }
-    requestAnimationFrame(() => requestAnimationFrame(scrollToFocused))
   }, [selectedFocusIndex, accusationFocusIndex, selectedWitnessIndex, showWitnesses, showAccusation])
 
   // Reset accusationFocusIndex ao abrir formulário de acusação
@@ -277,14 +279,14 @@ function Investigation({ crime, state, onDiscoverClue, onViewWitness, onMakeAccu
           e.preventDefault()
           setShowAccusation(false)
         }
-      } else if (showWitnesses) {
+      } else if (showWitnesses && witnessNavActive) {
         const witnessButtons = crime.witnesses
           .map((_, i) => i)
           .filter(i => !witnessesViewed.includes(i))
         if (e.key === 'ArrowDown') {
           e.preventDefault()
           if (selectedWitnessIndex >= witnessButtons.length - 1) {
-            setShowWitnesses(false)
+            setWitnessNavActive(false)
             const suspectsIdx = availableClues.length + 1
             setSelectedFocusIndex(Math.min(suspectsIdx, focusableItems.length - 1))
           } else {
@@ -293,7 +295,7 @@ function Investigation({ crime, state, onDiscoverClue, onViewWitness, onMakeAccu
         } else if (e.key === 'ArrowUp') {
           e.preventDefault()
           if (selectedWitnessIndex === 0) {
-            setShowWitnesses(false)
+            setWitnessNavActive(false)
             const cluesIdx = Math.max(0, availableClues.length - 1)
             setSelectedFocusIndex(cluesIdx)
           } else {
@@ -305,6 +307,7 @@ function Investigation({ crime, state, onDiscoverClue, onViewWitness, onMakeAccu
         } else if (e.key === 'Escape') {
           e.preventDefault()
           setShowWitnesses(false)
+          setWitnessNavActive(false)
         }
       } else if (showSuspects) {
         if (e.key === 'Escape') {
@@ -331,6 +334,7 @@ function Investigation({ crime, state, onDiscoverClue, onViewWitness, onMakeAccu
             setShowAccusation(true)
           } else if (item.id === 'witnesses') {
             setShowWitnesses(true)
+            setWitnessNavActive(true)
           } else if (item.id === 'suspects') {
             setShowSuspects(true)
           } else if (item.id === 'viewResult') {
@@ -346,7 +350,7 @@ function Investigation({ crime, state, onDiscoverClue, onViewWitness, onMakeAccu
     return () => {
       window.removeEventListener('keydown', handleKeyPress)
     }
-  }, [showAccusation, accusationFocusIndex, selectedSuspect, selectedLocation, selectedMethod, selectedWitnessIndex, suspectsWithRecords, crime, canDiscoverMore, showWitnesses, showSuspects, isFailed, remainingAttempts, witnessesViewed, selectedFocusIndex, focusableItems, availableClues, handleAccusation, handleViewWitness, onViewWitness, onViewCase, onViewResult, onBack])
+  }, [showAccusation, accusationFocusIndex, selectedSuspect, selectedLocation, selectedMethod, selectedWitnessIndex, suspectsWithRecords, crime, canDiscoverMore, showWitnesses, witnessNavActive, showSuspects, isFailed, remainingAttempts, witnessesViewed, selectedFocusIndex, focusableItems, availableClues, handleAccusation, handleViewWitness, onViewWitness, onViewCase, onViewResult, onBack])
 
   return (
     <div className="investigation">
@@ -405,6 +409,7 @@ function Investigation({ crime, state, onDiscoverClue, onViewWitness, onMakeAccu
                       key={index}
                       className={`option-button ${isSelected ? 'selected' : ''}`}
                       onClick={() => handleDiscoverClue(clue.type)}
+                      data-focused={isSelected ? 'true' : undefined}
                     >
                       &gt; {clue.type}..
                       {isSelected && (
@@ -445,7 +450,8 @@ function Investigation({ crime, state, onDiscoverClue, onViewWitness, onMakeAccu
           {!showWitnesses && witnessesViewed.length < crime.witnesses.length && !showViewResult && (
             <button 
               className="terminal-button" 
-              onClick={() => setShowWitnesses(true)}
+              onClick={() => { setShowWitnesses(true); setWitnessNavActive(true) }}
+              data-focused={titleAnimationComplete && !showAccusation && focusableItems[selectedFocusIndex]?.id === 'witnesses' ? 'true' : undefined}
             >
               &gt; VER TESTEMUNHAS
               {titleAnimationComplete && !showAccusation && focusableItems[selectedFocusIndex]?.id === 'witnesses' && (
@@ -483,6 +489,7 @@ function Investigation({ crime, state, onDiscoverClue, onViewWitness, onMakeAccu
                       <button
                         className={`option-button ${isFocused ? 'selected' : ''}`}
                         onClick={() => handleViewWitness(index)}
+                        data-focused={isFocused ? 'true' : undefined}
                       >
                         &gt; VER DEPOIMENTO
                         {isFocused && (
@@ -510,6 +517,7 @@ function Investigation({ crime, state, onDiscoverClue, onViewWitness, onMakeAccu
             <button 
               className="terminal-button" 
               onClick={() => setShowSuspects(true)}
+              data-focused={titleAnimationComplete && !showWitnesses && !showAccusation && focusableItems[selectedFocusIndex]?.id === 'suspects' ? 'true' : undefined}
             >
               &gt; BANCO DE DADOS DOS SUSPEITOS
               {titleAnimationComplete && !showWitnesses && !showAccusation && focusableItems[selectedFocusIndex]?.id === 'suspects' && (
@@ -542,6 +550,7 @@ function Investigation({ crime, state, onDiscoverClue, onViewWitness, onMakeAccu
           <button 
             className="terminal-button" 
             onClick={onViewCase}
+            data-focused={titleAnimationComplete && !showWitnesses && !showAccusation && focusableItems[selectedFocusIndex]?.id === 'case' ? 'true' : undefined}
           >
             &gt; CASO
             {titleAnimationComplete && !showWitnesses && !showAccusation && focusableItems[selectedFocusIndex]?.id === 'case' && (
@@ -579,6 +588,7 @@ function Investigation({ crime, state, onDiscoverClue, onViewWitness, onMakeAccu
               opacity: remainingAttempts <= 0 ? 0.5 : 1,
               cursor: remainingAttempts <= 0 ? 'not-allowed' : 'pointer'
             }}
+            data-focused={titleAnimationComplete && !showWitnesses && !showAccusation && focusableItems[selectedFocusIndex]?.id === 'accusation' ? 'true' : undefined}
           >
             &gt; FAZER ACUSACAO ({remainingAttempts > 0 ? `${remainingAttempts} TENTATIVA${remainingAttempts !== 1 ? 'S' : ''} RESTANTE${remainingAttempts !== 1 ? 'S' : ''}` : 'ESGOTADAS'})
             {titleAnimationComplete && !showWitnesses && !showAccusation && focusableItems[selectedFocusIndex]?.id === 'accusation' && (
@@ -607,6 +617,7 @@ function Investigation({ crime, state, onDiscoverClue, onViewWitness, onMakeAccu
                           key={suspect.name}
                           className={`option-button ${selectedSuspect === suspect.name ? 'selected' : ''} ${isFocused ? 'focused' : ''}`}
                           onClick={() => setSelectedSuspect(suspect.name)}
+                          data-focused={showAccusation && isFocused ? 'true' : undefined}
                         >
                           &gt; {suspect.name}
                           {isFocused && (
@@ -633,6 +644,7 @@ function Investigation({ crime, state, onDiscoverClue, onViewWitness, onMakeAccu
                           key={location}
                           className={`option-button ${selectedLocation === location ? 'selected' : ''} ${isFocused ? 'focused' : ''}`}
                           onClick={() => setSelectedLocation(location)}
+                          data-focused={showAccusation && isFocused ? 'true' : undefined}
                         >
                           &gt; {location}
                           {isFocused && (
@@ -659,6 +671,7 @@ function Investigation({ crime, state, onDiscoverClue, onViewWitness, onMakeAccu
                           key={method}
                           className={`option-button ${selectedMethod === method ? 'selected' : ''} ${isFocused ? 'focused' : ''}`}
                           onClick={() => setSelectedMethod(method)}
+                          data-focused={showAccusation && isFocused ? 'true' : undefined}
                         >
                           &gt; {method}
                           {isFocused && (
@@ -685,6 +698,7 @@ function Investigation({ crime, state, onDiscoverClue, onViewWitness, onMakeAccu
                 <button 
                   className={`terminal-button highlight ${accusationFocusIndex === confirmIdx ? 'focused' : ''}`}
                   onClick={handleAccusation}
+                  data-focused={showAccusation && accusationFocusIndex === confirmIdx ? 'true' : undefined}
                   style={{
                     opacity: remainingAttempts <= 0 ? 0.5 : 1,
                     cursor: remainingAttempts <= 0 ? 'not-allowed' : 'pointer',
@@ -705,6 +719,7 @@ function Investigation({ crime, state, onDiscoverClue, onViewWitness, onMakeAccu
                 <button 
                   className={`terminal-button secondary ${accusationFocusIndex === cancelIdx ? 'focused' : ''}`}
                   onClick={() => setShowAccusation(false)}
+                  data-focused={showAccusation && accusationFocusIndex === cancelIdx ? 'true' : undefined}
                   style={{ display: 'flex', alignItems: 'center' }}
                 >
                   &gt; CANCELAR
@@ -727,6 +742,7 @@ function Investigation({ crime, state, onDiscoverClue, onViewWitness, onMakeAccu
             <button 
               className="terminal-button highlight"
               onClick={onViewResult}
+              data-focused={titleAnimationComplete && !showWitnesses && !showAccusation && focusableItems[selectedFocusIndex]?.id === 'viewResult' ? 'true' : undefined}
             >
               &gt; VER RESULTADO
               {titleAnimationComplete && !showWitnesses && !showAccusation && focusableItems[selectedFocusIndex]?.id === 'viewResult' && (
@@ -744,6 +760,7 @@ function Investigation({ crime, state, onDiscoverClue, onViewWitness, onMakeAccu
         <button 
           className="terminal-button secondary"
           onClick={onBack}
+          data-focused={titleAnimationComplete && !showWitnesses && !showAccusation && focusableItems[selectedFocusIndex]?.id === 'back' ? 'true' : undefined}
         >
           &gt; VOLTAR AO INICIO
           {titleAnimationComplete && !showWitnesses && !showAccusation && focusableItems[selectedFocusIndex]?.id === 'back' && (

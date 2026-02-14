@@ -149,8 +149,6 @@ https://nexoterminal.netlify.app/`
           )}
         </div>
 
-        <div className="separator">------------------------------------</div>
-
         {state.solved && (3 - displayStats.attempts) > 0 && onBackToInvestigation && (
           <>
             <button 
@@ -172,18 +170,17 @@ https://nexoterminal.netlify.app/`
 
         <div className="case-code-section">
           <div className="case-code-line">
-            CODIGO: <span className="highlight">{caseCode}</span>
-            <button 
-              className="terminal-button copy-code-btn"
+            CODIGO: <span 
+              className="highlight case-code-clickable" 
               onClick={copyCaseCode}
-              title="Copiar codigo"
+              title="Clique para copiar"
             >
-              &gt; COPIA CODIGO
-            </button>
+              {caseCode}
+            </span>
+            {showCodeCopied && (
+              <span className="case-code-feedback">&gt; Codigo Copiado</span>
+            )}
           </div>
-          {showCodeCopied && (
-            <span className="case-code-feedback">COPIADO</span>
-          )}
         </div>
       </div>
     </div>

@@ -23,6 +23,10 @@
   color: var(--text-secondary);
 }
 
+.investigation .terminal-header .case-title-animated {
+  text-align: center;
+}
+
 /* Date glitch effect - year 2026 -> 1987 */
 .date-glitch {
   animation: dateGlitch 0.15s ease-out;

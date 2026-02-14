@@ -12,6 +12,7 @@ function App() {
   const [currentCrime, setCurrentCrime] = useState(null)
   const [isLoading, setIsLoading] = useState(true)
   const [offlineNoCache, setOfflineNoCache] = useState(false)
+  const [x7, setX7] = useState(false)
   const [investigationState, setInvestigationState] = useState({
     cluesDiscovered: 0,
     cluesRevealed: [],
@@ -88,7 +89,8 @@ function App() {
     load()
   }, [])
 
-  const startInvestigation = () => {
+  const startInvestigation = (opts) => {
+    setX7(!!(opts?.x))
     setScreen('caseDescription')
   }
 
@@ -130,15 +132,12 @@ function App() {
       return true
     }
     
-    const maxAttempts = 3
+    const maxAttempts = x7 ? 999 : 3
     const currentAttempts = investigationState.attempts + 1
-    
-    // Check if already failed
-    if (investigationState.failed) {
-      return false
-    }
-    
-    const isCorrect = 
+
+    if (investigationState.failed) return false
+
+    const isCorrect =
       suspect === currentCrime.solution.suspect &&
       location === currentCrime.solution.location &&
       method === currentCrime.solution.method
@@ -290,6 +289,7 @@ function App() {
         <Investigation
           crime={currentCrime}
           state={investigationState}
+          x7={x7}
           onDiscoverClue={discoverClue}
           onViewWitness={viewWitness}
           onMakeAccusation={makeAccusation}

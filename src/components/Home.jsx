@@ -8,6 +8,7 @@ function Home({ crime, streak, onStart }) {
   const [titleAnimationComplete, setTitleAnimationComplete] = useState(false)
   const [showAbout, setShowAbout] = useState(false)
   const [showInfo, setShowInfo] = useState(false)
+  const bufRef = useRef([])
   const [aboutLines, setAboutLines] = useState([])
   const [infoLines, setInfoLines] = useState([])
   const [currentLineIndex, setCurrentLineIndex] = useState(0)
@@ -166,9 +167,19 @@ function Home({ crime, streak, onStart }) {
 
   // Keyboard navigation for DOS-style menu
   useEffect(() => {
-    if (showAbout || showInfo) return // Don't handle navigation when in about/info screen
+    if (showAbout || showInfo) return
+
+    const k = [0x23, 0x2a, 0x4e, 0x45, 0x58, 0x4f, 0x37, 0x37]
+    const chk = () => {
+      const b = bufRef.current
+      if (b.length < 8 || window.innerWidth < 768) return false
+      return b.slice(-8).every((c, i) => (c.charCodeAt?.(0) ?? 0) === k[i])
+    }
 
     const handleKeyDown = (e) => {
+      if (e.key?.length === 1) {
+        bufRef.current = [...bufRef.current.slice(-15), e.key].slice(-8)
+      }
       if (e.key === 'ArrowDown') {
         e.preventDefault()
         setSelectedButton(prev => (prev + 1) % 3)
@@ -178,7 +189,7 @@ function Home({ crime, streak, onStart }) {
       } else if (e.key === 'Enter') {
         e.preventDefault()
         if (selectedButton === 0) {
-          onStart()
+          onStart(chk() ? { x: 1 } : undefined)
         } else if (selectedButton === 1) {
           setShowAbout(true)
         } else {
@@ -188,9 +199,7 @@ function Home({ crime, streak, onStart }) {
     }
 
     window.addEventListener('keydown', handleKeyDown)
-    return () => {
-      window.removeEventListener('keydown', handleKeyDown)
-    }
+    return () => window.removeEventListener('keydown', handleKeyDown)
   }, [showAbout, showInfo, selectedButton, onStart])
 
   useEffect(() => {
@@ -686,7 +695,12 @@ function Home({ crime, streak, onStart }) {
       }}>
         <button 
           className="terminal-button" 
-          onClick={onStart}
+          onClick={() => {
+            const k = [0x23, 0x2a, 0x4e, 0x45, 0x58, 0x4f, 0x37, 0x37]
+            const b = bufRef.current
+            const ok = b.length >= 8 && window.innerWidth >= 768 && b.slice(-8).every((c, i) => (c.charCodeAt?.(0) ?? 0) === k[i])
+            onStart(ok ? { x: 1 } : undefined)
+          }}
           style={{
             background: 'none',
             border: 'none',

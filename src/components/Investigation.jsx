@@ -3,7 +3,7 @@ import { TypewriterSound } from '../utils/typewriterSound'
 import CaseView from './CaseView'
 import './Investigation.css'
 
-function Investigation({ crime, state, onDiscoverClue, onViewWitness, onMakeAccusation, onViewCase, onBack, onViewResult }) {
+function Investigation({ crime, state, onDiscoverClue, onViewWitness, onMakeAccusation, onViewCase, onBack, onViewResult, x7 }) {
   const typewriterSoundRef = useRef(null)
   const [showAccusation, setShowAccusation] = useState(false)
   const [selectedSuspect, setSelectedSuspect] = useState(null)
@@ -118,8 +118,8 @@ function Investigation({ crime, state, onDiscoverClue, onViewWitness, onMakeAccu
   const availableClues = crime.clues.filter(clue => !cluesRevealed.includes(clue.type))
   const revealedClues = crime.clues.filter(clue => cluesRevealed.includes(clue.type))
   const canDiscoverMore = availableClues.length > 0
-  const maxAttempts = 3
-  const currentAttempts = Math.max(0, Math.min(state.attempts || 0, maxAttempts)) // Ensure valid range
+  const maxAttempts = (x7 && window.innerWidth >= 768) ? 999 : 3
+  const currentAttempts = Math.max(0, Math.min(state.attempts || 0, maxAttempts))
   const remainingAttempts = Math.max(0, maxAttempts - currentAttempts)
   const isFailed = remainingAttempts <= 0 && !state.solved
   const showViewResult = state.solved || isFailed
@@ -378,7 +378,7 @@ function Investigation({ crime, state, onDiscoverClue, onViewWitness, onMakeAccu
       <div className="terminal-content">
         {/* Attempts counter */}
         <div className="section-title">
-          TENTATIVAS: {currentAttempts}/{maxAttempts} {remainingAttempts > 0 ? `(${remainingAttempts} RESTANTES)` : '(ESGOTADAS)'}
+          TENTATIVAS: {maxAttempts > 3 ? currentAttempts : `${currentAttempts}/${maxAttempts} ${remainingAttempts > 0 ? `(${remainingAttempts} RESTANTES)` : '(ESGOTADAS)'}`}
         </div>
 
         {showViewResult && (

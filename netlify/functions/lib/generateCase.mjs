@@ -27,7 +27,7 @@ function getPrompt(dateStr, caseNumber, caseCode, temaOverride) {
   const dateInstruction = getDateSpecialInstructions(dateStr)
   const temaLine = temaOverride ? `\n## TEMA OBRIGATÓRIO (esta execução)\nO caso DEVE ser em uma ${temaOverride.toUpperCase()}. Local (location) no JSON deve refletir isso.\n\n` : ''
 
-  return `Gere um novo caso criminal para o jogo Nexo Terminal. Siga 100% a lógica do jogo.${temaLine}
+  return `Gere um novo caso criminal para o jogo Nexo Terminal. O caso será escrito em pt-BR. Siga 100% a lógica do jogo.${temaLine}
 
 ## REGRAS DE OURO (OBRIGATÓRIAS)
 - Solução única: Existe apenas UMA combinação correta: suspeito + local + método.
@@ -36,9 +36,9 @@ function getPrompt(dateStr, caseNumber, caseCode, temaOverride) {
 - Falsos coerentes: Testemunhas falsas podem errar ou mentir, mas o caso continua claro e resolvível.
 - Sem ambiguidade: O jogador NÃO pode chegar, de forma lógica, a mais de uma solução válida.
 - Sem duplicidade: Nomes, locais e métodos ÚNICOS (não repetir entre si).
-- Crimes leves: Furto, roubo, arrombamento, cyber crimes década de 80, apropriação indevida. SEM violência grave.
+- Crimes leves: Apenas furto, roubo, arrombamento, cyber crimes década de 80, apropriação indevida e outros, SEM violência grave.
 - Caso fechado: O caso tem começo, meio e fim; todas as pistas contribuem para a solução.
-- Lógica interna: Horários, locais e eventos consistentes entre si.
+- Lógica interna: Horários, locais e eventos precisam ser consistentes entre si.
 - Jogo em primeiro lugar: O caso é pensado para ser jogável e divertido, não realista demais.
 
 ## EVIDÊNCIAS OBRIGATÓRIAS (distribuir na descrição, pistas ou depoimentos)
@@ -52,16 +52,18 @@ function getPrompt(dateStr, caseNumber, caseCode, temaOverride) {
 - NÃO pode existir testemunha que resolve o caso sozinha.
 - Sempre o caso tem que ter mais de uma evidência que prove o culpado.
 
-## DADOS DO CASO (uso interno)
-- Data do caso (real, para registro): ${dateStr}
-- Número do caso: #${String(caseNumber).padStart(4, '0')}
-- Código do caso: ${caseCode}
+## DADOS DO CASO (uso interno – NUNCA incluir data em campos do JSON)
+- Data do caso (real, para registro na base de dados): ${dateStr}
+- Número do caso: #${String(caseNumber).padStart(4, '0')} (sempre sequenciado)
+- Código do caso: ${caseCode} (número, letras e caracteres randômicos)
 - ${dateInstruction}
 
 ## TÍTULO E DESCRIÇÃO
 - Mínimo 350, máximo 500 caracteres.
-- Crimes da década de 80. Elementos até 1987 apenas (sem smartphones).
-- Incluir pista escondida na descrição (ex: "dinheiro do caixa foram levados" indica local = caixa).
+- NÃO ficar declarando depoimentos de testemunhas ou pistas na narrativa. Use a narrativa como uma HISTÓRIA que gere curiosidade, instigue e sentimento investigativo.
+- Crimes sempre da década de 80. Elementos até 1987 apenas. Smartphones NÃO podem estar no caso.
+- JAMAIS citar a data do caso na descrição.
+- Pista escondida: sempre ter algum elemento relevante na solução (ex: "dinheiro do caixa foram levados" indica local = caixa registradora). Deixar sempre uma pista extra na descrição.
 - Sempre terminar com: "Analise as pistas e testemunhas com cuidado. Algumas informações podem ser falsas."
 
 ## PISTAS (6 tipos – jogador escolhe qual revelar primeiro)
@@ -69,17 +71,18 @@ HORARIO, LOCAL, ACESSO, ALIBI, COMPORTAMENTO, EVIDENCIA
 - Use informações soltas: "ouvi boatos que..", "registros incompletos", "por volta das 19:00".
 
 ## TESTEMUNHAS (3)
-- name + cargo: sempre declarar nome e cargo/função (ex: cliente, morador, funcionário, mãe de alguém).
-- statement: depoimento. isTruthful: true ou false. Indicar [VERDADEIRA] ou [PODE SER FALSA].
-- Informações discretas: "suspeito parecia um homem forte" (indica que provavelmente não é mulher).
+- Sempre declarar nome e cargo/função (ex: cliente, morador, mãe de alguém).
+- Cada testemunha dá sua versão. Alguma versão pode ser falsa. Indicar [VERDADEIRA] ou [PODE SER FALSA].
+- Informações discretas: "Suspeito parecia um homem forte" (indica que provavelmente não é mulher).
 - Álibi ou testemunhas próximas (esposa, mãe, filhos) podem ou não estar falando a verdade.
 
 ## SUSPEITOS (4)
-- name + cargo: sempre declarar nome e cargo/função (ex: cliente, morador, funcionário, gerente).
-- criminalRecord: passagem pela polícia ou "Sem antecedentes".
-- caracteristica: física ou comportamental (ex: costuma usar azul, anda de boné, cabelos longos). Evite termos genéricos como "usa calça jeans".
-- Correlações: a característica deve aparecer em pistas, testemunhas ou descrição para conectar ao culpado.
-- Mencionar pelo menos 3 suspeitos na descrição, pistas ou depoimentos (1 por vez).
+- Sempre declarar nome e cargo/função (ex: cliente, morador, funcionário, gerente, encanador).
+- Histórico: passagem pela polícia e motivo, ou "Sem antecedentes".
+- Característica: costuma usar azul, anda sempre de boné, tem cabelos longos. Evite "usa calça jeans" ou "não é muito inteligente"; use "costuma usar calça jeans".
+- Correlações: características devem conectar a pistas, testemunhas e descrição.
+- Mencionar pelo menos 3 suspeitos na descrição, pistas ou depoimentos (1 por vez). Ex: suspeito visto por testemunha; na descrição fala de possível suspeito no local; em pista: "em tal horário foi visto tal pessoa". Álibi: "Paulo estava em casa (confirmado pela mãe)" – a mãe pode estar mentindo.
+- Garanta a lógica: com todas as testemunhas, pistas e descrição será possível chegar a apenas um resultado correto. Faça de forma sutil, para não deixar o jogo simples demais.
 
 ## LOCAIS (4 opções), MÉTODOS (4 opções)
 

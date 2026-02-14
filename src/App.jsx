@@ -4,13 +4,13 @@ import CaseDescription from './components/CaseDescription'
 import Investigation from './components/Investigation'
 import Result from './components/Result'
 import { getDailyCrimeFromFirebase } from './utils/crimeService'
+import { getDailyCrime } from './utils/dailySeed'
 import './App.css'
 
 function App() {
   const [screen, setScreen] = useState('home')
   const [currentCrime, setCurrentCrime] = useState(null)
   const [isLoading, setIsLoading] = useState(true)
-  const [errorNoCrime, setErrorNoCrime] = useState(false)
   const [x7, setX7] = useState(false)
   const [investigationState, setInvestigationState] = useState({
     cluesDiscovered: 0,
@@ -31,15 +31,13 @@ function App() {
     const startTime = Date.now()
     const minLoadTime = 1000
     try {
-      setErrorNoCrime(false)
       setIsLoading(true)
-      const crime = await getDailyCrimeFromFirebase()
-      setCurrentCrime(crime)
+      let crime = await getDailyCrimeFromFirebase()
       if (!crime) {
-        setErrorNoCrime(true)
-        setIsLoading(false)
-        return
+        crime = getDailyCrime()
+        crime = { ...crime, caseCode: String(crime.id), caseNumber: String(crime.id).slice(-4).padStart(4, '0') }
       }
+      setCurrentCrime(crime)
       try {
         const savedState = localStorage.getItem(`crime_${crime.id}`)
         if (savedState) {
@@ -79,7 +77,10 @@ function App() {
       setTimeout(() => setIsLoading(false), remainingTime)
     } catch (error) {
       console.error('Error loading crime:', error)
-      setErrorNoCrime(true)
+      try {
+        const fallback = getDailyCrime()
+        setCurrentCrime({ ...fallback, caseCode: String(fallback.id), caseNumber: String(fallback.id).slice(-4).padStart(4, '0') })
+      } catch (_) {}
       setTimeout(() => setIsLoading(false), minLoadTime)
     }
   }
@@ -179,53 +180,6 @@ function App() {
         date: new Date().toDateString()
       }))
     }
-  }
-
-  if (errorNoCrime) {
-    return (
-      <div className="app" style={{
-        minHeight: '100vh',
-        padding: '16px',
-        maxWidth: '1200px',
-        margin: '0 auto',
-        background: '#020403',
-        color: '#00CC55',
-        fontFamily: "'PxPlus IBM VGA8', monospace",
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'center',
-        justifyContent: 'center'
-      }}>
-        <div style={{
-          padding: '24px 32px',
-          border: '2px solid #FF6600',
-          background: 'rgba(255, 102, 0, 0.06)',
-          color: '#FF6600',
-          fontFamily: "'PxPlus IBM VGA8', monospace",
-          fontSize: '14px',
-          lineHeight: 1.8,
-          textAlign: 'center',
-          maxWidth: '500px'
-        }}>
-          CASO DO DIA NAO DISPONIVEL.
-        </div>
-        <button
-          onClick={load}
-          style={{
-            marginTop: '24px',
-            padding: '12px 24px',
-            background: 'none',
-            border: '1px solid #00FF66',
-            color: '#00FF66',
-            fontFamily: "'PxPlus IBM VGA8', monospace",
-            fontSize: '14px',
-            cursor: 'pointer'
-          }}
-        >
-          &gt; TENTAR NOVAMENTE
-        </button>
-      </div>
-    )
   }
 
   if (!currentCrime || isLoading) {

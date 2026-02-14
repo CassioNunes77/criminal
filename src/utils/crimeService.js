@@ -1,5 +1,6 @@
 import { getDoc, doc } from 'firebase/firestore/lite'
 import { db } from '../firebase'
+import { getDailyCrime } from './dailySeed'
 
 function decodeFirestoreValue(v) {
   if (!v) return null
@@ -132,7 +133,17 @@ export async function getDailyCrimeFromFirebase() {
     }
   }
 
-  return null
+  try {
+    const fallback = getDailyCrime()
+    return {
+      ...fallback,
+      caseCode: fallback.caseCode || String(fallback.id),
+      caseNumber: fallback.caseNumber || String(fallback.id).slice(-4).padStart(4, '0')
+    }
+  } catch (e) {
+    console.error('[Nexo] Fallback crime failed:', e)
+    return null
+  }
 }
 
 /**

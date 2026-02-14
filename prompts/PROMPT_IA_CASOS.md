@@ -61,9 +61,10 @@ Gere um novo caso criminal para o jogo Nexo Terminal. O caso gerado DEVE obedece
 
 ## TÍTULO E DESCRIÇÃO DO CASO
 
-- **Título do caso** deve ser apenas o nome do caso. Exemplo(FURTO DE FITAS RARAS EM VIDEOLOCADORA, Cibercrime em CPD de Banco, ROUBO EM LOJA DE ELETRÔNICOS) NÃO usar títulos como: (caso de furto, caso de...).
-- Crie uma **narrativa de um caso** (Mínimo 400 caracteres, Máximo 600 caracteres).
-- Crie narrativa em tom **investigativo, misterioso, tenso**, sentimento investigativo, a descrição do caso tem que ser uma sinopse de uma boa história, como um caso de carmen sandiego ou sherlok holmes, ambientado nos anos 80.
+- **Título do caso** deve ser apenas o nome do caso. Exemplo: (FURTO DE FITAS RARAS EM VIDEOLOCADORA, Cibercrime em CPD de Banco, ROUBO EM LOJA DE ELETRÔNICOS) NÃO usar títulos como: (caso de furto, caso de...)
+- É obrigado que o título seja coerente com a narrativa.
+- Crie uma **descriçao narrativa de um caso**
+- Crie descrição narrativa em tom **investigativo, misterioso, tenso**, sentimento investigativo, a descrição do caso tem que ser uma sinopse de uma boa história, como um caso de carmen sandiego ou sherlok holmes, ambientado nos anos 80.
 - **Não ficar declarando** depoimentos de testemunhas ou pistas na narrativa.
 - **Não será permitido** colocar data, nem dia, nem mês, nem ano na descrição do caso.
 - Crimes sempre da **década de 80**. Crie narrativa considerando apenas elementos que fazem sentido até o ano de **1987**.
@@ -131,7 +132,7 @@ Relação: O veículo deve coincidir com o de um suspeito (cor, modelo, uso).
 ## TESTEMUNHAS (5)
 
 - Crie 5 testemunhas relacionadas com o caso.
-- Sempre declarar **nome e sobrenome**.
+- Sempre declarar **nome e sobrenome** das testemunhas.
 - Sempre declarar **cargo ou função** ou quem ele ou ela é na história (ex: cliente, morador, mãe de alguém).
 - Entre as testemunhas será permitido **no máximo 1 suspeito** como testemunha.
 - Cada testemunha dá sua versão (alguma versão pode ser falsa). Indicar **[VERDADEIRA]** ou **[PODE SER FALSA]**.
@@ -154,7 +155,7 @@ Relação: O veículo deve coincidir com o de um suspeito (cor, modelo, uso).
 - **Histórico:** se já teve passagem pela polícia e o motivo, ou "Sem antecedentes".
 - **Todo suspeito terá uma Característica.** Exemplos: Cabelos longos até os ombros, Usa óculos de aro grosso, Costuma usar jaqueta de couro, Anda sempre de boné, Usa brincos grandes dourados, Costuma usar camisa azul, Usa tênis branco, Tem barba por fazer, Cabelo cacheado, Usa pulseira de prata. Crie característica de acordo com o caso. (Evite "usa calça jeans"; use "costuma usar calça jeans").
 - **Todo suspeito terá um Comportamento.** Exemplos: Foi direto ao local sem hesitar, Parecia nervoso perto do caixa, Saiu correndo após o crime, Ficou observando a vitrine antes de entrar, Pediu para trocar de nota várias vezes, Desviou o olhar quando questionado, Conhecia o layout da loja, Entrou e saiu em menos de 5 minutos, Foi ao banheiro antes do crime, Fingiu estar procurando algo na estante. Crie comportamento de acordo com o caso.
-- **Veículo:** Carro verde, bicicleta, moto esportiva ou outro meio de transporte, costuma andar a pé. Declare o veículo como comentário. Exemplo: "Geralmente avistado pilotando uma moto esportiva preta."
+- **Todo suspeito terá um Veículo:** Exemplos: Carro conversível vermelho, bicicleta, moto esportiva ou outro meio de transporte, costuma andar a pé. Declare o veículo como comentário. Exemplo: "Geralmente avistado pilotando uma moto esportiva preta."
 - **Correlações:** características devem conectar a pistas, testemunhas e descrição. Alguma menção que conecta ao suspeito.
 - **Mencionar pelo menos 3 suspeitos** na descrição ou em depoimento de alguma testemunha ou em alguma pista. Pelo menos 3 suspeitos devem ser citados 1 por vez. Ex: suspeito visto por testemunha; na descrição fala de possível suspeito no local; em pista: "em tal horário foi visto tal pessoa". Álibi: "Paulo estava em casa (confirmado pela mãe)" – a mãe pode estar mentindo.
 - Garanta a lógica: com todas as testemunhas, pistas e descrição será possível chegar a **apenas um resultado correto**. Faça de forma **sutil**, para não deixar o jogo simples demais.

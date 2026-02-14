@@ -4,6 +4,7 @@ import CaseDescription from './components/CaseDescription'
 import Investigation from './components/Investigation'
 import Result from './components/Result'
 import Dossier from './components/Dossier'
+import LoadingScreen from './components/LoadingScreen'
 import { getDailyCrimeFromFirebase } from './utils/crimeService'
 import { getDailyCrime } from './utils/dailySeed'
 import './App.css'
@@ -185,21 +186,7 @@ function App() {
   }
 
   if (!currentCrime || isLoading) {
-    return (
-      <div className="loading" style={{ 
-        display: 'flex', 
-        alignItems: 'center', 
-        justifyContent: 'center', 
-        minHeight: '100vh',
-        fontSize: '18px',
-        color: '#00CC55',
-        fontFamily: "'PxPlus IBM VGA8', monospace",
-        background: '#020403'
-      }}>
-        CARREGANDO TERMINAL...
-        <span className="cursor-blink" style={{ marginLeft: '4px' }}>█</span>
-      </div>
-    )
+    return <LoadingScreen />
   }
 
   return (

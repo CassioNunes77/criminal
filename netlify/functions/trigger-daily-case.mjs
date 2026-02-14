@@ -2,43 +2,27 @@ import { runGenerateCase } from './lib/generateCase.mjs'
 
 export default async (req) => {
   if (req.method !== 'POST') {
-    return {
-      statusCode: 405,
-      body: JSON.stringify({ error: 'Method not allowed. Use POST.' })
-    }
+    return Response.json({ error: 'Method not allowed. Use POST.' }, { status: 405 })
   }
 
   const secret = process.env.TRIGGER_SECRET
-  const authHeader = req.headers['authorization'] || ''
+  const authHeader = req.headers.get('authorization') || ''
   const token = authHeader.startsWith('Bearer ') ? authHeader.slice(7) : ''
-  const headerSecret = req.headers['x-trigger-secret'] || ''
+  const headerSecret = req.headers.get('x-trigger-secret') || ''
 
   if (!secret) {
-    return {
-      statusCode: 500,
-      body: JSON.stringify({ error: 'TRIGGER_SECRET not configured in Netlify' })
-    }
+    return Response.json({ error: 'TRIGGER_SECRET not configured in Netlify' }, { status: 500 })
   }
 
   if (token !== secret && headerSecret !== secret) {
-    return {
-      statusCode: 401,
-      body: JSON.stringify({ error: 'Unauthorized' })
-    }
+    return Response.json({ error: 'Unauthorized' }, { status: 401 })
   }
 
   try {
     const result = await runGenerateCase()
-    return {
-      statusCode: 200,
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ ok: true, ...result })
-    }
+    return Response.json({ ok: true, ...result })
   } catch (err) {
     console.error('trigger-daily-case failed:', err)
-    return {
-      statusCode: 500,
-      body: JSON.stringify({ error: err.message || 'Failed to generate case' })
-    }
+    return Response.json({ error: err.message || 'Failed to generate case' }, { status: 500 })
   }
 }

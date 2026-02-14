@@ -73,6 +73,7 @@ export default async (req) => {
     const suspectsWithRecords = suspects.map(normalizeSuspect)
     const witnesses = (data.witnesses || []).map(normalizeWitness)
 
+    const ensureString = (v) => (typeof v === 'string' ? v : (v && typeof v === 'object' ? String(v.type ?? v.name ?? v.value ?? '') : String(v ?? '')))
     const ensureDescArr = (desc) => {
       if (Array.isArray(desc)) return desc.map(l => (typeof l === 'string' ? l : String(l ?? '')))
       if (typeof desc === 'string') return desc.split('\n')
@@ -90,8 +91,8 @@ export default async (req) => {
       description: ensureDescArr(data.description),
       suspects: suspectsWithRecords.map(s => s.name),
       suspectsWithRecords,
-      locations: data.locations || [],
-      methods: data.methods || [],
+      locations: (data.locations || []).map(ensureString),
+      methods: (data.methods || []).map(ensureString),
       clues: (data.clues || []).map(c => ({
         type: c.type,
         text: c.text,

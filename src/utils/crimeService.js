@@ -56,6 +56,12 @@ function ensureDescriptionArray(desc) {
   return []
 }
 
+function ensureString(v) {
+  if (typeof v === 'string') return v
+  if (v && typeof v === 'object') return String(v.type ?? v.name ?? v.value ?? '')
+  return String(v ?? '')
+}
+
 function normalizeSuspect(s) {
   if (typeof s !== 'object') return { name: String(s), cargo: '', criminalRecord: 'Sem antecedentes', comportamento: '', caracteristica: '', veiculo: '' }
   const rawName = (s.name || '').trim()
@@ -104,6 +110,8 @@ function normalizeCrime(crime) {
     description: ensureDescriptionArray(crime.description),
     suspects: suspectsWithRecords.map(s => s.name),
     suspectsWithRecords,
+    locations: (crime.locations || []).map(ensureString),
+    methods: (crime.methods || []).map(ensureString),
     witnesses: (crime.witnesses || []).map(normalizeWitness),
     dossier: crime.dossier || '',
     clues: (crime.clues || []).map(c => ({
@@ -223,8 +231,8 @@ function transformFirestoreCrime(data, dateId) {
     description,
     suspects: suspectsWithRecords.map(s => s.name),
     suspectsWithRecords,
-    locations: data.locations || [],
-    methods: data.methods || [],
+    locations: (data.locations || []).map(ensureString),
+    methods: (data.methods || []).map(ensureString),
     clues: (data.clues || []).map(c => ({
       type: c.type,
       text: c.text,

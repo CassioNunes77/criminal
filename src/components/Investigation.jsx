@@ -5,6 +5,7 @@ import './Investigation.css'
 
 function Investigation({ crime, state, onDiscoverClue, onViewWitness, onMakeAccusation, onBack, onViewResult, x7 }) {
   const typewriterSoundRef = useRef(null)
+  const lastClueRevealTimeRef = useRef(0)
   const [showAccusation, setShowAccusation] = useState(false)
   const [selectedSuspect, setSelectedSuspect] = useState(null)
   const [selectedLocation, setSelectedLocation] = useState(null)
@@ -152,16 +153,19 @@ function Investigation({ crime, state, onDiscoverClue, onViewWitness, onMakeAccu
     setSelectedFocusIndex(prev => (prev > max ? max : prev))
   }, [focusableItems.length])
 
-  // Desktop: scroll sincronizado com o cursor ao navegar com setas
+  // Desktop: scroll sincronizado com o cursor ao navegar com setas (exceto ao revelar pistas)
   useEffect(() => {
     if (window.innerWidth < 769) return
+    if (Date.now() - lastClueRevealTimeRef.current < 200) return // Não rolar ao revelar pista
+    const focusedItem = focusableItems[selectedFocusIndex]
+    if (focusedItem?.type === 'clue') return // Não rolar ao navegar entre pistas
     const el = document.querySelector('.investigation .terminal-content [data-focused="true"]')
     if (el) {
       requestAnimationFrame(() => {
         el.scrollIntoView({ behavior: 'smooth', block: 'center' })
       })
     }
-  }, [selectedFocusIndex, accusationFocusIndex, selectedWitnessIndex, showWitnesses, showAccusation])
+  }, [selectedFocusIndex, accusationFocusIndex, selectedWitnessIndex, showWitnesses, showAccusation, focusableItems])
 
   // Reset accusationFocusIndex ao abrir formulário de acusação
   useEffect(() => {
@@ -183,6 +187,7 @@ function Investigation({ crime, state, onDiscoverClue, onViewWitness, onMakeAccu
     if (cluesRevealed.includes(clueType)) return
     const clue = crime.clues.find(c => c.type === clueType)
     if (clue) {
+      lastClueRevealTimeRef.current = Date.now()
       onDiscoverClue(clueType)
     }
   }
@@ -255,9 +260,9 @@ function Investigation({ crime, state, onDiscoverClue, onViewWitness, onMakeAccu
     const handleKeyPress = (e) => {
       if (showAccusation) {
         const accItems = [
-          ...suspectsWithRecords.map(s => ({ type: 'suspect', value: s.name })),
-          ...crime.locations.map(l => ({ type: 'location', value: l })),
-          ...crime.methods.map(m => ({ type: 'method', value: m })),
+          ...suspectsWithRecords.map(s => ({ type: 'suspect', value: typeof s === 'object' ? (s.name ?? s.displayName ?? '') : String(s) })),
+          ...crime.locations.map(l => ({ type: 'location', value: typeof l === 'string' ? l : (l?.type ?? l?.name ?? l?.value ?? '') })),
+          ...crime.methods.map(m => ({ type: 'method', value: typeof m === 'string' ? m : (m?.type ?? m?.name ?? m?.value ?? '') })),
           { type: 'confirm' },
           { type: 'cancel' }
         ]
@@ -635,15 +640,17 @@ function Investigation({ crime, state, onDiscoverClue, onViewWitness, onMakeAccu
                     {suspectsWithRecords.map((suspect) => {
                       const curIdx = idx++
                       const isFocused = accusationFocusIndex === curIdx
+                      const suspectName = typeof suspect === 'object' ? (suspect.name ?? suspect.displayName ?? '') : String(suspect)
+                      const suspectDisplay = typeof suspect === 'object' ? (suspect.displayName ?? suspect.name ?? '') : String(suspect)
                       return (
                         <button
-                          key={suspect.name}
-                          className={`option-button ${selectedSuspect === suspect.name ? 'selected' : ''} ${isFocused ? 'focused' : ''}`}
-                          onClick={() => setSelectedSuspect(suspect.name)}
+                          key={String(suspectName)}
+                          className={`option-button ${selectedSuspect === suspectName ? 'selected' : ''} ${isFocused ? 'focused' : ''}`}
+                          onClick={() => setSelectedSuspect(suspectName)}
                           data-focused={showAccusation && isFocused ? 'true' : undefined}
                         >
-                          &gt; {suspect.displayName || suspect.name}
-                          {suspect.cargo && ` (${suspect.cargo})`}
+                          &gt; {String(suspectDisplay)}
+                          {typeof suspect === 'object' && suspect.cargo ? ` (${String(suspect.cargo)})` : ''}
                           {isFocused && (
                             <span className="cursor-blink" style={{
                               color: '#00FF66',
@@ -660,17 +667,18 @@ function Investigation({ crime, state, onDiscoverClue, onViewWitness, onMakeAccu
                 <div className="form-group">
                   <div className="form-label">LOCAL:</div>
                   <div className="form-options">
-                    {crime.locations.map((location) => {
+                    {crime.locations.map((location, locIdx) => {
                       const curIdx = idx++
                       const isFocused = accusationFocusIndex === curIdx
+                      const locStr = typeof location === 'string' ? location : (location?.type ?? location?.name ?? location?.value ?? String(location ?? ''))
                       return (
                         <button
-                          key={location}
-                          className={`option-button ${selectedLocation === location ? 'selected' : ''} ${isFocused ? 'focused' : ''}`}
-                          onClick={() => setSelectedLocation(location)}
+                          key={locIdx}
+                          className={`option-button ${selectedLocation === locStr ? 'selected' : ''} ${isFocused ? 'focused' : ''}`}
+                          onClick={() => setSelectedLocation(locStr)}
                           data-focused={showAccusation && isFocused ? 'true' : undefined}
                         >
-                          &gt; {location}
+                          &gt; {locStr}
                           {isFocused && (
                             <span className="cursor-blink" style={{
                               color: '#00FF66',
@@ -687,17 +695,18 @@ function Investigation({ crime, state, onDiscoverClue, onViewWitness, onMakeAccu
                 <div className="form-group">
                   <div className="form-label">METODO:</div>
                   <div className="form-options">
-                    {crime.methods.map((method) => {
+                    {crime.methods.map((method, methodIdx) => {
                       const curIdx = idx++
                       const isFocused = accusationFocusIndex === curIdx
+                      const methodStr = typeof method === 'string' ? method : (method?.type ?? method?.name ?? method?.value ?? String(method ?? ''))
                       return (
                         <button
-                          key={method}
-                          className={`option-button ${selectedMethod === method ? 'selected' : ''} ${isFocused ? 'focused' : ''}`}
-                          onClick={() => setSelectedMethod(method)}
+                          key={methodIdx}
+                          className={`option-button ${selectedMethod === methodStr ? 'selected' : ''} ${isFocused ? 'focused' : ''}`}
+                          onClick={() => setSelectedMethod(methodStr)}
                           data-focused={showAccusation && isFocused ? 'true' : undefined}
                         >
-                          &gt; {method}
+                          &gt; {methodStr}
                           {isFocused && (
                             <span className="cursor-blink" style={{
                               color: '#00FF66',

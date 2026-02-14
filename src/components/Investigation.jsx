@@ -142,7 +142,7 @@ function Investigation({ crime, state, onDiscoverClue, onViewWitness, onMakeAccu
 
   // Itens focáveis: pistas (se houver) + botões do menu. Ordem visual para setas cima/baixo
   const focusableItems = [
-    ...(canDiscoverMore && !showViewResult ? availableClues.map((c, i) => ({ type: 'clue', index: i })) : []),
+    ...(canDiscoverMore ? availableClues.map((c, i) => ({ type: 'clue', index: i })) : []),
     ...mainButtons.map(id => ({ type: 'button', id }))
   ]
 
@@ -402,9 +402,11 @@ function Investigation({ crime, state, onDiscoverClue, onViewWitness, onMakeAccu
             <span className="progress-bar">{renderProgressBar(revealedClues.length, crime.clues.length)}</span>
           </div>
 
-          {canDiscoverMore && !showViewResult && (
+          {canDiscoverMore && (
             <div className="clue-selection">
-              <div className="form-label">ESCOLHA QUAL PISTA REVELAR:</div>
+              <div className="form-label">
+                {showViewResult ? 'PISTAS NAO REVELADAS (visualizar nao altera estatisticas):' : 'ESCOLHA QUAL PISTA REVELAR:'}
+              </div>
               <div className="form-options">
                 {availableClues.map((clue, index) => {
                   const isSelected = titleAnimationComplete && !showWitnesses && !showAccusation && focusableItems[selectedFocusIndex]?.type === 'clue' && focusableItems[selectedFocusIndex]?.index === index

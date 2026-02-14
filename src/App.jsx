@@ -115,13 +115,14 @@ function App() {
     if (!currentCrime) return
     if (investigationState.cluesRevealed?.includes(clueType)) return // Já revelada
     
+    const caseEnded = investigationState.solved || investigationState.failed
     const newState = {
       ...investigationState,
-      cluesDiscovered: investigationState.solved ? investigationState.cluesDiscovered : investigationState.cluesDiscovered + 1, // Não altera contagem se já concluiu
+      cluesDiscovered: caseEnded ? investigationState.cluesDiscovered : investigationState.cluesDiscovered + 1,
       cluesRevealed: [...(investigationState.cluesRevealed || []), clueType]
     }
     setInvestigationState(newState)
-    if (!investigationState.solved) saveState(newState) // Só persiste se não concluiu
+    if (!caseEnded) saveState(newState)
   }
 
   const makeAccusation = (suspect, location, method) => {

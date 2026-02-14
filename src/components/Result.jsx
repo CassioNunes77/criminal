@@ -166,6 +166,18 @@ https://nexoterminal.netlify.app/`
           </>
         )}
 
+        {!state.solved && onBackToInvestigation && crime.clues && (crime.clues.length - (state.cluesRevealed?.length || 0)) > 0 && (
+          <>
+            <button 
+              className="terminal-button secondary"
+              onClick={onBackToInvestigation}
+            >
+              &gt; VER PISTAS NAO REVELADAS
+            </button>
+            <div className="separator">------------------------------------</div>
+          </>
+        )}
+
         {crime.dossier && onViewDossier && (
           <>
             <button 

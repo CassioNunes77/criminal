@@ -34,19 +34,45 @@ async function main() {
   const crimesRef = db.collection('crimes')
   const metaRef = db.collection('_meta').doc('counters')
 
+  const normalizeSuspect = (s) => {
+    const rawName = (s.name || '').trim()
+    let name = rawName
+    let cargo = (s.cargo || '').trim()
+    if (!cargo && rawName.includes(', ')) {
+      const idx = rawName.indexOf(', ')
+      name = rawName.slice(0, idx).trim()
+      cargo = rawName.slice(idx + 1).trim()
+    }
+    return { name, cargo, criminalRecord: s.criminalRecord || 'Sem antecedentes', caracteristica: s.caracteristica || '' }
+  }
+
   for (let i = 0; i < CASES_001_TO_005.length; i++) {
     const c = CASES_001_TO_005[i]
     const dateStr = getDateStr(i)
+    const normalizeWitness = (w) => {
+      const rawName = (w.name || '').trim()
+      let name = rawName
+      let cargo = (w.cargo || '').trim()
+      if (!cargo && rawName.includes(', ')) {
+        const idx = rawName.indexOf(', ')
+        name = rawName.slice(0, idx).trim()
+        cargo = rawName.slice(idx + 1).trim()
+      }
+      return { name, cargo, statement: w.statement || '', isTruthful: !!w.isTruthful }
+    }
+
+    const suspects = (c.suspects || []).map(normalizeSuspect)
+    const witnesses = (c.witnesses || []).map(normalizeWitness)
     const doc = {
       type: c.type || 'CRIME',
       location: c.location || '',
       time: c.time || '',
       description: c.description || [],
-      suspects: c.suspects || [],
+      suspects,
       locations: c.locations || [],
       methods: c.methods || [],
       clues: (c.clues || []).map(cl => ({ type: cl.type, text: cl.text })),
-      witnesses: c.witnesses || [],
+      witnesses,
       solution: c.solution || {},
       dossier: c.dossier || '',
       caseNumber: c.caseNumber || String(i + 1).padStart(4, '0'),

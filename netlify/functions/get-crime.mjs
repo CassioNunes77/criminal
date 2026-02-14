@@ -44,9 +44,34 @@ export default async (req) => {
 
     const crimeId = parseInt(dateId.replace(/-/g, ''), 10)
     const suspects = data.suspects || []
-    const suspectsWithRecords = suspects.map(s =>
-      typeof s === 'object' ? s : { name: s, criminalRecord: 'Sem antecedentes' }
-    )
+
+    const normalizeSuspect = (s) => {
+      if (typeof s !== 'object') return { name: String(s), cargo: '', criminalRecord: 'Sem antecedentes', caracteristica: '' }
+      const rawName = (s.name || '').trim()
+      let name = rawName
+      let cargo = (s.cargo || '').trim()
+      if (!cargo && rawName.includes(', ')) {
+        const idx = rawName.indexOf(', ')
+        name = rawName.slice(0, idx).trim()
+        cargo = rawName.slice(idx + 1).trim()
+      }
+      const fullName = cargo ? `${name}, ${cargo}` : name
+      return { name: fullName, displayName: name, cargo, criminalRecord: s.criminalRecord || 'Sem antecedentes', caracteristica: s.caracteristica || '' }
+    }
+    const normalizeWitness = (w) => {
+      if (!w || typeof w !== 'object') return { name: '', cargo: '', statement: '', isTruthful: false }
+      const rawName = (w.name || '').trim()
+      let name = rawName
+      let cargo = (w.cargo || '').trim()
+      if (!cargo && rawName.includes(', ')) {
+        const idx = rawName.indexOf(', ')
+        name = rawName.slice(0, idx).trim()
+        cargo = rawName.slice(idx + 1).trim()
+      }
+      return { name, cargo, statement: w.statement || '', isTruthful: !!w.isTruthful }
+    }
+    const suspectsWithRecords = suspects.map(normalizeSuspect)
+    const witnesses = (data.witnesses || []).map(normalizeWitness)
 
     const ensureDescArr = (desc) => {
       if (Array.isArray(desc)) return desc.map(l => (typeof l === 'string' ? l : String(l ?? '')))
@@ -72,8 +97,10 @@ export default async (req) => {
         text: c.text,
         revealed: false
       })),
-      witnesses: data.witnesses || [],
-      solution: data.solution || {}
+      witnesses,
+      solution: data.solution || {},
+      dossier: data.dossier || '',
+      date: data.date || dateId
     }
 
     return {

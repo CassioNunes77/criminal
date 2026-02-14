@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import './Result.css'
 
-function Result({ crime, state, onBack, onBackToInvestigation }) {
+function Result({ crime, state, onBack, onBackToInvestigation, onViewDossier }) {
   const [showShare, setShowShare] = useState(false)
   const [showCodeCopied, setShowCodeCopied] = useState(false)
 
@@ -161,6 +161,18 @@ https://nexoterminal.netlify.app/`
               onClick={onBackToInvestigation}
             >
               &gt; CONTINUAR INVESTIGANDO
+            </button>
+            <div className="separator">------------------------------------</div>
+          </>
+        )}
+
+        {crime.dossier && onViewDossier && (
+          <>
+            <button 
+              className="terminal-button secondary"
+              onClick={onViewDossier}
+            >
+              &gt; VER DOSSIER DO CASO
             </button>
             <div className="separator">------------------------------------</div>
           </>

@@ -3,6 +3,7 @@ import Home from './components/Home'
 import CaseDescription from './components/CaseDescription'
 import Investigation from './components/Investigation'
 import Result from './components/Result'
+import Dossier from './components/Dossier'
 import { getDailyCrimeFromFirebase } from './utils/crimeService'
 import { getDailyCrime } from './utils/dailySeed'
 import './App.css'
@@ -242,6 +243,13 @@ function App() {
           state={investigationState}
           onBack={() => setScreen('home')}
           onBackToInvestigation={() => setScreen('investigation')}
+          onViewDossier={() => setScreen('dossier')}
+        />
+      )}
+      {screen === 'dossier' && (
+        <Dossier
+          crime={currentCrime}
+          onBack={() => setScreen('result')}
         />
       )}
     </div>

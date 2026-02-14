@@ -217,6 +217,12 @@
   font-size: 14px;
 }
 
+.witness-cargo {
+  font-weight: 400;
+  color: var(--text-primary);
+  opacity: 0.95;
+}
+
 .witness-status {
   font-size: 12px;
   padding: 2px 6px;
@@ -255,6 +261,12 @@
   color: var(--text-highlight);
   font-size: 14px;
   margin-bottom: 4px;
+}
+
+.suspect-cargo {
+  font-weight: 400;
+  color: var(--text-primary);
+  opacity: 0.95;
 }
 
 .suspect-record-text {

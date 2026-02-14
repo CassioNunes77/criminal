@@ -56,16 +56,54 @@ function ensureDescriptionArray(desc) {
   return []
 }
 
+function normalizeSuspect(s) {
+  if (typeof s !== 'object') return { name: String(s), cargo: '', criminalRecord: 'Sem antecedentes', caracteristica: '' }
+  const rawName = (s.name || '').trim()
+  let name = rawName
+  let cargo = (s.cargo || '').trim()
+  if (!cargo && rawName.includes(', ')) {
+    const idx = rawName.indexOf(', ')
+    name = rawName.slice(0, idx).trim()
+    cargo = rawName.slice(idx + 1).trim()
+  }
+  const fullName = cargo ? `${name}, ${cargo}` : name
+  return {
+    name: fullName,
+    displayName: name,
+    cargo,
+    criminalRecord: s.criminalRecord || 'Sem antecedentes',
+    caracteristica: s.caracteristica || ''
+  }
+}
+
+function normalizeWitness(w) {
+  if (!w || typeof w !== 'object') return { name: '', cargo: '', statement: '', isTruthful: false }
+  const rawName = (w.name || '').trim()
+  let name = rawName
+  let cargo = (w.cargo || '').trim()
+  if (!cargo && rawName.includes(', ')) {
+    const idx = rawName.indexOf(', ')
+    name = rawName.slice(0, idx).trim()
+    cargo = rawName.slice(idx + 1).trim()
+  }
+  return {
+    name,
+    cargo,
+    statement: w.statement || '',
+    isTruthful: !!w.isTruthful
+  }
+}
+
 function normalizeCrime(crime) {
   const suspects = crime.suspects || []
-  const suspectsWithRecords = crime.suspectsWithRecords || suspects.map(s =>
-    typeof s === 'object' ? s : { name: s, criminalRecord: 'Sem antecedentes' }
-  )
+  const suspectsWithRecords = (crime.suspectsWithRecords || suspects).map(normalizeSuspect)
   return {
     ...crime,
     description: ensureDescriptionArray(crime.description),
-    suspects: suspectsWithRecords.map(s => (typeof s === 'object' ? s.name : s)),
+    suspects: suspectsWithRecords.map(s => s.name),
     suspectsWithRecords,
+    witnesses: (crime.witnesses || []).map(normalizeWitness),
+    dossier: crime.dossier || '',
     clues: (crime.clues || []).map(c => ({
       type: c.type,
       text: c.text,
@@ -149,11 +187,11 @@ export async function getDailyCrimeFromFirebase() {
 
   try {
     const fallback = getDailyCrime()
-    return {
+    return normalizeCrime({
       ...fallback,
       caseCode: fallback.caseCode || String(fallback.id),
       caseNumber: fallback.caseNumber || String(fallback.id).slice(-4).padStart(4, '0')
-    }
+    })
   } catch (e) {
     console.error('[Nexo] Fallback crime failed:', e)
     return null
@@ -167,11 +205,11 @@ export async function getDailyCrimeFromFirebase() {
 function transformFirestoreCrime(data, dateId) {
   const crimeId = parseInt(dateId.replace(/-/g, ''), 10)
   const suspects = data.suspects || []
-  const suspectsWithRecords = suspects.map(s =>
-    typeof s === 'object' ? s : { name: s, criminalRecord: 'Sem antecedentes' }
-  )
+  const suspectsWithRecords = suspects.map(normalizeSuspect)
 
   const description = ensureDescriptionArray(data.description)
+
+  const witnesses = (data.witnesses || []).map(normalizeWitness)
 
   return {
     id: crimeId,
@@ -190,7 +228,9 @@ function transformFirestoreCrime(data, dateId) {
       text: c.text,
       revealed: false
     })),
-    witnesses: data.witnesses || [],
-    solution: data.solution || {}
+    witnesses,
+    solution: data.solution || {},
+    dossier: data.dossier || '',
+    date: data.date || ''
   }
 }

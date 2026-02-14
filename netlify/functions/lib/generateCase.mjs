@@ -66,13 +66,15 @@ HORARIO, LOCAL, ACESSO, ALIBI, COMPORTAMENTO, EVIDENCIA
 - Use informações soltas: "ouvi boatos que..", "registros incompletos", "por volta das 19:00".
 
 ## TESTEMUNHAS (3)
-- Nome + cargo/função (ex: cliente, morador, funcionário).
-- Statement com isTruthful (true/false). Indicar [VERDADEIRA] ou [PODE SER FALSA].
+- name: apenas o nome completo.
+- cargo: cargo, função ou quem é na história (ex: cliente, morador, funcionário, vigilante, mãe do acusado, esposa, vizinha). OBRIGATÓRIO.
+- statement: depoimento. isTruthful (true/false). Indicar [VERDADEIRA] ou [PODE SER FALSA].
 - Informações discretas: "suspeito parecia um homem forte" (indica que não é mulher).
 - Álibi ou testemunhas próximas (esposa, mãe, filhos) podem ou não estar falando a verdade.
 
 ## SUSPEITOS (4)
-- Nome + cargo/função (ex: cliente, morador, funcionário, gerente).
+- name: apenas o nome completo (ex: Marcos Lima).
+- cargo: cargo, função ou quem é na história (ex: operador de terminal, cliente, morador, funcionário, gerente, encanador). OBRIGATÓRIO.
 - criminalRecord: passagem pela polícia ou "Sem antecedentes".
 - caracteristica: física ou comportamental (ex: costuma usar azul, anda de boné, cabelos longos).
 - Correlações: a característica deve aparecer em pistas, testemunhas ou descrição para conectar ao culpado.
@@ -81,13 +83,13 @@ HORARIO, LOCAL, ACESSO, ALIBI, COMPORTAMENTO, EVIDENCIA
 ## LOCAIS (4 opções), MÉTODOS (4 opções)
 
 ## SOLUÇÃO
-suspect, location, method (exatamente como nas listas de suspeitos, locais e métodos).
+suspect no formato "Nome, cargo" (ex: "Marcos Lima, operador de terminal"), location, method (exatamente das listas).
 
 ## DOSSIER
 Texto completo: caso + solução + provas. PROVE por que o culpado é o correto E por que os outros 3 NÃO são.
 
 Retorne APENAS um JSON válido, sem markdown ou texto extra. Formato:
-{"type":"","location":"","time":"","description":[],"suspects":[{"name":"","criminalRecord":"","caracteristica":""}],"locations":[],"methods":[],"clues":[{"type":"","text":""}],"witnesses":[{"name":"","statement":"","isTruthful":false}],"solution":{"suspect":"","location":"","method":""},"dossier":""}`
+{"type":"","location":"","time":"","description":[],"suspects":[{"name":"","cargo":"","criminalRecord":"","caracteristica":""}],"locations":[],"methods":[],"clues":[{"type":"","text":""}],"witnesses":[{"name":"","cargo":"","statement":"","isTruthful":false}],"solution":{"suspect":"","location":"","method":""},"dossier":""}`
 }
 
 function generateCaseCode() {
@@ -161,11 +163,22 @@ export async function runGenerateCase() {
 
   const crime = JSON.parse(jsonStr)
 
-  const suspects = (crime.suspects || []).map(s => ({
-    name: s.name || '',
-    criminalRecord: s.criminalRecord || 'Sem antecedentes',
-    caracteristica: s.caracteristica || ''
-  }))
+  const suspects = (crime.suspects || []).map(s => {
+    const rawName = (s.name || '').trim()
+    let name = rawName
+    let cargo = (s.cargo || '').trim()
+    if (!cargo && rawName.includes(', ')) {
+      const idx = rawName.indexOf(', ')
+      name = rawName.slice(0, idx).trim()
+      cargo = rawName.slice(idx + 1).trim()
+    }
+    return {
+      name,
+      cargo,
+      criminalRecord: s.criminalRecord || 'Sem antecedentes',
+      caracteristica: s.caracteristica || ''
+    }
+  })
 
   const ensureDescArr = (desc) => {
     if (Array.isArray(desc)) return desc.map(l => (typeof l === 'string' ? l : String(l ?? '')))
@@ -173,6 +186,24 @@ export async function runGenerateCase() {
     if (desc && typeof desc === 'object') return Object.values(desc).map(v => (typeof v === 'string' ? v : String(v ?? '')))
     return []
   }
+
+  const normalizeWitness = (w) => {
+    const rawName = (w.name || '').trim()
+    let name = rawName
+    let cargo = (w.cargo || '').trim()
+    if (!cargo && rawName.includes(', ')) {
+      const idx = rawName.indexOf(', ')
+      name = rawName.slice(0, idx).trim()
+      cargo = rawName.slice(idx + 1).trim()
+    }
+    return {
+      name,
+      cargo,
+      statement: w.statement || '',
+      isTruthful: !!w.isTruthful
+    }
+  }
+  const witnesses = (crime.witnesses || []).map(normalizeWitness)
 
   const document = {
     type: crime.type || 'CRIME',
@@ -183,7 +214,7 @@ export async function runGenerateCase() {
     locations: crime.locations || [],
     methods: crime.methods || [],
     clues: (crime.clues || []).map(c => ({ type: c.type || '', text: c.text || '' })),
-    witnesses: crime.witnesses || [],
+    witnesses,
     solution: crime.solution || {},
     dossier: crime.dossier || '',
     caseNumber: String(caseNumber).padStart(4, '0'),

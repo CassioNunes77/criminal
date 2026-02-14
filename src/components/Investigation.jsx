@@ -478,7 +478,12 @@ function Investigation({ crime, state, onDiscoverClue, onViewWitness, onMakeAccu
                 return (
                   <div key={index} className="witness-item">
                     <div className="witness-header">
-                      <span className="witness-name">{witness.name}</span>
+                      <span className="witness-name">
+                        {witness.name}
+                        {witness.cargo && (
+                          <span className="witness-cargo"> ({witness.cargo})</span>
+                        )}
+                      </span>
                       {witnessesViewed.includes(index) && (
                         <span className={`witness-status ${witness.isTruthful ? 'truthful' : 'false'}`}>
                           {witness.isTruthful ? '[VERDADEIRA]' : '[PODE SER FALSA]'}
@@ -533,7 +538,12 @@ function Investigation({ crime, state, onDiscoverClue, onViewWitness, onMakeAccu
               <div className="section-title">BANCO DE DADOS DOS SUSPEITOS:</div>
               {suspectsWithRecords.map((suspect, index) => (
                 <div key={index} className="suspect-record">
-                  <div className="suspect-name">{suspect.name}</div>
+                  <div className="suspect-name">
+                    {suspect.displayName || suspect.name}
+                    {suspect.cargo && (
+                      <span className="suspect-cargo"> ({suspect.cargo})</span>
+                    )}
+                  </div>
                   <div className="suspect-record-text">
                     HISTORICO: {suspect.criminalRecord}
                   </div>
@@ -620,7 +630,8 @@ function Investigation({ crime, state, onDiscoverClue, onViewWitness, onMakeAccu
                           onClick={() => setSelectedSuspect(suspect.name)}
                           data-focused={showAccusation && isFocused ? 'true' : undefined}
                         >
-                          &gt; {suspect.name}
+                          &gt; {suspect.displayName || suspect.name}
+                          {suspect.cargo && ` (${suspect.cargo})`}
                           {isFocused && (
                             <span className="cursor-blink" style={{
                               color: '#00FF66',

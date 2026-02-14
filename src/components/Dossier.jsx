@@ -9,6 +9,8 @@ function Dossier({ crime, onBack }) {
   const [dossierComplete, setDossierComplete] = useState(false)
   const typewriterSoundRef = useRef(null)
   const typingTimeoutRef = useRef(null)
+  const animationTimeoutRef = useRef(null)
+  const cancelRef = useRef(false)
 
   const caseNumber = crime.caseNumber || String(crime.id).slice(-4).padStart(4, '0')
   const titleLine = (crime.description && crime.description[0]) || `CASO #${caseNumber} - ${crime.type || 'CRIME'} EM ${crime.location || ''}`
@@ -40,14 +42,15 @@ function Dossier({ crime, onBack }) {
     let charIndex = 0
     let dotsCount = 0
     let timeoutId = null
-    let isCancelled = false
+    cancelRef.current = false
 
     const showDots = () => {
-      if (isCancelled || dossierComplete) return
+      if (cancelRef.current) return
       if (dotsCount < 3) {
         setDots('.'.repeat(dotsCount + 1))
         dotsCount++
         timeoutId = setTimeout(showDots, 300)
+        animationTimeoutRef.current = timeoutId
       } else {
         setDots('')
         dotsCount = 0
@@ -56,6 +59,7 @@ function Dossier({ crime, onBack }) {
           setCurrentLineIndex(lineIndex)
           charIndex = 0
           timeoutId = setTimeout(typeLine, 50)
+          animationTimeoutRef.current = timeoutId
         } else {
           setDossierComplete(true)
         }
@@ -63,7 +67,7 @@ function Dossier({ crime, onBack }) {
     }
 
     const typeLine = () => {
-      if (isCancelled || dossierComplete) return
+      if (cancelRef.current) return
       if (lineIndex >= lines.length) {
         setDossierComplete(true)
         return
@@ -72,6 +76,7 @@ function Dossier({ crime, onBack }) {
       const currentLine = lines[lineIndex]
       if (currentLine === '') {
         timeoutId = setTimeout(showDots, 200)
+        animationTimeoutRef.current = timeoutId
         return
       }
       if (charIndex < currentLine.length) {
@@ -86,9 +91,11 @@ function Dossier({ crime, onBack }) {
         })
         charIndex++
         timeoutId = setTimeout(typeLine, 15)
+        animationTimeoutRef.current = timeoutId
       } else {
         if (lineIndex < lines.length - 1) {
           timeoutId = setTimeout(showDots, 200)
+          animationTimeoutRef.current = timeoutId
         } else {
           setDossierComplete(true)
         }
@@ -96,7 +103,7 @@ function Dossier({ crime, onBack }) {
     }
 
     typingTimeoutRef.current = setTimeout(() => {
-      if (!isCancelled) {
+      if (!cancelRef.current) {
         if (lines.length === 0) {
           setDossierComplete(true)
         } else {
@@ -107,9 +114,12 @@ function Dossier({ crime, onBack }) {
     }, 500)
 
     const cancelAnimation = () => {
-      isCancelled = true
+      cancelRef.current = true
       if (typingTimeoutRef.current) {
         clearTimeout(typingTimeoutRef.current)
+      }
+      if (animationTimeoutRef.current) {
+        clearTimeout(animationTimeoutRef.current)
       }
       if (timeoutId) clearTimeout(timeoutId)
     }
@@ -120,20 +130,40 @@ function Dossier({ crime, onBack }) {
   }, [crime])
 
   const completeAnimation = () => {
+    cancelRef.current = true
+    if (typingTimeoutRef.current) {
+      clearTimeout(typingTimeoutRef.current)
+      typingTimeoutRef.current = null
+    }
+    if (animationTimeoutRef.current) {
+      clearTimeout(animationTimeoutRef.current)
+      animationTimeoutRef.current = null
+    }
     const raw = crime.dossier || ''
     const lines = typeof raw === 'string' ? raw.split('\n') : []
     setDossierLines(lines)
     setDossierComplete(true)
   }
 
-  const handleClick = () => {
+  const handleComplete = () => {
     if (!dossierComplete) completeAnimation()
   }
+
+  useEffect(() => {
+    const onKeyDown = (e) => {
+      if (e.key === 'Enter' && !dossierComplete) {
+        e.preventDefault()
+        completeAnimation()
+      }
+    }
+    window.addEventListener('keydown', onKeyDown)
+    return () => window.removeEventListener('keydown', onKeyDown)
+  }, [dossierComplete, crime.dossier])
 
   return (
     <div
       className="dossier-screen"
-      onClick={handleClick}
+      onClick={handleComplete}
       onTouchStart={(e) => { if (!dossierComplete) { e.preventDefault(); completeAnimation() } }}
       style={{
         fontFamily: "'PxPlus IBM VGA8', monospace",
@@ -162,7 +192,7 @@ function Dossier({ crime, onBack }) {
 
       <div
         className="dossier-content"
-        onClick={!dossierComplete ? completeAnimation : undefined}
+        onClick={!dossierComplete ? handleComplete : undefined}
         style={{
           lineHeight: '1.8',
           fontSize: '14px',

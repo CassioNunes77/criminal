@@ -116,6 +116,12 @@ https://nexoterminal.netlify.app/`
           </div>
         </div>
 
+        {state.solved && (
+          <div className="solution-destination" style={{ marginTop: '12px', fontStyle: 'italic', fontSize: '13px', opacity: 0.9 }}>
+            O indiciado foi detido e conduzido à delegacia, ficando à disposição do Juízo para os devidos esclarecimentos.
+          </div>
+        )}
+
         <div className="separator">------------------------------------</div>
 
         <div className="stats-section">

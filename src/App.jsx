@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react'
 import Home from './components/Home'
 import CaseDescription from './components/CaseDescription'
-import CaseView from './components/CaseView'
 import Investigation from './components/Investigation'
 import Result from './components/Result'
 import { getDailyCrimeFromFirebase } from './utils/crimeService'
@@ -279,12 +278,6 @@ function App() {
           onBack={() => setScreen('home')}
         />
       )}
-      {screen === 'caseView' && (
-        <CaseView
-          crime={currentCrime}
-          onBack={() => setScreen('investigation')}
-        />
-      )}
       {screen === 'investigation' && (
         <Investigation
           crime={currentCrime}
@@ -293,7 +286,6 @@ function App() {
           onDiscoverClue={discoverClue}
           onViewWitness={viewWitness}
           onMakeAccusation={makeAccusation}
-          onViewCase={() => setScreen('caseView')}
           onViewResult={() => setScreen('result')}
           onBack={() => setScreen('home')}
         />

@@ -3,7 +3,7 @@ import { TypewriterSound } from '../utils/typewriterSound'
 import CaseView from './CaseView'
 import './Investigation.css'
 
-function Investigation({ crime, state, onDiscoverClue, onViewWitness, onMakeAccusation, onViewCase, onBack, onViewResult, x7 }) {
+function Investigation({ crime, state, onDiscoverClue, onViewWitness, onMakeAccusation, onBack, onViewResult, x7 }) {
   const typewriterSoundRef = useRef(null)
   const [showAccusation, setShowAccusation] = useState(false)
   const [selectedSuspect, setSelectedSuspect] = useState(null)
@@ -329,7 +329,7 @@ function Investigation({ crime, state, onDiscoverClue, onViewWitness, onMakeAccu
           if (item.type === 'clue') {
             handleDiscoverClue(availableClues[item.index].type)
           } else if (item.id === 'case') {
-            onViewCase()
+            setShowCaseView(true)
           } else if (item.id === 'accusation' && remainingAttempts > 0) {
             setShowAccusation(true)
           } else if (item.id === 'witnesses') {
@@ -350,7 +350,11 @@ function Investigation({ crime, state, onDiscoverClue, onViewWitness, onMakeAccu
     return () => {
       window.removeEventListener('keydown', handleKeyPress)
     }
-  }, [showAccusation, accusationFocusIndex, selectedSuspect, selectedLocation, selectedMethod, selectedWitnessIndex, suspectsWithRecords, crime, canDiscoverMore, showWitnesses, witnessNavActive, showSuspects, isFailed, remainingAttempts, witnessesViewed, selectedFocusIndex, focusableItems, availableClues, handleAccusation, handleViewWitness, onViewWitness, onViewCase, onViewResult, onBack])
+  }, [showAccusation, accusationFocusIndex, selectedSuspect, selectedLocation, selectedMethod, selectedWitnessIndex, suspectsWithRecords, crime, canDiscoverMore, showWitnesses, witnessNavActive, showSuspects, isFailed, remainingAttempts, witnessesViewed, selectedFocusIndex, focusableItems, availableClues, handleAccusation, handleViewWitness, onViewWitness, onViewResult, onBack])
+
+  if (showCaseView) {
+    return <CaseView crime={crime} onBack={() => setShowCaseView(false)} />
+  }
 
   return (
     <div className="investigation">
@@ -549,7 +553,7 @@ function Investigation({ crime, state, onDiscoverClue, onViewWitness, onMakeAccu
         <div className="case-section">
           <button 
             className="terminal-button" 
-            onClick={onViewCase}
+            onClick={() => setShowCaseView(true)}
             data-focused={titleAnimationComplete && !showWitnesses && !showAccusation && focusableItems[selectedFocusIndex]?.id === 'case' ? 'true' : undefined}
           >
             &gt; CASO

@@ -43,6 +43,19 @@ function getDateId() {
   return `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`
 }
 
+function ensureDescriptionArray(desc) {
+  if (Array.isArray(desc)) {
+    return desc.map(line => (typeof line === 'string' ? line : String(line ?? '')))
+  }
+  if (typeof desc === 'string') {
+    return desc.split('\n')
+  }
+  if (desc && typeof desc === 'object') {
+    return Object.values(desc).map(v => (typeof v === 'string' ? v : String(v ?? '')))
+  }
+  return []
+}
+
 function normalizeCrime(crime) {
   const suspects = crime.suspects || []
   const suspectsWithRecords = crime.suspectsWithRecords || suspects.map(s =>
@@ -50,6 +63,7 @@ function normalizeCrime(crime) {
   )
   return {
     ...crime,
+    description: ensureDescriptionArray(crime.description),
     suspects: suspectsWithRecords.map(s => (typeof s === 'object' ? s.name : s)),
     suspectsWithRecords,
     clues: (crime.clues || []).map(c => ({
@@ -157,7 +171,7 @@ function transformFirestoreCrime(data, dateId) {
     typeof s === 'object' ? s : { name: s, criminalRecord: 'Sem antecedentes' }
   )
 
-  const description = data.description || []
+  const description = ensureDescriptionArray(data.description)
 
   return {
     id: crimeId,

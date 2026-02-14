@@ -48,6 +48,13 @@ export default async (req) => {
       typeof s === 'object' ? s : { name: s, criminalRecord: 'Sem antecedentes' }
     )
 
+    const ensureDescArr = (desc) => {
+      if (Array.isArray(desc)) return desc.map(l => (typeof l === 'string' ? l : String(l ?? '')))
+      if (typeof desc === 'string') return desc.split('\n')
+      if (desc && typeof desc === 'object') return Object.values(desc).map(v => (typeof v === 'string' ? v : String(v ?? '')))
+      return []
+    }
+
     const crime = {
       id: crimeId,
       caseCode: data.caseCode || String(crimeId),
@@ -55,7 +62,7 @@ export default async (req) => {
       type: data.type || 'CRIME',
       location: data.location || '',
       time: data.time || '',
-      description: data.description || [],
+      description: ensureDescArr(data.description),
       suspects: suspectsWithRecords.map(s => s.name),
       suspectsWithRecords,
       locations: data.locations || [],

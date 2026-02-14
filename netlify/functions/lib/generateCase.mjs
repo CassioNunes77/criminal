@@ -167,11 +167,18 @@ export async function runGenerateCase() {
     caracteristica: s.caracteristica || ''
   }))
 
+  const ensureDescArr = (desc) => {
+    if (Array.isArray(desc)) return desc.map(l => (typeof l === 'string' ? l : String(l ?? '')))
+    if (typeof desc === 'string') return desc.split('\n')
+    if (desc && typeof desc === 'object') return Object.values(desc).map(v => (typeof v === 'string' ? v : String(v ?? '')))
+    return []
+  }
+
   const document = {
     type: crime.type || 'CRIME',
     location: crime.location || '',
     time: crime.time || '',
-    description: crime.description || [],
+    description: ensureDescArr(crime.description),
     suspects,
     locations: crime.locations || [],
     methods: crime.methods || [],

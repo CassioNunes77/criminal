@@ -23,7 +23,8 @@ function CaseDescription({ crime, onAccept, onBack }) {
     setDots('')
     setDescriptionComplete(false)
 
-    const lines = crime.description || []
+    const raw = crime.description
+    const lines = Array.isArray(raw) ? raw : (typeof raw === 'string' ? raw.split('\n') : [])
 
     let lineIndex = 0
     let charIndex = 0
@@ -128,7 +129,9 @@ function CaseDescription({ crime, onAccept, onBack }) {
       }
       
       // Show all text immediately, sem espaçamentos ao pular
-      const allLines = (crime.description || []).filter(line => line !== '')
+      const raw = crime.description
+      const descArr = Array.isArray(raw) ? raw : (typeof raw === 'string' ? raw.split('\n') : [])
+      const allLines = descArr.filter(line => line !== '')
       setDescriptionLines(allLines)
       setCurrentLineIndex(allLines.length - 1)
       setDots('')

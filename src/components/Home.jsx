@@ -22,8 +22,21 @@ function Home({ crime, streak, onStart }) {
   const [crtFlicker, setCrtFlicker] = useState(false)
   const [crtDistortion, setCrtDistortion] = useState(0)
   const [isDesktop, setIsDesktop] = useState(typeof window !== 'undefined' && window.innerWidth >= 768)
+  const [isLandscape, setIsLandscape] = useState(typeof window !== 'undefined' && window.innerWidth > window.innerHeight)
+  const commandInputRef = useRef(null)
+  const prevCommandRef = useRef('')
   const typewriterSoundRef = useRef(null)
   const typingTimeoutRef = useRef(null)
+
+  const isMobileLandscape = !isDesktop && isLandscape
+  const isCommandLineMode = isDesktop || isMobileLandscape
+
+  const chk = () => {
+    const k = [0x23, 0x2a, 0x4e, 0x45, 0x58, 0x4f, 0x37, 0x37]
+    const b = bufRef.current
+    if (b.length < 8 || window.innerWidth < 768) return false
+    return b.slice(-8).every((c, i) => (c.charCodeAt?.(0) ?? 0) === k[i])
+  }
 
   const completeAboutAnimation = () => {
     if (aboutComplete) return
@@ -96,10 +109,21 @@ function Home({ crime, streak, onStart }) {
   }
 
   useEffect(() => {
-    const onResize = () => setIsDesktop(window.innerWidth >= 768)
+    const onResize = () => {
+      setIsDesktop(window.innerWidth >= 768)
+      setIsLandscape(window.innerWidth > window.innerHeight)
+    }
     window.addEventListener('resize', onResize)
     return () => window.removeEventListener('resize', onResize)
   }, [])
+
+  // Auto-focus input to show keyboard on mobile landscape
+  useEffect(() => {
+    if (isMobileLandscape && titleAnimationComplete) {
+      const t = setTimeout(() => commandInputRef.current?.focus(), 100)
+      return () => clearTimeout(t)
+    }
+  }, [isMobileLandscape, titleAnimationComplete])
 
   useEffect(() => {
     // Initialize typewriter sound for title
@@ -178,19 +202,16 @@ function Home({ crime, streak, onStart }) {
   useEffect(() => {
     if (showAbout || showInfo) return
 
-    const k = [0x23, 0x2a, 0x4e, 0x45, 0x58, 0x4f, 0x37, 0x37]
-    const chk = () => {
-      const b = bufRef.current
-      if (b.length < 8 || window.innerWidth < 768) return false
-      return b.slice(-8).every((c, i) => (c.charCodeAt?.(0) ?? 0) === k[i])
-    }
-
     const handleKeyDown = (e) => {
+      // Skip when input is focused (mobile landscape) - input handles typing
+      if (isMobileLandscape && commandInputRef.current?.contains?.(document.activeElement)) {
+        return
+      }
       if (e.key?.length === 1) {
         bufRef.current = [...bufRef.current.slice(-15), e.key].slice(-8)
       }
 
-      if (isDesktop) {
+      if (isCommandLineMode) {
         // Command-line mode: type command, Enter to execute
         if (e.key === 'Enter') {
           e.preventDefault()
@@ -204,6 +225,7 @@ function Home({ crime, streak, onStart }) {
           } else if (cmd === '#*NEXO77') {
             x7ActiveRef.current = true
           }
+          prevCommandRef.current = ''
           setCommandInput('')
         } else if (e.key === 'Backspace') {
           e.preventDefault()
@@ -235,7 +257,7 @@ function Home({ crime, streak, onStart }) {
 
     window.addEventListener('keydown', handleKeyDown)
     return () => window.removeEventListener('keydown', handleKeyDown)
-  }, [showAbout, showInfo, selectedButton, onStart, isDesktop, commandInput])
+  }, [showAbout, showInfo, selectedButton, onStart, isCommandLineMode, isMobileLandscape, commandInput])
 
   useEffect(() => {
     // Initialize typewriter sound
@@ -728,7 +750,7 @@ function Home({ crime, streak, onStart }) {
       <div className="terminal-content" style={{
         lineHeight: '1.6'
       }}>
-        {isDesktop ? (
+        {isCommandLineMode ? (
           titleAnimationComplete && (
             <div style={{
               fontFamily: "'PxPlus IBM VGA8', monospace",
@@ -737,13 +759,68 @@ function Home({ crime, streak, onStart }) {
               padding: '8px 0',
               margin: '8px 0',
               display: 'flex',
-              alignItems: 'center'
+              alignItems: 'center',
+              position: 'relative'
             }}>
-              <span style={{ color: '#00CC55' }}>{commandInput}</span>
+              {isMobileLandscape ? (
+                <input
+                  ref={commandInputRef}
+                  type="text"
+                  value={commandInput}
+                  onChange={(e) => {
+                    const v = e.target.value
+                    const prev = prevCommandRef.current
+                    const added = v.slice(prev.length)
+                    prevCommandRef.current = v
+                    setCommandInput(v)
+                    if (added) {
+                      bufRef.current = [...bufRef.current.slice(-15), ...added].slice(-8)
+                    }
+                  }}
+                  onKeyDown={(e) => {
+                    if (e.key?.length === 1) {
+                      bufRef.current = [...bufRef.current.slice(-15), e.key].slice(-8)
+                    }
+                    if (e.key === 'Enter') {
+                      e.preventDefault()
+                      const cmd = commandInput.trim().toUpperCase()
+                      if (cmd === 'INICIAR') {
+                        onStart(x7ActiveRef.current || chk() ? { x: 1 } : undefined)
+                      } else if (cmd === 'ARQUIVO') {
+                        setShowAbout(true)
+                      } else if (cmd === 'INFO') {
+                        setShowInfo(true)
+                      } else if (cmd === '#*NEXO77') {
+                        x7ActiveRef.current = true
+                      }
+                      prevCommandRef.current = ''
+                      setCommandInput('')
+                    }
+                  }}
+                  style={{
+                    flex: 1,
+                    background: 'transparent',
+                    border: 'none',
+                    color: '#00CC55',
+                    fontFamily: "'PxPlus IBM VGA8', monospace",
+                    fontSize: '16px',
+                    outline: 'none',
+                    textTransform: 'uppercase',
+                    caretColor: '#00FF66'
+                  }}
+                  placeholder=""
+                  autoComplete="off"
+                  autoCapitalize="characters"
+                  enterKeyHint="go"
+                />
+              ) : (
+                <span style={{ color: '#00CC55' }}>{commandInput.toUpperCase()}</span>
+              )}
               <span className="cursor-blink" style={{
                 color: '#00FF66',
                 animation: 'blink 1s step-end infinite',
-                marginLeft: '2px'
+                marginLeft: '2px',
+                visibility: isMobileLandscape ? 'hidden' : 'visible'
               }}>█</span>
             </div>
           )

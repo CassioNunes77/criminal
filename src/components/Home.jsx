@@ -764,11 +764,6 @@ function Home({ crime, streak, onStart }) {
             }}>
               {isMobileLandscape ? (
                 <>
-                  <span className="cursor-blink" style={{
-                    color: '#00FF66',
-                    animation: 'blink 1s step-end infinite',
-                    marginRight: '2px'
-                  }}>█</span>
                   <input
                     ref={commandInputRef}
                     type="text"
@@ -819,6 +814,11 @@ function Home({ crime, streak, onStart }) {
                     autoCapitalize="characters"
                     enterKeyHint="go"
                   />
+                  <span className="cursor-blink" style={{
+                    color: '#00FF66',
+                    animation: 'blink 1s step-end infinite',
+                    marginLeft: '2px'
+                  }}>█</span>
                 </>
               ) : (
                 <>

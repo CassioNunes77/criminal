@@ -763,64 +763,73 @@ function Home({ crime, streak, onStart }) {
               position: 'relative'
             }}>
               {isMobileLandscape ? (
-                <input
-                  ref={commandInputRef}
-                  type="text"
-                  value={commandInput}
-                  onChange={(e) => {
-                    const v = e.target.value
-                    const prev = prevCommandRef.current
-                    const added = v.slice(prev.length)
-                    prevCommandRef.current = v
-                    setCommandInput(v)
-                    if (added) {
-                      bufRef.current = [...bufRef.current.slice(-15), ...added].slice(-8)
-                    }
-                  }}
-                  onKeyDown={(e) => {
-                    if (e.key?.length === 1) {
-                      bufRef.current = [...bufRef.current.slice(-15), e.key].slice(-8)
-                    }
-                    if (e.key === 'Enter') {
-                      e.preventDefault()
-                      const cmd = commandInput.trim().toUpperCase()
-                      if (cmd === 'INICIAR') {
-                        onStart(x7ActiveRef.current || chk() ? { x: 1 } : undefined)
-                      } else if (cmd === 'ARQUIVO') {
-                        setShowAbout(true)
-                      } else if (cmd === 'INFO') {
-                        setShowInfo(true)
-                      } else if (cmd === '#*NEXO77') {
-                        x7ActiveRef.current = true
+                <>
+                  <span className="cursor-blink" style={{
+                    color: '#00FF66',
+                    animation: 'blink 1s step-end infinite',
+                    marginRight: '2px'
+                  }}>█</span>
+                  <input
+                    ref={commandInputRef}
+                    type="text"
+                    value={commandInput}
+                    onChange={(e) => {
+                      const v = e.target.value
+                      const prev = prevCommandRef.current
+                      const added = v.slice(prev.length)
+                      prevCommandRef.current = v
+                      setCommandInput(v)
+                      if (added) {
+                        bufRef.current = [...bufRef.current.slice(-15), ...added].slice(-8)
                       }
-                      prevCommandRef.current = ''
-                      setCommandInput('')
-                    }
-                  }}
-                  style={{
-                    flex: 1,
-                    background: 'transparent',
-                    border: 'none',
-                    color: '#00CC55',
-                    fontFamily: "'PxPlus IBM VGA8', monospace",
-                    fontSize: '16px',
-                    outline: 'none',
-                    textTransform: 'uppercase',
-                    caretColor: 'transparent'
-                  }}
-                  placeholder=""
-                  autoComplete="off"
-                  autoCapitalize="characters"
-                  enterKeyHint="go"
-                />
+                    }}
+                    onKeyDown={(e) => {
+                      if (e.key?.length === 1) {
+                        bufRef.current = [...bufRef.current.slice(-15), e.key].slice(-8)
+                      }
+                      if (e.key === 'Enter') {
+                        e.preventDefault()
+                        const cmd = commandInput.trim().toUpperCase()
+                        if (cmd === 'INICIAR') {
+                          onStart(x7ActiveRef.current || chk() ? { x: 1 } : undefined)
+                        } else if (cmd === 'ARQUIVO') {
+                          setShowAbout(true)
+                        } else if (cmd === 'INFO') {
+                          setShowInfo(true)
+                        } else if (cmd === '#*NEXO77') {
+                          x7ActiveRef.current = true
+                        }
+                        prevCommandRef.current = ''
+                        setCommandInput('')
+                      }
+                    }}
+                    style={{
+                      flex: 1,
+                      background: 'transparent',
+                      border: 'none',
+                      color: '#00CC55',
+                      fontFamily: "'PxPlus IBM VGA8', monospace",
+                      fontSize: '16px',
+                      outline: 'none',
+                      textTransform: 'uppercase',
+                      caretColor: 'transparent'
+                    }}
+                    placeholder=""
+                    autoComplete="off"
+                    autoCapitalize="characters"
+                    enterKeyHint="go"
+                  />
+                </>
               ) : (
-                <span style={{ color: '#00CC55' }}>{commandInput.toUpperCase()}</span>
+                <>
+                  <span style={{ color: '#00CC55' }}>{commandInput.toUpperCase()}</span>
+                  <span className="cursor-blink" style={{
+                    color: '#00FF66',
+                    animation: 'blink 1s step-end infinite',
+                    marginLeft: '2px'
+                  }}>█</span>
+                </>
               )}
-              <span className="cursor-blink" style={{
-                color: '#00FF66',
-                animation: 'blink 1s step-end infinite',
-                marginLeft: '2px'
-              }}>█</span>
             </div>
           )
         ) : (

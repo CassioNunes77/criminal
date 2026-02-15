@@ -1,9 +1,17 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import './Result.css'
 
 function Result({ crime, state, onBack, onBackToInvestigation, onViewDossier }) {
   const [showShare, setShowShare] = useState(false)
   const [showCodeCopied, setShowCodeCopied] = useState(false)
+  const [selectedFocusIndex, setSelectedFocusIndex] = useState(0)
+  const [isDesktop, setIsDesktop] = useState(typeof window !== 'undefined' && window.innerWidth >= 768)
+
+  useEffect(() => {
+    const onResize = () => setIsDesktop(window.innerWidth >= 768)
+    window.addEventListener('resize', onResize)
+    return () => window.removeEventListener('resize', onResize)
+  }, [])
 
   const caseCode = crime.caseCode || String(crime.id)
 
@@ -92,6 +100,52 @@ https://nexoterminal.netlify.app/`
     setTimeout(() => setShowCodeCopied(false), 2000)
   }
 
+  // Itens focáveis (ordem visual) - desktop: setas + Enter
+  const focusableItems = [
+    'share',
+    state.solved && (3 - displayStats.attempts) > 0 && onBackToInvestigation && 'continueInvestigation',
+    !state.solved && onBackToInvestigation && crime.clues && (crime.clues.length - (state.cluesRevealed?.length || 0)) > 0 && 'viewClues',
+    crime.dossier && onViewDossier && 'viewDossier',
+    'back'
+  ].filter(Boolean)
+
+  useEffect(() => {
+    const max = Math.max(0, focusableItems.length - 1)
+    setSelectedFocusIndex(prev => (prev > max ? max : prev))
+  }, [focusableItems.length])
+
+  // Desktop: navegação por setas e Enter
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if (!isDesktop) return
+      if (e.key === 'ArrowDown') {
+        e.preventDefault()
+        setSelectedFocusIndex(prev => Math.min(prev + 1, focusableItems.length - 1))
+      } else if (e.key === 'ArrowUp') {
+        e.preventDefault()
+        setSelectedFocusIndex(prev => Math.max(prev - 1, 0))
+      } else if (e.key === 'Enter') {
+        e.preventDefault()
+        const id = focusableItems[selectedFocusIndex]
+        if (!id) return
+        if (id === 'share') copyToClipboard()
+        else if (id === 'continueInvestigation') onBackToInvestigation?.()
+        else if (id === 'viewClues') onBackToInvestigation?.()
+        else if (id === 'viewDossier') onViewDossier?.()
+        else if (id === 'back') onBack?.()
+      }
+    }
+    window.addEventListener('keydown', handleKeyDown)
+    return () => window.removeEventListener('keydown', handleKeyDown)
+  }, [focusableItems, selectedFocusIndex, onBack, onBackToInvestigation, onViewDossier, isDesktop])
+
+  // Desktop: scroll do item focado
+  useEffect(() => {
+    if (!isDesktop) return
+    const el = document.querySelector('.result .terminal-content [data-focused="true"]')
+    if (el) el.scrollIntoView({ behavior: 'smooth', block: 'center' })
+  }, [selectedFocusIndex, isDesktop])
+
   return (
     <div className="result">
       <div className="terminal-header">
@@ -150,8 +204,12 @@ https://nexoterminal.netlify.app/`
             className="terminal-button highlight"
             onClick={copyToClipboard}
             style={{ marginTop: '12px' }}
+            data-focused={isDesktop && focusableItems[selectedFocusIndex] === 'share' ? 'true' : undefined}
           >
             &gt; COMPARTILHAR RESULTADO
+            {isDesktop && focusableItems[selectedFocusIndex] === 'share' && (
+              <span className="cursor-blink" style={{ color: '#00FF66', animation: 'blink 1s step-end infinite', marginLeft: '4px' }}>█</span>
+            )}
           </button>
           {showShare && (
             <div className="share-feedback">
@@ -165,8 +223,12 @@ https://nexoterminal.netlify.app/`
             <button 
               className="terminal-button secondary"
               onClick={onBackToInvestigation}
+              data-focused={isDesktop && focusableItems[selectedFocusIndex] === 'continueInvestigation' ? 'true' : undefined}
             >
               &gt; CONTINUAR INVESTIGANDO
+              {isDesktop && focusableItems[selectedFocusIndex] === 'continueInvestigation' && (
+                <span className="cursor-blink" style={{ color: '#00FF66', animation: 'blink 1s step-end infinite', marginLeft: '4px' }}>█</span>
+              )}
             </button>
             <div className="separator">------------------------------------</div>
           </>
@@ -177,8 +239,12 @@ https://nexoterminal.netlify.app/`
             <button 
               className="terminal-button secondary"
               onClick={onBackToInvestigation}
+              data-focused={isDesktop && focusableItems[selectedFocusIndex] === 'viewClues' ? 'true' : undefined}
             >
               &gt; VER PISTAS NAO REVELADAS
+              {isDesktop && focusableItems[selectedFocusIndex] === 'viewClues' && (
+                <span className="cursor-blink" style={{ color: '#00FF66', animation: 'blink 1s step-end infinite', marginLeft: '4px' }}>█</span>
+              )}
             </button>
             <div className="separator">------------------------------------</div>
           </>
@@ -189,8 +255,12 @@ https://nexoterminal.netlify.app/`
             <button 
               className="terminal-button secondary"
               onClick={onViewDossier}
+              data-focused={isDesktop && focusableItems[selectedFocusIndex] === 'viewDossier' ? 'true' : undefined}
             >
               &gt; VER DOSSIER DO CASO
+              {isDesktop && focusableItems[selectedFocusIndex] === 'viewDossier' && (
+                <span className="cursor-blink" style={{ color: '#00FF66', animation: 'blink 1s step-end infinite', marginLeft: '4px' }}>█</span>
+              )}
             </button>
             <div className="separator">------------------------------------</div>
           </>
@@ -199,8 +269,12 @@ https://nexoterminal.netlify.app/`
         <button 
           className="terminal-button"
           onClick={onBack}
+          data-focused={isDesktop && focusableItems[selectedFocusIndex] === 'back' ? 'true' : undefined}
         >
           &gt; VOLTAR AO INICIO
+          {isDesktop && focusableItems[selectedFocusIndex] === 'back' && (
+            <span className="cursor-blink" style={{ color: '#00FF66', animation: 'blink 1s step-end infinite', marginLeft: '4px' }}>█</span>
+          )}
         </button>
 
         <div className="case-code-section">

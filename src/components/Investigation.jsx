@@ -131,9 +131,9 @@ function Investigation({ crime, state, onDiscoverClue, onViewWitness, onMakeAccu
     typeof s === 'object' ? s : { name: s, criminalRecord: 'Sem antecedentes' }
   )
 
-  // Main menu buttons - ordem única para cursor e teclado
+  // Main menu buttons - ordem única para cursor e teclado (testemunhas sempre visível, inclusive após caso resolvido)
   const mainButtons = [
-    (!showWitnesses && witnessesViewed.length < crime.witnesses.length && !showViewResult) && 'witnesses',
+    !showWitnesses && 'witnesses',
     !showSuspects && 'suspects',
     'case',
     (!isFailed && remainingAttempts > 0) && 'accusation',
@@ -456,7 +456,7 @@ function Investigation({ crime, state, onDiscoverClue, onViewWitness, onMakeAccu
             <span className="progress-bar">{renderProgressBar(witnessesViewed.length, crime.witnesses.length)}</span>
           </div>
 
-          {!showWitnesses && witnessesViewed.length < crime.witnesses.length && !showViewResult && (
+          {!showWitnesses && (
             <button 
               className="terminal-button" 
               onClick={() => { setShowWitnesses(true); setWitnessNavActive(true) }}

@@ -7,10 +7,15 @@ function Dossier({ crime, onBack }) {
   const [currentLineIndex, setCurrentLineIndex] = useState(0)
   const [dots, setDots] = useState('')
   const [dossierComplete, setDossierComplete] = useState(false)
+  const [isDesktop, setIsDesktop] = useState(typeof window !== 'undefined' && window.innerWidth >= 768)
+  const [isLandscape, setIsLandscape] = useState(typeof window !== 'undefined' && window.innerWidth > window.innerHeight)
+  const keyboardInputRef = useRef(null)
   const typewriterSoundRef = useRef(null)
   const typingTimeoutRef = useRef(null)
   const animationTimeoutRef = useRef(null)
   const cancelRef = useRef(false)
+
+  const isMobileLandscape = !isDesktop && isLandscape
 
   const caseNumber = crime.caseNumber || String(crime.id).slice(-4).padStart(4, '0')
   const titleLine = (crime.description && crime.description[0]) || `CASO #${caseNumber} - ${crime.type || 'CRIME'} EM ${crime.location || ''}`
@@ -23,6 +28,23 @@ function Dossier({ crime, onBack }) {
     const d = new Date()
     return `${String(d.getDate()).padStart(2, '0')}/${String(d.getMonth() + 1).padStart(2, '0')}/1987`
   })()
+
+  useEffect(() => {
+    const onResize = () => {
+      setIsDesktop(window.innerWidth >= 768)
+      setIsLandscape(window.innerWidth > window.innerHeight)
+    }
+    window.addEventListener('resize', onResize)
+    return () => window.removeEventListener('resize', onResize)
+  }, [])
+
+  // Auto-focus input to show keyboard on mobile landscape
+  useEffect(() => {
+    if (isMobileLandscape) {
+      const t = setTimeout(() => keyboardInputRef.current?.focus(), 300)
+      return () => clearTimeout(t)
+    }
+  }, [isMobileLandscape])
 
   useEffect(() => {
     if (!typewriterSoundRef.current) {
@@ -166,6 +188,7 @@ function Dossier({ crime, onBack }) {
       onClick={handleComplete}
       onTouchStart={(e) => { if (!dossierComplete) { e.preventDefault(); completeAnimation() } }}
       style={{
+        position: 'relative',
         fontFamily: "'PxPlus IBM VGA8', monospace",
         color: '#00CC55',
         background: '#020403',
@@ -174,6 +197,26 @@ function Dossier({ crime, onBack }) {
         touchAction: 'manipulation'
       }}
     >
+      {isMobileLandscape && (
+        <input
+          ref={keyboardInputRef}
+          type="text"
+          tabIndex={0}
+          autoComplete="off"
+          aria-label="Campo para ativar teclado"
+          style={{
+            position: 'absolute',
+            top: 0,
+            left: 0,
+            width: '1px',
+            height: '1px',
+            opacity: 0,
+            pointerEvents: 'none',
+            border: 'none',
+            outline: 'none'
+          }}
+        />
+      )}
       <div className="terminal-header">
         <div className="separator separator-full-width">{'═'.repeat(150)}</div>
         <div className="title" style={{ color: '#00FF66' }}>

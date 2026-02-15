@@ -806,7 +806,7 @@ function Home({ crime, streak, onStart }) {
                     fontSize: '16px',
                     outline: 'none',
                     textTransform: 'uppercase',
-                    caretColor: '#00FF66'
+                    caretColor: 'transparent'
                   }}
                   placeholder=""
                   autoComplete="off"
@@ -819,8 +819,7 @@ function Home({ crime, streak, onStart }) {
               <span className="cursor-blink" style={{
                 color: '#00FF66',
                 animation: 'blink 1s step-end infinite',
-                marginLeft: '2px',
-                visibility: isMobileLandscape ? 'hidden' : 'visible'
+                marginLeft: '2px'
               }}>█</span>
             </div>
           )

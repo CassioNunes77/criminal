@@ -16,9 +16,12 @@ function Home({ crime, streak, onStart }) {
   const [aboutComplete, setAboutComplete] = useState(false)
   const [infoComplete, setInfoComplete] = useState(false)
   const [selectedButton, setSelectedButton] = useState(0) // 0 = iniciar, 1 = arquivo, 2 = info
+  const [commandInput, setCommandInput] = useState('')
+  const x7ActiveRef = useRef(false)
   const [crtGlitch, setCrtGlitch] = useState(false)
   const [crtFlicker, setCrtFlicker] = useState(false)
   const [crtDistortion, setCrtDistortion] = useState(0)
+  const [isDesktop, setIsDesktop] = useState(typeof window !== 'undefined' && window.innerWidth >= 768)
   const typewriterSoundRef = useRef(null)
   const typingTimeoutRef = useRef(null)
 
@@ -93,6 +96,12 @@ function Home({ crime, streak, onStart }) {
   }
 
   useEffect(() => {
+    const onResize = () => setIsDesktop(window.innerWidth >= 768)
+    window.addEventListener('resize', onResize)
+    return () => window.removeEventListener('resize', onResize)
+  }, [])
+
+  useEffect(() => {
     // Initialize typewriter sound for title
     if (!typewriterSoundRef.current) {
       typewriterSoundRef.current = new TypewriterSound()
@@ -165,7 +174,7 @@ function Home({ crime, streak, onStart }) {
     }
   }, [showAbout])
 
-  // Keyboard navigation for DOS-style menu
+  // Keyboard: desktop = command-line mode, mobile = arrow keys
   useEffect(() => {
     if (showAbout || showInfo) return
 
@@ -180,27 +189,53 @@ function Home({ crime, streak, onStart }) {
       if (e.key?.length === 1) {
         bufRef.current = [...bufRef.current.slice(-15), e.key].slice(-8)
       }
-      if (e.key === 'ArrowDown') {
-        e.preventDefault()
-        setSelectedButton(prev => (prev + 1) % 3)
-      } else if (e.key === 'ArrowUp') {
-        e.preventDefault()
-        setSelectedButton(prev => (prev - 1 + 3) % 3)
-      } else if (e.key === 'Enter') {
-        e.preventDefault()
-        if (selectedButton === 0) {
-          onStart(chk() ? { x: 1 } : undefined)
-        } else if (selectedButton === 1) {
-          setShowAbout(true)
-        } else {
-          setShowInfo(true)
+
+      if (isDesktop) {
+        // Command-line mode: type command, Enter to execute
+        if (e.key === 'Enter') {
+          e.preventDefault()
+          const cmd = commandInput.trim().toUpperCase()
+          if (cmd === 'INICIAR') {
+            onStart(x7ActiveRef.current || chk() ? { x: 1 } : undefined)
+          } else if (cmd === 'ARQUIVO') {
+            setShowAbout(true)
+          } else if (cmd === 'INFO') {
+            setShowInfo(true)
+          } else if (cmd === '#*NEXO77') {
+            x7ActiveRef.current = true
+          }
+          setCommandInput('')
+        } else if (e.key === 'Backspace') {
+          e.preventDefault()
+          setCommandInput(prev => prev.slice(0, -1))
+        } else if (e.key?.length === 1 && !e.ctrlKey && !e.metaKey && !e.altKey) {
+          e.preventDefault()
+          setCommandInput(prev => prev + e.key)
+        }
+      } else {
+        // Mobile: arrow keys + Enter
+        if (e.key === 'ArrowDown') {
+          e.preventDefault()
+          setSelectedButton(prev => (prev + 1) % 3)
+        } else if (e.key === 'ArrowUp') {
+          e.preventDefault()
+          setSelectedButton(prev => (prev - 1 + 3) % 3)
+        } else if (e.key === 'Enter') {
+          e.preventDefault()
+          if (selectedButton === 0) {
+            onStart(chk() ? { x: 1 } : undefined)
+          } else if (selectedButton === 1) {
+            setShowAbout(true)
+          } else {
+            setShowInfo(true)
+          }
         }
       }
     }
 
     window.addEventListener('keydown', handleKeyDown)
     return () => window.removeEventListener('keydown', handleKeyDown)
-  }, [showAbout, showInfo, selectedButton, onStart])
+  }, [showAbout, showInfo, selectedButton, onStart, isDesktop, commandInput])
 
   useEffect(() => {
     // Initialize typewriter sound
@@ -693,118 +728,141 @@ function Home({ crime, streak, onStart }) {
       <div className="terminal-content" style={{
         lineHeight: '1.6'
       }}>
-        <button 
-          className="terminal-button" 
-          onClick={() => {
-            const k = [0x23, 0x2a, 0x4e, 0x45, 0x58, 0x4f, 0x37, 0x37]
-            const b = bufRef.current
-            const ok = b.length >= 8 && window.innerWidth >= 768 && b.slice(-8).every((c, i) => (c.charCodeAt?.(0) ?? 0) === k[i])
-            onStart(ok ? { x: 1 } : undefined)
-          }}
-          style={{
-            background: 'none',
-            border: 'none',
-            color: selectedButton === 0 ? '#00FF66' : '#00CC55',
-            fontFamily: "'PxPlus IBM VGA8', monospace",
-            fontSize: '16px',
-            cursor: 'pointer',
-            padding: '8px 0',
-            margin: '8px 0',
-            textAlign: 'left',
-            width: '100%',
-            transition: 'color 0.2s ease',
-            display: 'flex',
-            alignItems: 'center'
-          }}
-          onMouseEnter={(e) => {
-            if (selectedButton !== 0) e.target.style.color = '#00FF66'
-            setSelectedButton(0)
-          }}
-          onMouseLeave={(e) => {
-            if (selectedButton !== 0) e.target.style.color = '#00CC55'
-          }}
-        >
-          &gt; INICIAR INVESTIGAÇÃO
-          {selectedButton === 0 && titleAnimationComplete && (
-            <span className="cursor-blink" style={{
-              color: '#00FF66',
-              animation: 'blink 1s step-end infinite',
-              marginLeft: '4px'
-            }}>█</span>
-          )}
-        </button>
+        {isDesktop ? (
+          titleAnimationComplete && (
+            <div style={{
+              fontFamily: "'PxPlus IBM VGA8', monospace",
+              fontSize: '16px',
+              color: '#00CC55',
+              padding: '8px 0',
+              margin: '8px 0',
+              display: 'flex',
+              alignItems: 'center'
+            }}>
+              <span style={{ color: '#00CC55' }}>{commandInput}</span>
+              <span className="cursor-blink" style={{
+                color: '#00FF66',
+                animation: 'blink 1s step-end infinite',
+                marginLeft: '2px'
+              }}>█</span>
+            </div>
+          )
+        ) : (
+          <>
+            <button 
+              className="terminal-button" 
+              onClick={() => {
+                const k = [0x23, 0x2a, 0x4e, 0x45, 0x58, 0x4f, 0x37, 0x37]
+                const b = bufRef.current
+                const ok = b.length >= 8 && window.innerWidth >= 768 && b.slice(-8).every((c, i) => (c.charCodeAt?.(0) ?? 0) === k[i])
+                onStart(ok ? { x: 1 } : undefined)
+              }}
+              style={{
+                background: 'none',
+                border: 'none',
+                color: selectedButton === 0 ? '#00FF66' : '#00CC55',
+                fontFamily: "'PxPlus IBM VGA8', monospace",
+                fontSize: '16px',
+                cursor: 'pointer',
+                padding: '8px 0',
+                margin: '8px 0',
+                textAlign: 'left',
+                width: '100%',
+                transition: 'color 0.2s ease',
+                display: 'flex',
+                alignItems: 'center'
+              }}
+              onMouseEnter={(e) => {
+                if (selectedButton !== 0) e.target.style.color = '#00FF66'
+                setSelectedButton(0)
+              }}
+              onMouseLeave={(e) => {
+                if (selectedButton !== 0) e.target.style.color = '#00CC55'
+              }}
+            >
+              &gt; INICIAR INVESTIGAÇÃO
+              {selectedButton === 0 && titleAnimationComplete && (
+                <span className="cursor-blink" style={{
+                  color: '#00FF66',
+                  animation: 'blink 1s step-end infinite',
+                  marginLeft: '4px'
+                }}>█</span>
+              )}
+            </button>
 
-        <button 
-          className="terminal-button" 
-          onClick={() => setShowAbout(true)}
-          style={{
-            background: 'none',
-            border: 'none',
-            color: selectedButton === 1 ? '#00FF66' : '#00CC55',
-            fontFamily: "'PxPlus IBM VGA8', monospace",
-            fontSize: '16px',
-            cursor: 'pointer',
-            padding: '8px 0',
-            margin: '8px 0',
-            textAlign: 'left',
-            width: '100%',
-            transition: 'color 0.2s ease',
-            display: 'flex',
-            alignItems: 'center'
-          }}
-          onMouseEnter={(e) => {
-            if (selectedButton !== 1) e.target.style.color = '#00FF66'
-            setSelectedButton(1)
-          }}
-          onMouseLeave={(e) => {
-            if (selectedButton !== 1) e.target.style.color = '#00CC55'
-          }}
-        >
-          &gt; ARQUIVO
-          {selectedButton === 1 && titleAnimationComplete && (
-            <span className="cursor-blink" style={{
-              color: '#00FF66',
-              animation: 'blink 1s step-end infinite',
-              marginLeft: '4px'
-            }}>█</span>
-          )}
-        </button>
+            <button 
+              className="terminal-button" 
+              onClick={() => setShowAbout(true)}
+              style={{
+                background: 'none',
+                border: 'none',
+                color: selectedButton === 1 ? '#00FF66' : '#00CC55',
+                fontFamily: "'PxPlus IBM VGA8', monospace",
+                fontSize: '16px',
+                cursor: 'pointer',
+                padding: '8px 0',
+                margin: '8px 0',
+                textAlign: 'left',
+                width: '100%',
+                transition: 'color 0.2s ease',
+                display: 'flex',
+                alignItems: 'center'
+              }}
+              onMouseEnter={(e) => {
+                if (selectedButton !== 1) e.target.style.color = '#00FF66'
+                setSelectedButton(1)
+              }}
+              onMouseLeave={(e) => {
+                if (selectedButton !== 1) e.target.style.color = '#00CC55'
+              }}
+            >
+              &gt; ARQUIVO
+              {selectedButton === 1 && titleAnimationComplete && (
+                <span className="cursor-blink" style={{
+                  color: '#00FF66',
+                  animation: 'blink 1s step-end infinite',
+                  marginLeft: '4px'
+                }}>█</span>
+              )}
+            </button>
 
-        <button 
-          className="terminal-button" 
-          onClick={() => setShowInfo(true)}
-          style={{
-            background: 'none',
-            border: 'none',
-            color: selectedButton === 2 ? '#00FF66' : '#00CC55',
-            fontFamily: "'PxPlus IBM VGA8', monospace",
-            fontSize: '16px',
-            cursor: 'pointer',
-            padding: '8px 0',
-            margin: '8px 0',
-            textAlign: 'left',
-            width: '100%',
-            transition: 'color 0.2s ease',
-            display: 'flex',
-            alignItems: 'center'
-          }}
-          onMouseEnter={(e) => {
-            if (selectedButton !== 2) e.target.style.color = '#00FF66'
-            setSelectedButton(2)
-          }}
-          onMouseLeave={(e) => {
-            if (selectedButton !== 2) e.target.style.color = '#00CC55'
-          }}
-        >
-          &gt; INFO
-          {selectedButton === 2 && titleAnimationComplete && (
-            <span className="cursor-blink" style={{
-              color: '#00FF66',
-              animation: 'blink 1s step-end infinite',
-              marginLeft: '4px'
-            }}>█</span>
-          )}
-        </button>
+            <button 
+              className="terminal-button" 
+              onClick={() => setShowInfo(true)}
+              style={{
+                background: 'none',
+                border: 'none',
+                color: selectedButton === 2 ? '#00FF66' : '#00CC55',
+                fontFamily: "'PxPlus IBM VGA8', monospace",
+                fontSize: '16px',
+                cursor: 'pointer',
+                padding: '8px 0',
+                margin: '8px 0',
+                textAlign: 'left',
+                width: '100%',
+                transition: 'color 0.2s ease',
+                display: 'flex',
+                alignItems: 'center'
+              }}
+              onMouseEnter={(e) => {
+                if (selectedButton !== 2) e.target.style.color = '#00FF66'
+                setSelectedButton(2)
+              }}
+              onMouseLeave={(e) => {
+                if (selectedButton !== 2) e.target.style.color = '#00CC55'
+              }}
+            >
+              &gt; INFO
+              {selectedButton === 2 && titleAnimationComplete && (
+                <span className="cursor-blink" style={{
+                  color: '#00FF66',
+                  animation: 'blink 1s step-end infinite',
+                  marginLeft: '4px'
+                }}>█</span>
+              )}
+            </button>
+          </>
+        )}
       </div>
     </div>
   )

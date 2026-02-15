@@ -5,6 +5,8 @@
   "type": "module",
   "scripts": {
     "trigger": "./scripts/trigger-case.sh",
+    "deploy": "npx netlify-cli deploy --prod",
+    "deploy:trigger": "npm run deploy && echo 'Aguardando deploy (~60s)...' && sleep 60 && npm run trigger",
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview",

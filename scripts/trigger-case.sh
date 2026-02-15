@@ -1,12 +1,12 @@
 #!/bin/bash
 # Atualiza o caso do dia pela DATA (referência por data, não por número do caso).
 # O caso é salvo/atualizado no documento da data (ex: 2025-02-09).
-# Tema aleatório quando não informado.
+# Tema ALEATÓRIO por padrão. Use TEMA=... apenas se quiser tema fixo.
 #
 # Uso:
-#   npm run trigger                    # Caso de hoje (data atual)
-#   DATE=2025-02-09 npm run trigger     # Caso da data específica
-#   TEMA=videolocadora npm run trigger  # Com tema fixo (opcional)
+#   npm run trigger                    # Caso de hoje, tema aleatório
+#   DATE=2025-02-09 npm run trigger    # Caso da data específica, tema aleatório
+#   TEMA=joalheria npm run trigger     # Com tema fixo (opcional)
 #
 # Ou: TRIGGER_SECRET=seu_secret ./scripts/trigger-case.sh
 # Ou: DATE=2025-02-09 TRIGGER_SECRET=xxx ./scripts/trigger-case.sh

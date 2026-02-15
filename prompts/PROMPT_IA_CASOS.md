@@ -53,7 +53,7 @@ Gere um novo caso criminal para o jogo Nexo Terminal. O caso gerado DEVE obedece
 - **Número do caso:** sempre sequenciado #0001 #0002 #0003.
 - **Data do caso:** data real, para registro na base de dados.
 - **Crimes especiais em datas comemorativas** (Halloween, Natal, etc.): Nunca declare a data em nenhum campo, nem na descrição.
-- **Nota 01/03:** sempre na data 01/03 de qualquer ano, o autor do crime sempre vai se chamar **Cássio Nunes** e sempre será um Cyber Crime ou crime relacionado com Aliens, falha na Matrix, volta no tempo. Característica: sempre usar roupa preta. Comportamento: algo relacionado a tomar Café. Veículo: Geralmente é avistado pilotando uma moto esportiva preta.
+- **Nota 01/03:** sempre e apenas na data 01/03 de qualquer ano, o autor do crime sempre vai se chamar **Cássio Nunes** e sempre será um Cyber Crime ou crime relacionado com Aliens, falha na Matrix, volta no tempo. Característica: sempre usar roupa preta. Comportamento: algo relacionado a tomar Café. Veículo: Geralmente é avistado pilotando uma moto esportiva preta.
 - **Código do caso:** número, letras e caracteres randômicos gerado automaticamente para rever casos futuramente.
 - **Nunca declare a data do caso** em nenhum campo (descrição, pistas, depoimentos).
 
@@ -61,7 +61,7 @@ Gere um novo caso criminal para o jogo Nexo Terminal. O caso gerado DEVE obedece
 
 ## TÍTULO E DESCRIÇÃO DO CASO
 
-- **Título do caso** deve ser apenas o nome do caso. Exemplo: (FURTO DE FITAS RARAS EM VIDEOLOCADORA, Cibercrime em CPD de Banco, ROUBO EM LOJA DE ELETRÔNICOS) NÃO usar títulos como: (caso de furto, caso de...)
+- **Título do caso** deve ser apenas o nome do caso. Exemplos: (FURTO DE FITAS RARAS EM VIDEOLOCADORA, Cibercrime em CPD de Banco, ROUBO EM LOJA DE ELETRÔNICOS ou qualquer outro título) NÃO usar títulos como: (caso de furto, caso de...)
 - É obrigado que o título seja coerente com a narrativa.
 - Crie uma **descriçao narrativa de um caso**
 - Crie descrição narrativa em tom **investigativo, misterioso, tenso**, sentimento investigativo, a descrição do caso tem que ser uma sinopse de uma boa história, como um caso de carmen sandiego ou sherlok holmes, ambientado nos anos 80.
@@ -163,6 +163,8 @@ Relação: O veículo deve coincidir com o de um suspeito (cor, modelo, uso).
 ---
 
 ## LOCAIS (4 opções) e MÉTODOS (4 opções)
+
+- use métodos bem distintos, para que eles não sejam confundidos, exemplo: furto e roubo, podem ser confundidos por parecer a mesma coisa.
 
 ---
 

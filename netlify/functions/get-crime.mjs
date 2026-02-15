@@ -81,6 +81,20 @@ export default async (req) => {
       return []
     }
 
+    const normForCmp = (s) => (s == null ? '' : String(s).trim().replace(/\s+/g, ' '))
+    const locations = (data.locations || []).map(ensureString)
+    const methods = (data.methods || []).map(ensureString)
+    const sol = data.solution || {}
+    let suspect = normForCmp(sol.suspect)
+    let location = normForCmp(sol.location)
+    let method = normForCmp(sol.method)
+    const matchedSuspect = suspectsWithRecords.find(sus => normForCmp(sus.name) === suspect || normForCmp(sus.displayName || sus.name) === suspect)
+    if (matchedSuspect) suspect = matchedSuspect.name
+    const matchedLoc = locations.find(l => normForCmp(l) === location)
+    if (matchedLoc) location = matchedLoc
+    const matchedMeth = methods.find(m => normForCmp(m) === method)
+    if (matchedMeth) method = matchedMeth
+
     const crime = {
       id: crimeId,
       caseCode: data.caseCode || String(crimeId),
@@ -91,15 +105,15 @@ export default async (req) => {
       description: ensureDescArr(data.description),
       suspects: suspectsWithRecords.map(s => s.name),
       suspectsWithRecords,
-      locations: (data.locations || []).map(ensureString),
-      methods: (data.methods || []).map(ensureString),
+      locations,
+      methods,
       clues: (data.clues || []).map(c => ({
         type: c.type,
         text: c.text,
         revealed: false
       })),
       witnesses,
-      solution: data.solution || {},
+      solution: { suspect, location, method },
       dossier: data.dossier || '',
       date: data.date || dateId
     }

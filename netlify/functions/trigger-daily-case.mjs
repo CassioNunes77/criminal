@@ -21,10 +21,10 @@ export default async (req) => {
   try {
     const url = new URL(req.url || '', `http://${req.headers.get('host') || 'localhost'}`)
     const tema = url.searchParams.get('tema') || ''
-    const caseNum = url.searchParams.get('caseNumber') || url.searchParams.get('case_number') || ''
+    const date = url.searchParams.get('date') || ''
     const opts = {}
     if (tema) opts.tema = tema
-    if (caseNum) opts.forceCaseNumber = parseInt(caseNum, 10) || 1
+    if (date && /^\d{4}-\d{2}-\d{2}$/.test(date)) opts.date = date
     const result = await runGenerateCase(Object.keys(opts).length ? opts : {})
     return Response.json({ ok: true, ...result })
   } catch (err) {

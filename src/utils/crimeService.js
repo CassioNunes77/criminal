@@ -102,16 +102,50 @@ function normalizeWitness(w) {
   }
 }
 
+function normalizeForComparison(str) {
+  if (str == null) return ''
+  return String(str).trim().replace(/\s+/g, ' ')
+}
+
+function normalizeSolution(crime, suspectsWithRecords, locations, methods) {
+  const sol = crime.solution || {}
+  let suspect = normalizeForComparison(sol.suspect)
+  let location = normalizeForComparison(sol.location)
+  let method = normalizeForComparison(sol.method)
+
+  // Suspect: usar valor canônico da lista (evita diferenças de formatação da IA)
+  const matchedSuspect = suspectsWithRecords.find(s => {
+    const canon = normalizeForComparison(s.name)
+    const display = normalizeForComparison(s.displayName || s.name)
+    return canon === suspect || display === suspect
+  })
+  if (matchedSuspect) suspect = matchedSuspect.name
+
+  // Location e method: usar valor canônico da lista
+  const matchedLoc = locations.find(l => normalizeForComparison(l) === location)
+  if (matchedLoc) location = matchedLoc
+
+  const matchedMeth = methods.find(m => normalizeForComparison(m) === method)
+  if (matchedMeth) method = matchedMeth
+
+  return { suspect, location, method }
+}
+
 function normalizeCrime(crime) {
   const suspects = crime.suspects || []
   const suspectsWithRecords = (crime.suspectsWithRecords || suspects).map(normalizeSuspect)
+  const locations = (crime.locations || []).map(ensureString)
+  const methods = (crime.methods || []).map(ensureString)
+  const solution = normalizeSolution(crime, suspectsWithRecords, locations, methods)
+
   return {
     ...crime,
     description: ensureDescriptionArray(crime.description),
     suspects: suspectsWithRecords.map(s => s.name),
     suspectsWithRecords,
-    locations: (crime.locations || []).map(ensureString),
-    methods: (crime.methods || []).map(ensureString),
+    locations,
+    methods,
+    solution,
     witnesses: (crime.witnesses || []).map(normalizeWitness),
     dossier: crime.dossier || '',
     clues: (crime.clues || []).map(c => ({
@@ -158,6 +192,8 @@ async function fetchViaNetlifyFunction(dateId) {
  * Busca o crime do dia.
  * Prioridade: 1) Netlify function (evita Safari) 2) Firebase SDK 3) REST API 4) cache
  */
+export { normalizeCrime }
+
 export async function getDailyCrimeFromFirebase() {
   const dateId = getDateId()
 
@@ -221,6 +257,15 @@ function transformFirestoreCrime(data, dateId) {
 
   const witnesses = (data.witnesses || []).map(normalizeWitness)
 
+  const locations = (data.locations || []).map(ensureString)
+  const methods = (data.methods || []).map(ensureString)
+  const solution = normalizeSolution(
+    { solution: data.solution || {} },
+    suspectsWithRecords,
+    locations,
+    methods
+  )
+
   return {
     id: crimeId,
     caseCode: data.caseCode || String(crimeId),
@@ -231,15 +276,15 @@ function transformFirestoreCrime(data, dateId) {
     description,
     suspects: suspectsWithRecords.map(s => s.name),
     suspectsWithRecords,
-    locations: (data.locations || []).map(ensureString),
-    methods: (data.methods || []).map(ensureString),
+    locations,
+    methods,
     clues: (data.clues || []).map(c => ({
       type: c.type,
       text: c.text,
       revealed: false
     })),
     witnesses,
-    solution: data.solution || {},
+    solution,
     dossier: data.dossier || '',
     date: data.date || ''
   }

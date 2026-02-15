@@ -112,6 +112,7 @@ Relação: A evidência deve apontar para características físicas ou objetos d
 Indícios de veículo usado (marcas, descrições, registros).
 Exemplos: "Marcas de pneu de moto no barro atrás do estabelecimento; um suspeito possui moto vermelha." "Vizinho anotou placa parcial de um Fusca azul saindo às 21:30."
 Relação: O veículo deve coincidir com o de um suspeito (cor, modelo, uso).
+A depender do crime veículo não será avistado. Exemplo: Cibercrimes (garantir a lógica da narrativa)
 
 ### REGRAS DE USO DAS PISTAS
 

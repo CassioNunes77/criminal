@@ -136,7 +136,7 @@ function Investigation({ crime, state, onDiscoverClue, onViewWitness, onMakeAccu
     !showWitnesses && 'witnesses',
     !showSuspects && 'suspects',
     'case',
-    (!isFailed && remainingAttempts > 0) && 'accusation',
+    'accusation',
     showViewResult && 'viewResult',
     'back'
   ].filter(Boolean)
@@ -199,9 +199,10 @@ function Investigation({ crime, state, onDiscoverClue, onViewWitness, onMakeAccu
   }
 
   const getFeedbackMessage = (suspect, location, method) => {
-    const correctSuspect = suspect === crime.solution.suspect
-    const correctLocation = location === crime.solution.location
-    const correctMethod = method === crime.solution.method
+    const norm = (s) => (s ?? '').trim().replace(/\s+/g, ' ')
+    const correctSuspect = norm(suspect) === norm(crime.solution.suspect)
+    const correctLocation = norm(location) === norm(crime.solution.location)
+    const correctMethod = norm(method) === norm(crime.solution.method)
 
     const correctCount = [correctSuspect, correctLocation, correctMethod].filter(Boolean).length
 
@@ -335,7 +336,7 @@ function Investigation({ crime, state, onDiscoverClue, onViewWitness, onMakeAccu
             handleDiscoverClue(availableClues[item.index].type)
           } else if (item.id === 'case') {
             setShowCaseView(true)
-          } else if (item.id === 'accusation' && remainingAttempts > 0) {
+          } else if (item.id === 'accusation') {
             setShowAccusation(true)
           } else if (item.id === 'witnesses') {
             setShowWitnesses(true)
@@ -608,13 +609,13 @@ function Investigation({ crime, state, onDiscoverClue, onViewWitness, onMakeAccu
         </div>
 
         {/* Accusation Form */}
-        {!showAccusation && !showViewResult ? (
+        {!showAccusation ? (
           <button 
             className="terminal-button"
-            onClick={() => remainingAttempts > 0 && setShowAccusation(true)}
+            onClick={() => setShowAccusation(true)}
             style={{
-              opacity: remainingAttempts <= 0 ? 0.5 : 1,
-              cursor: remainingAttempts <= 0 ? 'not-allowed' : 'pointer'
+              opacity: remainingAttempts <= 0 ? 0.85 : 1,
+              cursor: 'pointer'
             }}
             data-focused={titleAnimationComplete && !showWitnesses && !showAccusation && focusableItems[selectedFocusIndex]?.id === 'accusation' ? 'true' : undefined}
           >
@@ -627,7 +628,7 @@ function Investigation({ crime, state, onDiscoverClue, onViewWitness, onMakeAccu
               }}>█</span>
             )}
           </button>
-        ) : showAccusation && !showViewResult ? (
+        ) : showAccusation ? (
           (() => {
             const confirmIdx = suspectsWithRecords.length + crime.locations.length + crime.methods.length
             const cancelIdx = confirmIdx + 1

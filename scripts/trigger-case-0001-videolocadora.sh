@@ -1,7 +1,7 @@
 #!/bin/bash
-# Atualiza o Caso #0001 (videolocadora) no Firebase.
-# Gera novo caso via Groq e sobrescreve o documento de hoje.
+# Gera caso com tema videolocadora para a data informada (ou hoje).
 #
 # Uso: TRIGGER_SECRET=seu_secret ./scripts/trigger-case-0001-videolocadora.sh
+# Data específica: DATE=2025-02-09 TRIGGER_SECRET=xxx ./scripts/trigger-case-0001-videolocadora.sh
 
-CASE_NUMBER=1 TEMA=videolocadora exec "$(dirname "$0")/trigger-case.sh" "$@"
+TEMA=videolocadora exec "$(dirname "$0")/trigger-case.sh" "$@"

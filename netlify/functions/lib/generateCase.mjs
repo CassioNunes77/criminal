@@ -179,8 +179,14 @@ function generateCaseCode() {
   return code
 }
 
+const TEMAS_ALEATORIOS = [
+  'videolocadora', 'lanchonete', 'joalheria', 'banco', 'loja de eletrônicos',
+  'biblioteca', 'farmácia', 'restaurante', 'posto de gasolina', 'agência de viagens',
+  'loja de discos', 'floricultura', 'papelaria', 'sorveteria', 'padaria'
+]
+
 export async function runGenerateCase(opts = {}) {
-  const { tema, forceCaseNumber } = opts
+  const { tema, forceCaseNumber, date: dateOverride } = opts
   const apiKey = process.env.GROQ_API_KEY
   const serviceAccountJson = process.env.FIREBASE_SERVICE_ACCOUNT
 
@@ -196,22 +202,21 @@ export async function runGenerateCase(opts = {}) {
   }
 
   const db = getFirestore()
-  const now = new Date()
-  const dateStr = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`
+  const dateStr = dateOverride || (() => {
+    const now = new Date()
+    return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`
+  })()
 
   const crimesRef = db.collection('crimes')
-  const metaRef = db.collection('_meta').doc('counters')
 
-  let caseNumber = forceCaseNumber || 1
-  if (!forceCaseNumber) {
-    try {
-      const metaDoc = await metaRef.get()
-      if (metaDoc.exists) {
-        caseNumber = (metaDoc.data().lastCaseNumber || 0) + 1
-      }
-    } catch (e) {
-      console.warn('Could not read case counter:', e.message)
-    }
+  // Tema: aleatório quando não informado
+  const temaFinal = tema || TEMAS_ALEATORIOS[Math.floor(Math.random() * TEMAS_ALEATORIOS.length)]
+
+  // caseNumber: derivado da data (YYYYMMDD % 9999 + 1) para referência por data
+  let caseNumber = forceCaseNumber
+  if (caseNumber == null) {
+    const dateNum = parseInt(dateStr.replace(/-/g, ''), 10)
+    caseNumber = (dateNum % 9999) + 1
   }
 
   const caseCode = generateCaseCode()
@@ -226,7 +231,7 @@ export async function runGenerateCase(opts = {}) {
     model: 'llama-3.1-8b-instant',
     messages: [
       { role: 'system', content: systemPrompt },
-      { role: 'user', content: getPrompt(dateStr, caseNumber, caseCode, tema) }
+      { role: 'user', content: getPrompt(dateStr, caseNumber, caseCode, temaFinal) }
     ],
     temperature: 0.8,
     max_tokens: 4000
@@ -303,7 +308,6 @@ export async function runGenerateCase(opts = {}) {
   }
 
   await crimesRef.doc(dateStr).set(document)
-  await metaRef.set({ lastCaseNumber: caseNumber }, { merge: true })
 
   return { success: true, caseNumber: document.caseNumber, date: dateStr }
 }

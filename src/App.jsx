@@ -5,7 +5,7 @@ import Investigation from './components/Investigation'
 import Result from './components/Result'
 import Dossier from './components/Dossier'
 import LoadingScreen from './components/LoadingScreen'
-import { getDailyCrimeFromFirebase } from './utils/crimeService'
+import { getDailyCrimeFromFirebase, normalizeCrime } from './utils/crimeService'
 import { getDailyCrime } from './utils/dailySeed'
 import './App.css'
 
@@ -37,7 +37,7 @@ function App() {
       let crime = await getDailyCrimeFromFirebase()
       if (!crime) {
         crime = getDailyCrime()
-        crime = { ...crime, caseCode: String(crime.id), caseNumber: String(crime.id).slice(-4).padStart(4, '0') }
+        crime = normalizeCrime({ ...crime, caseCode: String(crime.id), caseNumber: String(crime.id).slice(-4).padStart(4, '0') })
       }
       setCurrentCrime(crime)
       try {
@@ -81,7 +81,7 @@ function App() {
       console.error('Error loading crime:', error)
       try {
         const fallback = getDailyCrime()
-        setCurrentCrime({ ...fallback, caseCode: String(fallback.id), caseNumber: String(fallback.id).slice(-4).padStart(4, '0') })
+        setCurrentCrime(normalizeCrime({ ...fallback, caseCode: String(fallback.id), caseNumber: String(fallback.id).slice(-4).padStart(4, '0') }))
       } catch (_) {}
       setTimeout(() => setIsLoading(false), minLoadTime)
     }
@@ -140,10 +140,11 @@ function App() {
 
     if (investigationState.failed) return false
 
+    const norm = (s) => (s ?? '').trim().replace(/\s+/g, ' ')
     const isCorrect =
-      suspect === currentCrime.solution.suspect &&
-      location === currentCrime.solution.location &&
-      method === currentCrime.solution.method
+      norm(suspect) === norm(currentCrime.solution.suspect) &&
+      norm(location) === norm(currentCrime.solution.location) &&
+      norm(method) === norm(currentCrime.solution.method)
 
     const newState = {
       ...investigationState,

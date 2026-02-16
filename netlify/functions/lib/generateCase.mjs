@@ -64,8 +64,8 @@ function getPrompt(dateStr, caseNumber, caseCode, temaOverride) {
 - ${dateInstruction}
 
 ## TÍTULO E DESCRIÇÃO DO CASO
-- Título do caso deve ser apenas o nome do caso. Exemplo: (FURTO DE FITAS RARAS EM VIDEOLOCADORA, Cibercrime em CPD de Banco, ROUBO EM LOJA DE ELETRÔNICOS) NÃO usar títulos como: (caso de furto, caso de...).
-- É obrigado que o título seja coerente com a narrativa.
+- Título do caso deve ser apenas o nome do caso. Exemplos: (FURTO DE.., Cibercrime em.., ROUBO EM..) NÃO usar títulos como: (caso de furto, caso de...).
+- É obrigatório que o título seja coerente com a descrição do caso.
 - Crie uma descrição narrativa de um caso.
 - Crie descrição narrativa em tom investigativo, misterioso, tenso, sentimento investigativo. A descrição do caso tem que ser uma sinopse de uma boa história, como um caso de Carmen Sandiego ou Sherlock Holmes, ambientado nos anos 80.
 - NÃO ficar declarando depoimentos de testemunhas ou pistas na narrativa.
@@ -85,8 +85,8 @@ Exemplos: "Registro de ponto indica que o último funcionário saiu às 18:45; o
 Relação: O horário deve eliminar ou apontar suspeitos conforme seus álibis, rotinas ou possibilidade de estar no local.
 
 ### 2. LOCAL
-Indícios do local exato do crime (vestígios, sinais, objetos, layout).
-Exemplos: "Marcas de sapato no pó atrás do balcão; só funcionários acessam essa área." "Fita cassete caída na seção de raros; o furto foi nessa prateleira."
+Apresentar Indícios do local exato do crime, sem declarar literalmente onde foi o local. (vestígios, sinais, objetos, layout).
+- Esse campo vai sugerir indícios no local do crime. (no balcão.., na sessão.., na área.. e qualquer outro local específico, dentro da cena do crime)
 Relação: O local deve ser coerente com o método e com quem tinha acesso ou conhecimento do espaço.
 
 ### 3. ACESSO
@@ -101,8 +101,8 @@ Relação: O álibi pode ser verdadeiro (elimina suspeito) ou falso (mantém sus
 
 ### 5. COMPORTAMENTO
 Ações ou hábitos do suspeito na cena ou antes/depois (modo de agir, rotina).
-Exemplos: "Suspeito foi direto à seção de fitas raras, sem procurar; indica conhecimento prévio do layout." "Quem furtou evitou as câmeras; conhecia os ângulos de vigilância."
-Relação: O comportamento deve ligar-se a um suspeito específico (ex-funcionário, cliente frequente, fornecedor).
+Exemplos: "Suspeito foi direto à seção de.., sem procurar; indica conhecimento prévio do layout." "Quem furtou evitou as câmeras; conhecia os ângulos de vigilância."
+Relação: O comportamento deve ligar-se a um suspeito específico (ex-funcionário, cliente frequente, fornecedor, morador, cliente, visitante, prestador de serviço e qualquer outro exemplo).
 
 ### 6. EVIDÊNCIA
 Vestígios materiais (impressões, objetos, marcas, resíduos).
@@ -111,8 +111,9 @@ Relação: A evidência deve apontar para características físicas ou objetos d
 
 ### 7. VEÍCULO
 Indícios de veículo usado (marcas, descrições, registros).
-Exemplos: "Marcas de pneu de moto no barro atrás do estabelecimento; um suspeito possui moto vermelha." "Vizinho anotou placa parcial de um Fusca azul saindo às 21:30."
+Exemplos: "Marcas de pneu de moto no barro atrás do estabelecimento; um suspeito possui moto vermelha." "Vizinho anotou placa parcial de um Fusca azul saindo às 21:30." "Homem foi avistado pilotando uma moto esportiva preta."
 Relação: O veículo deve coincidir com o de um suspeito (cor, modelo, uso).
+A depender do crime veículo não será avistado. Garantir a lógica e coerência da narrativa.
 
 ### REGRAS DE USO DAS PISTAS
 - Pistas vêm da investigação: registros, perícia, documentos, câmeras, vestígios.
@@ -125,7 +126,9 @@ Relação: O veículo deve coincidir com o de um suspeito (cor, modelo, uso).
 - Pistas = fontes da investigação (perícia, registros, vestígios). Testemunhas = depoimentos orais; podem coincidir com pistas, mas não são a origem delas.
 - Cada pista deve ter relação direta com o caso e com pelo menos um suspeito.
 - Pistas e depoimentos verdadeiros não podem contradizer a solução.
+- É obrigatório que as pistas tenham coerência com o caso.
 - O jogador precisa cruzar pistas, depoimentos e descrição para chegar à solução.
+- Com exceção da pista Álibi que pode ser falso ou não, uma pista não deve ser completamente falsa, pode no máximo ser parcialmente falsa.
 
 ## TESTEMUNHAS (5)
 - Crie 5 testemunhas relacionadas com o caso.
@@ -133,10 +136,12 @@ Relação: O veículo deve coincidir com o de um suspeito (cor, modelo, uso).
 - Sempre declarar cargo ou função ou quem ele ou ela é na história (ex: cliente, morador, mãe de alguém).
 - Entre as testemunhas será permitido no máximo 1 suspeito como testemunha.
 - Cada testemunha dá sua versão (alguma versão pode ser falsa). Indicar [VERDADEIRA] ou [PODE SER FALSA].
+- Um depoimento com a tag [PODE SER FALSA] pode ser verdadeiro ou falso.
+- Sempre haverá 2 depoimentos com a tag [PODE SER FALSA].
 - Use informações discretas: "Suspeito parecia um homem forte" (indica que provavelmente não é mulher).
 - Falsos positivos: depoimentos falsos podem indicar comportamento de outro suspeito.
 - Alguma testemunha com vínculo com o suspeito pode declarar depoimento falso ou verdadeiro.
-- Use elementos que simulem veracidade nos depoimentos.
+- Use elementos que simulem veracidade nos depoimentos e garanta que alguns depoimentos serão mais detalhados.
 - Use tensão e mistério nos depoimentos: "ouvi boatos que..", "fiquei assustada..", "ouvi um barulho..".
 - Use registros incompletos. Use horários aproximados (ex: por volta de 19:00).
 - Álibi ou testemunhas próximas (esposa, mãe, filhos) podem ou não estar falando a verdade.
@@ -144,17 +149,20 @@ Relação: O veículo deve coincidir com o de um suspeito (cor, modelo, uso).
 ## SUSPEITOS (4)
 - Sempre haverão 4 suspeitos.
 - Suspeitos podem ser: funcionários, mãe, marido, estagiário, encanador, morador, turista, e qualquer outra coisa.
-- Sempre declarar nome e sobrenome.
-- Descrever cargo ou função ou quem ele é na história (ex: cliente, morador, funcionário, gerente, encanador).
+- É obrigatório sempre declarar Nome e Sobrenome.
+- É obrigatório sempre descrever cargo ou função ou quem ele é na história (ex: cliente, morador, funcionário, gerente, encanador).
 - Histórico: se já teve passagem pela polícia e o motivo, ou "Sem antecedentes".
 - Todo suspeito terá uma Característica. Exemplos: Cabelos longos até os ombros, Usa óculos de aro grosso, Costuma usar jaqueta de couro, Anda sempre de boné, Usa brincos grandes dourados, Costuma usar camisa azul, Usa tênis branco, Tem barba por fazer, Cabelo cacheado, Usa pulseira de prata. Crie característica de acordo com o caso. (Evite "usa calça jeans"; use "costuma usar calça jeans").
+- É obrigatório que características sejam coerentes com o sexo do suspeito.
 - Todo suspeito terá um Comportamento. Exemplos: Foi direto ao local sem hesitar, Parecia nervoso perto do caixa, Saiu correndo após o crime, Ficou observando a vitrine antes de entrar, Pediu para trocar de nota várias vezes, Desviou o olhar quando questionado, Conhecia o layout da loja, Entrou e saiu em menos de 5 minutos, Foi ao banheiro antes do crime, Fingiu estar procurando algo na estante. Crie comportamento de acordo com o caso.
 - Todo suspeito terá um Veículo. Exemplos: Carro conversível vermelho, bicicleta, moto esportiva ou outro meio de transporte, costuma andar a pé. Declare o veículo como comentário. Exemplo: "Geralmente avistado pilotando uma moto esportiva preta."
 - Correlações: características devem conectar a pistas, testemunhas e descrição. Alguma menção que conecta ao suspeito.
 - Mencionar pelo menos 3 suspeitos na descrição ou em depoimento de alguma testemunha ou em alguma pista. Pelo menos 3 suspeitos devem ser citados 1 por vez. Ex: suspeito visto por testemunha; na descrição fala de possível suspeito no local; em pista: "em tal horário foi visto tal pessoa". Álibi: "Paulo estava em casa (confirmado pela mãe)" – a mãe pode estar mentindo.
 - Garanta a lógica: com todas as testemunhas, pistas e descrição será possível chegar a apenas um resultado correto. Faça de forma sutil, para não deixar o jogo simples demais.
 
-## LOCAIS (4 opções), MÉTODOS (4 opções)
+## LOCAIS (4 opções) e MÉTODOS (4 opções)
+- É obrigatório que o local do crime seja específico. Ex: na seção de raros, no CPD do banco, no estoque, na área administrativa da loja.
+- Use métodos bem distintos, não use métodos similares para que eles não sejam confundidos.
 
 ## SOLUÇÃO
 - suspect no formato "Nome, cargo" (exatamente das listas).
@@ -163,7 +171,9 @@ Relação: O veículo deve coincidir com o de um suspeito (cor, modelo, uso).
 ## DOSSIER DO CASO
 - Texto completo: descrição, solução e dados que levam à prova do caso.
 - PROVE por que o culpado é o correto e por que os outros 3 NÃO são.
-- PROVE: Suspeito, Local e Método.
+- PROVE: Suspeito.
+- PROVE: Local.
+- PROVE: Método.
 - Declarar falsos positivos, se houver.
 
 Retorne APENAS um JSON válido, sem markdown ou texto extra. clues: 7 itens (HORARIO, LOCAL, ACESSO, ALIBI, COMPORTAMENTO, EVIDENCIA, VEICULO). witnesses: 5 itens.

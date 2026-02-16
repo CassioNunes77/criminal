@@ -85,7 +85,7 @@ Relação: O horário deve eliminar ou apontar suspeitos conforme seus álibis, 
 
 ### 2. LOCAL
 Apresentar Indícios do local exato do crime, sem declarar literalmente onde foi o local. (vestígios, sinais, objetos, layout).
-Exemplos: "Marcas de sapato no pó atrás do balcão; só funcionários acessam essa área." "Fita cassete caída na seção de raros; o furto foi nessa prateleira." ou seja, esse campo vai sugerir indícios no local do crime. 
+- Esse campo vai sugerir indícios no local do crime. (no balcão.., na sessão.., na área.. e qualquer outro local específico, dentro da cena do crime)
 Relação: O local deve ser coerente com o método e com quem tinha acesso ou conhecimento do espaço.
 
 ### 3. ACESSO
@@ -100,8 +100,8 @@ Relação: O álibi pode ser verdadeiro (elimina suspeito) ou falso (mantém sus
 
 ### 5. COMPORTAMENTO
 Ações ou hábitos do suspeito na cena ou antes/depois (modo de agir, rotina).
-Exemplos: "Suspeito foi direto à seção de fitas raras, sem procurar; indica conhecimento prévio do layout." "Quem furtou evitou as câmeras; conhecia os ângulos de vigilância."
-Relação: O comportamento deve ligar-se a um suspeito específico (ex-funcionário, cliente frequente, fornecedor).
+Exemplos: "Suspeito foi direto à seção de.., sem procurar; indica conhecimento prévio do layout." "Quem furtou evitou as câmeras; conhecia os ângulos de vigilância."
+Relação: O comportamento deve ligar-se a um suspeito específico (ex-funcionário, cliente frequente, fornecedor, morador, cliente, visitante, prestador de serviço e qualquer outro exemplo).
 
 ### 6. EVIDÊNCIA
 Vestígios materiais (impressões, objetos, marcas, resíduos).

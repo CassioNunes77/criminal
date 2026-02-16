@@ -61,8 +61,8 @@ Gere um novo caso criminal para o jogo Nexo Terminal. O caso gerado DEVE obedece
 
 ## TÍTULO E DESCRIÇÃO DO CASO
 
-- **Título do caso** deve ser apenas o nome do caso. Exemplos: (FURTO DE FITAS RARAS EM VIDEOLOCADORA, Cibercrime em CPD de Banco, ROUBO EM LOJA DE ELETRÔNICOS ou qualquer outro título) NÃO usar títulos como: (caso de furto, caso de...)
-- É obrigado que o título seja coerente com a narrativa.
+- **Título do caso** deve ser apenas o nome do caso. Exemplos: (FURTO DE.., Cibercrime em.., ROUBO EM..) NÃO usar títulos como: (caso de furto, caso de...)
+- É obrigatório que o título seja coerente com a descrição do caso.
 - Crie uma **descriçao narrativa de um caso**
 - Crie descrição narrativa em tom **investigativo, misterioso, tenso**, sentimento investigativo, a descrição do caso tem que ser uma sinopse de uma boa história, como um caso de carmen sandiego ou sherlok holmes, ambientado nos anos 80.
 - **Não ficar declarando** depoimentos de testemunhas ou pistas na narrativa.
@@ -84,8 +84,8 @@ Exemplos: "Registro de ponto indica que o último funcionário saiu às 18:45; o
 Relação: O horário deve eliminar ou apontar suspeitos conforme seus álibis, rotinas ou possibilidade de estar no local.
 
 ### 2. LOCAL
-Indícios do local exato do crime (vestígios, sinais, objetos, layout).
-Exemplos: "Marcas de sapato no pó atrás do balcão; só funcionários acessam essa área." "Fita cassete caída na seção de raros; o furto foi nessa prateleira."
+Apresentar Indícios do local exato do crime, sem declarar literalmente onde foi o local. (vestígios, sinais, objetos, layout).
+Exemplos: "Marcas de sapato no pó atrás do balcão; só funcionários acessam essa área." "Fita cassete caída na seção de raros; o furto foi nessa prateleira." ou seja, esse campo vai sugerir indícios no local do crime. 
 Relação: O local deve ser coerente com o método e com quem tinha acesso ou conhecimento do espaço.
 
 ### 3. ACESSO
@@ -110,9 +110,9 @@ Relação: A evidência deve apontar para características físicas ou objetos d
 
 ### 7. VEÍCULO
 Indícios de veículo usado (marcas, descrições, registros).
-Exemplos: "Marcas de pneu de moto no barro atrás do estabelecimento; um suspeito possui moto vermelha." "Vizinho anotou placa parcial de um Fusca azul saindo às 21:30."
+Exemplos: "Marcas de pneu de moto no barro atrás do estabelecimento; um suspeito possui moto vermelha." "Vizinho anotou placa parcial de um Fusca azul saindo às 21:30." "Homem foi avistado pilotando umamoto esportiva preta."
 Relação: O veículo deve coincidir com o de um suspeito (cor, modelo, uso).
-A depender do crime veículo não será avistado. Exemplo: Cibercrimes (garantir a lógica da narrativa)
+A depender do crime veículo não será avistado. **garantir a lógica e coerência da narrativa**
 
 ### REGRAS DE USO DAS PISTAS
 
@@ -126,7 +126,9 @@ A depender do crime veículo não será avistado. Exemplo: Cibercrimes (garantir
 - Pistas = fontes da investigação (perícia, registros, vestígios). Testemunhas = depoimentos orais; podem coincidir com pistas, mas não são a origem delas.
 - Cada pista deve ter relação direta com o caso e com pelo menos um suspeito.
 - Pistas e depoimentos verdadeiros não podem contradizer a solução.
+- É obrigatório que as pistas tenham coerência com o caso.
 - O jogador precisa cruzar pistas, depoimentos e descrição para chegar à solução.
+- Com excessão da pista **Álibi que pode ser falso ou não**, uma pista não deve ser completamente falsa, pode no máximo ser parcialmente falsa.
 
 ---
 
@@ -137,10 +139,12 @@ A depender do crime veículo não será avistado. Exemplo: Cibercrimes (garantir
 - Sempre declarar **cargo ou função** ou quem ele ou ela é na história (ex: cliente, morador, mãe de alguém).
 - Entre as testemunhas será permitido **no máximo 1 suspeito** como testemunha.
 - Cada testemunha dá sua versão (alguma versão pode ser falsa). Indicar **[VERDADEIRA]** ou **[PODE SER FALSA]**.
+- Um depoimento com a tag **[PODE SER FALSA]** pode ser verdadeiro ou falso.
+- Sempre haverá 2 depoimentos com a tag **[PODE SER FALSA]** 
 - Use informações discretas: "Suspeito parecia um homem forte" (indica que provavelmente não é mulher).
 - **Falsos positivos:** depoimentos falsos podem indicar comportamento de outro suspeito.
 - Alguma testemunha com vínculo com o suspeito pode declarar depoimento falso ou verdadeiro.
-- Use elementos que simulem veracidade nos depoimentos.
+- Use elementos que simulem veracidade nos depoimentos e garanta de alguns depoimentos serão mais detalhados. 
 - Use tensão e mistério nos depoimentos: "ouvi boatos que..", "fiquei assustada..", "ouvi um barulho..".
 - Use registros incompletos. Use horários aproximados (ex: por volta de 19:00).
 - Álibi ou testemunhas próximas (esposa, mãe, filhos) podem ou não estar falando a verdade.
@@ -151,10 +155,11 @@ A depender do crime veículo não será avistado. Exemplo: Cibercrimes (garantir
 
 - Sempre haverão **4 suspeitos**.
 - Suspeitos podem ser: funcionários, mãe, marido, estagiário, encanador, morador, turista, e qualquer outra coisa.
-- Sempre declarar **nome e sobrenome**.
-- Descrever **cargo ou função** ou quem ele é na história (ex: cliente, morador, funcionário, gerente, encanador).
+- É obrigatório sempre declarar **Nome e Sobrenome**.
+- É obrigatório sempre descrever **cargo ou função** ou quem ele é na história (ex: cliente, morador, funcionário, gerente, encanador).
 - **Histórico:** se já teve passagem pela polícia e o motivo, ou "Sem antecedentes".
 - **Todo suspeito terá uma Característica.** Exemplos: Cabelos longos até os ombros, Usa óculos de aro grosso, Costuma usar jaqueta de couro, Anda sempre de boné, Usa brincos grandes dourados, Costuma usar camisa azul, Usa tênis branco, Tem barba por fazer, Cabelo cacheado, Usa pulseira de prata. Crie característica de acordo com o caso. (Evite "usa calça jeans"; use "costuma usar calça jeans").
+- É obrigatório que caratacteristicas sejas coerentes com o sexo do suspeito.
 - **Todo suspeito terá um Comportamento.** Exemplos: Foi direto ao local sem hesitar, Parecia nervoso perto do caixa, Saiu correndo após o crime, Ficou observando a vitrine antes de entrar, Pediu para trocar de nota várias vezes, Desviou o olhar quando questionado, Conhecia o layout da loja, Entrou e saiu em menos de 5 minutos, Foi ao banheiro antes do crime, Fingiu estar procurando algo na estante. Crie comportamento de acordo com o caso.
 - **Todo suspeito terá um Veículo:** Exemplos: Carro conversível vermelho, bicicleta, moto esportiva ou outro meio de transporte, costuma andar a pé. Declare o veículo como comentário. Exemplo: "Geralmente avistado pilotando uma moto esportiva preta."
 - **Correlações:** características devem conectar a pistas, testemunhas e descrição. Alguma menção que conecta ao suspeito.
@@ -165,7 +170,8 @@ A depender do crime veículo não será avistado. Exemplo: Cibercrimes (garantir
 
 ## LOCAIS (4 opções) e MÉTODOS (4 opções)
 
-- use métodos bem distintos, para que eles não sejam confundidos, exemplo: furto e roubo, podem ser confundidos por parecer a mesma coisa.
+- É Obrigatório que o local do crime seja específico. Ex: na sessão de fitas raras, no CDP do banco, no estoque, na área administrativa da loja. 
+- use métodos bem distintos, não use métodos similares para que eles não sejam confundidos.
 
 ---
 
@@ -180,7 +186,9 @@ A depender do crime veículo não será avistado. Exemplo: Cibercrimes (garantir
 
 - Texto completo: descrição, solução e dados que levam à prova do caso.
 - **PROVE** por que o culpado é o correto e por que os outros 3 NÃO são.
-- **PROVE:** Suspeito, Local e Método.
+- **PROVE:** Suspeito.
+- **PROVE:** Local.
+- **PROVE:** Método.
 - **Declarar falsos positivos**, se houver.
 
 ---

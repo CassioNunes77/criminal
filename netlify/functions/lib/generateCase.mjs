@@ -64,7 +64,7 @@ function getPrompt(dateStr, caseNumber, caseCode, temaOverride) {
 - ${dateInstruction}
 
 ## TÍTULO E DESCRIÇÃO DO CASO
-- Título do caso deve ser apenas o nome do caso. Exemplos: (FURTO DE.., Cibercrime em.., ROUBO EM..) NÃO usar títulos como: (caso de furto, caso de...).
+- Título do caso deve ser apenas o nome do caso. Exemplos: (FURTO DE (preencha com um título que tenha correlação com o tema).., Cibercrime em (preencha com um título que tenha correlação com o tema).., ROUBO EM..(preencha com um título que tenha correlação com o tema)) NÃO usar títulos como: (caso de furto, caso de...).
 - É obrigatório que o título seja coerente com a descrição do caso.
 - Crie uma descrição narrativa de um caso.
 - Crie descrição narrativa em tom investigativo, misterioso, tenso, sentimento investigativo. A descrição do caso tem que ser uma sinopse de uma boa história, como um caso de Carmen Sandiego ou Sherlock Holmes, ambientado nos anos 80.
@@ -161,7 +161,7 @@ A depender do crime veículo não será avistado. Garantir a lógica e coerênci
 - Garanta a lógica: com todas as testemunhas, pistas e descrição será possível chegar a apenas um resultado correto. Faça de forma sutil, para não deixar o jogo simples demais.
 
 ## LOCAIS (4 opções) e MÉTODOS (4 opções)
-- É obrigatório que o local do crime seja específico. Ex: na seção de raros, no CPD do banco, no estoque, na área administrativa da loja.
+- É obrigatório que o local do crime seja específico. Ex: na sessão de fitas raras, no CPD do banco, no estoque, na área administrativa da loja.
 - Use métodos bem distintos, não use métodos similares para que eles não sejam confundidos.
 
 ## SOLUÇÃO

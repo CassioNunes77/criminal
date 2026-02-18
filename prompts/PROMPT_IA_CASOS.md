@@ -61,7 +61,7 @@ Gere um novo caso criminal para o jogo Nexo Terminal. O caso gerado DEVE obedece
 
 ## TÍTULO E DESCRIÇÃO DO CASO
 
-- **Título do caso** deve ser apenas o nome do caso. Exemplos: (FURTO DE.., Cibercrime em.., ROUBO EM..) NÃO usar títulos como: (caso de furto, caso de...)
+- **Título do caso** deve ser apenas o nome do caso. Exemplos: (FURTO DE (preencha com um titulo que tenha correlaçao com o tema).., Cibercrime em (preencha com um titulo que tenha correlaçao com o tema).., ROUBO EM..(preencha com um titulo que tenha correlaçao com o tema)) NÃO usar títulos como: (caso de furto, caso de...)
 - É obrigatório que o título seja coerente com a descrição do caso.
 - Crie uma **descriçao narrativa de um caso**
 - Crie descrição narrativa em tom **investigativo, misterioso, tenso**, sentimento investigativo, a descrição do caso tem que ser uma sinopse de uma boa história, como um caso de carmen sandiego ou sherlok holmes, ambientado nos anos 80.
@@ -135,8 +135,9 @@ A depender do crime veículo não será avistado. **garantir a lógica e coerên
 ## TESTEMUNHAS (5)
 
 - Crie 5 testemunhas relacionadas com o caso.
-- Sempre declarar **nome e sobrenome** das testemunhas.
-- Sempre declarar **cargo ou função** ou quem ele ou ela é na história (ex: cliente, morador, mãe de alguém).
+- Sempre criar **nome e sobrenome** das testemunhas.
+- Sempre declarar **cargo ou função** ou quem ele ou ela é na história.
+ (exemplos: João Pedro (cliente), Carlos Almeida (morador), Zuleide (mãe de Carlos)).
 - Entre as testemunhas será permitido **no máximo 1 suspeito** como testemunha.
 - Cada testemunha dá sua versão (alguma versão pode ser falsa). Indicar **[VERDADEIRA]** ou **[PODE SER FALSA]**.
 - Um depoimento com a tag **[PODE SER FALSA]** pode ser verdadeiro ou falso.

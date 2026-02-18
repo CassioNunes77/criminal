@@ -113,7 +113,7 @@ Relação: A evidência deve apontar para características físicas ou objetos d
 Indícios de veículo usado (marcas, descrições, registros).
 Exemplos: "Marcas de pneu de moto no barro atrás do estabelecimento; um suspeito possui moto vermelha." "Vizinho anotou placa parcial de um Fusca azul saindo às 21:30." "Homem foi avistado pilotando uma moto esportiva preta."
 Relação: O veículo deve coincidir com o de um suspeito (cor, modelo, uso).
-A depender do crime veículo não será avistado. Garantir a lógica e coerência da narrativa.
+A depender do crime veículo não será avistado. **garantir a lógica e coerência da narrativa**
 
 ### REGRAS DE USO DAS PISTAS
 - Pistas vêm da investigação: registros, perícia, documentos, câmeras, vestígios.
@@ -132,8 +132,8 @@ A depender do crime veículo não será avistado. Garantir a lógica e coerênci
 
 ## TESTEMUNHAS (5)
 - Crie 5 testemunhas relacionadas com o caso.
-- Sempre declarar nome e sobrenome das testemunhas.
-- Sempre declarar cargo ou função ou quem ele ou ela é na história (ex: cliente, morador, mãe de alguém).
+- Sempre criar nome e sobrenome das testemunhas.
+- Sempre declarar cargo ou função ou quem ele ou ela é na história. (exemplos: João Pedro (cliente), Carlos Almeida (morador), Zuleide (mãe de Carlos)).
 - Entre as testemunhas será permitido no máximo 1 suspeito como testemunha.
 - Cada testemunha dá sua versão (alguma versão pode ser falsa). Indicar [VERDADEIRA] ou [PODE SER FALSA].
 - Um depoimento com a tag [PODE SER FALSA] pode ser verdadeiro ou falso.
@@ -161,8 +161,8 @@ A depender do crime veículo não será avistado. Garantir a lógica e coerênci
 - Garanta a lógica: com todas as testemunhas, pistas e descrição será possível chegar a apenas um resultado correto. Faça de forma sutil, para não deixar o jogo simples demais.
 
 ## LOCAIS (4 opções) e MÉTODOS (4 opções)
-- É obrigatório que o local do crime seja específico. Ex: na sessão de fitas raras, no CPD do banco, no estoque, na área administrativa da loja.
-- Use métodos bem distintos, não use métodos similares para que eles não sejam confundidos.
+- É Obrigatório que o local do crime seja específico. Ex: na sessão de fitas raras, no CDP do banco, no estoque, na área administrativa da loja.
+- use métodos bem distintos, não use métodos similares para que eles não sejam confundidos.
 
 ## SOLUÇÃO
 - suspect no formato "Nome, cargo" (exatamente das listas).
@@ -218,15 +218,25 @@ export async function runGenerateCase(opts = {}) {
   })()
 
   const crimesRef = db.collection('crimes')
+  const metaRef = db.collection('_meta').doc('counters')
 
   // Tema: aleatório quando não informado
   const temaFinal = tema || TEMAS_ALEATORIOS[Math.floor(Math.random() * TEMAS_ALEATORIOS.length)]
 
-  // caseNumber: derivado da data (YYYYMMDD % 9999 + 1) para referência por data
+  // caseNumber: sequencial via transação atômica em _meta/counters
   let caseNumber = forceCaseNumber
   if (caseNumber == null) {
-    const dateNum = parseInt(dateStr.replace(/-/g, ''), 10)
-    caseNumber = (dateNum % 9999) + 1
+    try {
+      caseNumber = await db.runTransaction(async (transaction) => {
+        const metaDoc = await transaction.get(metaRef)
+        const next = (metaDoc.exists ? (metaDoc.data().lastCaseNumber || 0) : 0) + 1
+        transaction.set(metaRef, { lastCaseNumber: next }, { merge: true })
+        return next
+      })
+    } catch (e) {
+      console.warn('Could not get case number from transaction:', e.message)
+      caseNumber = 1
+    }
   }
 
   const caseCode = generateCaseCode()
@@ -274,11 +284,19 @@ export async function runGenerateCase(opts = {}) {
     }
   })
 
+  const caseNumStr = String(caseNumber).padStart(4, '0')
+
   const ensureDescArr = (desc) => {
     if (Array.isArray(desc)) return desc.map(l => (typeof l === 'string' ? l : String(l ?? '')))
     if (typeof desc === 'string') return desc.split('\n')
     if (desc && typeof desc === 'object') return Object.values(desc).map(v => (typeof v === 'string' ? v : String(v ?? '')))
     return []
+  }
+
+  // Garante que descrição e dossier usem o caseNumber correto (a IA pode gerar número errado)
+  const fixCaseNumberRefs = (text) => {
+    if (typeof text !== 'string') return text
+    return text.replace(/\bCASO\s*#\s*\d+/gi, `CASO #${caseNumStr}`)
   }
 
   const normalizeWitness = (w) => {
@@ -299,19 +317,23 @@ export async function runGenerateCase(opts = {}) {
   }
   const witnesses = (crime.witnesses || []).map(normalizeWitness)
 
+  const rawDesc = ensureDescArr(crime.description)
+  const description = rawDesc.map(line => fixCaseNumberRefs(line))
+  const dossier = fixCaseNumberRefs(crime.dossier || '')
+
   const document = {
     type: crime.type || 'CRIME',
     location: crime.location || '',
     time: crime.time || '',
-    description: ensureDescArr(crime.description),
+    description,
     suspects,
     locations: crime.locations || [],
     methods: crime.methods || [],
     clues: (crime.clues || []).map(c => ({ type: c.type || '', text: c.text || '' })),
     witnesses,
     solution: crime.solution || {},
-    dossier: crime.dossier || '',
-    caseNumber: String(caseNumber).padStart(4, '0'),
+    dossier,
+    caseNumber: caseNumStr,
     caseCode,
     createdAt: new Date().toISOString(),
     date: dateStr

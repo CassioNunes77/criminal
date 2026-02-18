@@ -53,7 +53,7 @@ function getPrompt(dateStr, caseNumber, caseCode, temaOverride) {
 - Não pode existir testemunha que resolve o caso sozinha.
 
 ## IDIOMA E QUALIDADE
-- Caso será escrito em pt-BR, sem erros gramaticais.
+- Caso será escrito em pt-BR, garanta que todas as palavras estejas corretamente digitadas sem erros gramaticais.
 
 ## DADOS DO CASO (uso interno – NUNCA incluir data em campos do JSON)
 - Data do caso (data real, para registro na base de dados): ${dateStr}

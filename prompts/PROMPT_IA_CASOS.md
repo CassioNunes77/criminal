@@ -44,7 +44,7 @@ Gere um novo caso criminal para o jogo Nexo Terminal. O caso gerado DEVE obedece
 
 ## IDIOMA E QUALIDADE
 
-- Caso será escrito em pt-BR, sem erros gramaticais.
+- Caso será escrito em pt-BR, garanta que todas as palavras estejas corretamente digitadas sem erros gramaticais.
 
 ---
 

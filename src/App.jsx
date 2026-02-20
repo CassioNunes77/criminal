@@ -4,6 +4,7 @@ import CaseDescription from './components/CaseDescription'
 import Investigation from './components/Investigation'
 import Result from './components/Result'
 import Dossier from './components/Dossier'
+import Stats from './components/Stats'
 import LoadingScreen from './components/LoadingScreen'
 import { getDailyCrimeFromFirebase, normalizeCrime } from './utils/crimeService'
 import { getDailyCrime } from './utils/dailySeed'
@@ -181,7 +182,9 @@ function App() {
     if (currentCrime) {
       localStorage.setItem(`crime_${currentCrime.id}`, JSON.stringify({
         ...state,
-        date: new Date().toDateString()
+        date: new Date().toDateString(),
+        caseCode: currentCrime.caseCode,
+        caseNumber: currentCrime.caseNumber
       }))
     }
   }
@@ -205,6 +208,7 @@ function App() {
           crime={currentCrime}
           streak={investigationState.streak}
           onStart={startInvestigation}
+          onShowStats={() => setScreen('stats')}
         />
       )}
       {screen === 'caseDescription' && (
@@ -240,6 +244,9 @@ function App() {
           crime={currentCrime}
           onBack={() => setScreen('result')}
         />
+      )}
+      {screen === 'stats' && (
+        <Stats onBack={() => setScreen('home')} />
       )}
     </div>
   )

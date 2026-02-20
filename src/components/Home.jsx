@@ -2,7 +2,7 @@ import { useState, useEffect, useRef } from 'react'
 import './Home.css'
 import { TypewriterSound } from '../utils/typewriterSound'
 
-function Home({ crime, streak, onStart }) {
+function Home({ crime, streak, onStart, onShowStats }) {
   const [displayedText, setDisplayedText] = useState('')
   const [showCursor, setShowCursor] = useState(true)
   const [titleAnimationComplete, setTitleAnimationComplete] = useState(false)
@@ -216,6 +216,7 @@ function Home({ crime, streak, onStart }) {
         if (e.key === 'Enter') {
           e.preventDefault()
           const cmd = commandInput.trim().toUpperCase()
+          const cmdLower = commandInput.trim().toLowerCase()
           if (cmd === 'INICIAR') {
             onStart(x7ActiveRef.current || chk() ? { x: 1 } : undefined)
           } else if (cmd === 'ARQUIVO') {
@@ -224,6 +225,8 @@ function Home({ crime, streak, onStart }) {
             setShowInfo(true)
           } else if (cmd === '#*NEXO77') {
             x7ActiveRef.current = true
+          } else if (onShowStats && cmdLower === (typeof atob !== 'undefined' ? atob('c3RhdHM3Nw==') : 'stats77')) {
+            onShowStats()
           }
           prevCommandRef.current = ''
           setCommandInput('')

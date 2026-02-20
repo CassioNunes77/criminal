@@ -1,0 +1,117 @@
+.stats-screen {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 16px;
+  font-family: 'IBM Plex Mono', monospace;
+}
+
+.stats-header {
+  margin-bottom: 24px;
+}
+
+.stats-title {
+  font-size: 18px;
+  color: var(--text-highlight, #00CC55);
+  margin: 0 0 8px 0;
+}
+
+.stats-subtitle {
+  font-size: 12px;
+  color: var(--text-secondary, #00AA44);
+  margin: 0;
+}
+
+.stats-summary {
+  background: rgba(0, 0, 0, 0.3);
+  border: 1px solid rgba(0, 204, 85, 0.3);
+  padding: 16px;
+  margin-bottom: 24px;
+}
+
+.stats-summary-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 4px 0;
+  font-size: 14px;
+}
+
+.stats-value {
+  color: var(--text-highlight, #00CC55);
+}
+
+.stats-value.highlight {
+  color: #00FF66;
+}
+
+.stats-table-section h3 {
+  font-size: 14px;
+  color: var(--text-secondary, #00AA44);
+  margin-bottom: 12px;
+}
+
+.stats-table {
+  border: 1px solid rgba(0, 204, 85, 0.3);
+  margin-bottom: 24px;
+}
+
+.stats-table-header,
+.stats-table-row {
+  display: grid;
+  grid-template-columns: 90px 1fr 50px 90px 60px 50px;
+  gap: 8px;
+  padding: 8px 12px;
+  font-size: 12px;
+}
+
+.stats-table-header {
+  background: rgba(0, 204, 85, 0.1);
+  color: var(--text-secondary, #00AA44);
+  font-weight: 600;
+}
+
+.stats-table-row {
+  border-top: 1px solid rgba(0, 204, 85, 0.15);
+}
+
+.stats-code {
+  font-family: monospace;
+  color: var(--text-highlight, #00CC55);
+  word-break: break-all;
+}
+
+.status-ok {
+  color: #00FF66;
+}
+
+.status-fail {
+  color: #CC5500;
+}
+
+.stats-empty {
+  padding: 24px;
+  text-align: center;
+  color: var(--text-secondary, #00AA44);
+}
+
+.stats-back {
+  background: transparent;
+  border: 1px solid var(--text-highlight, #00CC55);
+  color: var(--text-highlight, #00CC55);
+  padding: 10px 20px;
+  font-family: inherit;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.stats-back:hover {
+  background: rgba(0, 204, 85, 0.2);
+}
+
+@media (max-width: 600px) {
+  .stats-table-header,
+  .stats-table-row {
+    grid-template-columns: 70px 1fr 40px 80px 50px 40px;
+    font-size: 11px;
+    padding: 6px 8px;
+  }
+}

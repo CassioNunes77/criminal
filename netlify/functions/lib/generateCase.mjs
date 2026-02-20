@@ -213,8 +213,7 @@ export async function runGenerateCase(opts = {}) {
 
   const db = getFirestore()
   const dateStr = dateOverride || (() => {
-    const now = new Date()
-    return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`
+    return new Date().toLocaleDateString('en-CA', { timeZone: 'America/Sao_Paulo' }) // YYYY-MM-DD
   })()
 
   const crimesRef = db.collection('crimes')
@@ -223,19 +222,37 @@ export async function runGenerateCase(opts = {}) {
   // Tema: aleatório quando não informado
   const temaFinal = tema || TEMAS_ALEATORIOS[Math.floor(Math.random() * TEMAS_ALEATORIOS.length)]
 
-  // caseNumber: sequencial via transação atômica em _meta/counters
+  // caseNumber: ao regenerar caso existente (dateOverride + doc existe), preserva número e NÃO incrementa contador
   let caseNumber = forceCaseNumber
+  if (caseNumber == null && dateOverride) {
+    const existingDoc = await crimesRef.doc(dateStr).get()
+    if (existingDoc.exists) {
+      const existingNum = existingDoc.data().caseNumber
+      if (existingNum != null) {
+        const parsed = typeof existingNum === 'number' ? existingNum : parseInt(String(existingNum), 10)
+        if (!isNaN(parsed) && parsed > 0) caseNumber = parsed
+      }
+    }
+  }
   if (caseNumber == null) {
-    try {
-      caseNumber = await db.runTransaction(async (transaction) => {
-        const metaDoc = await transaction.get(metaRef)
-        const next = (metaDoc.exists ? (metaDoc.data().lastCaseNumber || 0) : 0) + 1
-        transaction.set(metaRef, { lastCaseNumber: next }, { merge: true })
-        return next
-      })
-    } catch (e) {
-      console.warn('Could not get case number from transaction:', e.message)
-      caseNumber = 1
+    let lastError
+    for (let attempt = 1; attempt <= 3; attempt++) {
+      try {
+        caseNumber = await db.runTransaction(async (transaction) => {
+          const metaDoc = await transaction.get(metaRef)
+          const next = (metaDoc.exists ? (metaDoc.data().lastCaseNumber || 0) : 0) + 1
+          transaction.set(metaRef, { lastCaseNumber: next }, { merge: true })
+          return next
+        })
+        break
+      } catch (e) {
+        lastError = e
+        console.warn(`Transaction attempt ${attempt}/3 failed:`, e.message)
+        if (attempt < 3) await new Promise(r => setTimeout(r, 500 * attempt))
+      }
+    }
+    if (caseNumber == null) {
+      throw new Error(`Falha ao obter número do caso (contador _meta): ${lastError?.message || 'unknown'}`)
     }
   }
 

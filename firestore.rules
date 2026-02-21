@@ -8,5 +8,9 @@ service cloud.firestore {
     match /_meta/{document} {
       allow read, write: if false;
     }
+    match /gameStats/{document} {
+      allow read: if true;
+      allow write: if true;
+    }
   }
 }

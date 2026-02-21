@@ -31,6 +31,10 @@ Um caso novo é gerado por IA todo dia às 00:00 (America/Sao_Paulo). O mesmo ca
 **Coleção:** `_meta` (interno)  
 **Documento:** `counters` – contador para `lastCaseNumber`
 
+**Coleção:** `gameStats` (leitura/escrita do app)  
+- **Documento:** `_summary` – totais globais: `totalPlayed`, `totalSolved`, `totalFailed`
+- **Documento ID:** `YYYY-MM-DD` – por dia: `caseCode`, `caseNumber`, `caseDate`, `played`, `solved`, `failed`
+
 ### Formato do documento (crimes)
 
 ```json

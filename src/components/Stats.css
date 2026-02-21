@@ -57,7 +57,7 @@
 .stats-table-header,
 .stats-table-row {
   display: grid;
-  grid-template-columns: 90px 1fr 50px 90px 60px 50px;
+  grid-template-columns: 90px 1fr 50px 70px 80px 60px;
   gap: 8px;
   padding: 8px 12px;
   font-size: 12px;
@@ -107,10 +107,22 @@
   background: rgba(0, 204, 85, 0.2);
 }
 
+.stats-local-section {
+  margin-top: 24px;
+  padding-top: 16px;
+  border-top: 1px solid rgba(0, 204, 85, 0.3);
+}
+
+.stats-local-section h3 {
+  font-size: 14px;
+  color: var(--text-secondary, #00AA44);
+  margin-bottom: 12px;
+}
+
 @media (max-width: 600px) {
   .stats-table-header,
   .stats-table-row {
-    grid-template-columns: 70px 1fr 40px 80px 50px 40px;
+    grid-template-columns: 70px 1fr 40px 50px 60px 50px;
     font-size: 11px;
     padding: 6px 8px;
   }

@@ -78,7 +78,7 @@ function Result({ crime, state, onBack, onBackToInvestigation, onViewDossier }) 
   const shareWitnessesBar = '[' + '■'.repeat(Math.min(witnessesCount || 0, totalWitnesses)) + '□'.repeat(Math.max(0, totalWitnesses - (witnessesCount || 0))) + ']'
   const shareAttemptsBar = '[' + '■'.repeat(Math.min(displayStats.attempts || 0, maxAttempts)) + '□'.repeat(Math.max(0, maxAttempts - (displayStats.attempts || 0))) + ']'
   
-  const statusShare = state.solved ? 'RESOLVIDO' : 'ENCERRADO'
+  const statusShare = state.solved ? 'RESOLVIDO' : 'FALHOU'
   const shareText = `CASO #${crime.caseNumber || String(crime.id).slice(-3)} - ${statusShare}
 
 ${accuracy}% DE PRECISÃO.

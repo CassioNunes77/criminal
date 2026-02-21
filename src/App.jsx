@@ -8,6 +8,7 @@ import Stats from './components/Stats'
 import LoadingScreen from './components/LoadingScreen'
 import { getDailyCrimeFromFirebase, normalizeCrime } from './utils/crimeService'
 import { getDailyCrime } from './utils/dailySeed'
+import { recordPlay } from './utils/gameStatsService'
 import './App.css'
 
 function App() {
@@ -165,14 +166,16 @@ function App() {
     
     setInvestigationState(newState)
     saveState(newState)
+
+    const caseEnded = isCorrect || currentAttempts >= maxAttempts
+    if (caseEnded) {
+      recordPlay(currentCrime, isCorrect)
+    }
     
     if (isCorrect) {
       setScreen('result')
     } else if (currentAttempts >= maxAttempts) {
-      // Case failed, show failure screen
-      setTimeout(() => {
-        setScreen('result')
-      }, 3000)
+      setTimeout(() => setScreen('result'), 3000)
     }
     
     return isCorrect

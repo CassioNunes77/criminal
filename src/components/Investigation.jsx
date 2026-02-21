@@ -6,6 +6,7 @@ import './Investigation.css'
 function Investigation({ crime, state, onDiscoverClue, onViewWitness, onMakeAccusation, onBack, onViewResult, x7 }) {
   const typewriterSoundRef = useRef(null)
   const lastClueRevealTimeRef = useRef(0)
+  const lastNavWasKeyboardRef = useRef(false)
   const [showAccusation, setShowAccusation] = useState(false)
   const [selectedSuspect, setSelectedSuspect] = useState(null)
   const [selectedLocation, setSelectedLocation] = useState(null)
@@ -153,18 +154,20 @@ function Investigation({ crime, state, onDiscoverClue, onViewWitness, onMakeAccu
     setSelectedFocusIndex(prev => (prev > max ? max : prev))
   }, [focusableItems.length])
 
-  // Desktop: scroll sincronizado com o cursor ao navegar com setas (exceto ao revelar pistas)
+  // Desktop: scroll sincronizado com o cursor APENAS ao navegar com setas (não ao clicar com mouse)
   useEffect(() => {
     if (window.innerWidth < 769) return
-    if (Date.now() - lastClueRevealTimeRef.current < 200) return // Não rolar ao revelar pista
+    if (!lastNavWasKeyboardRef.current) return
+    if (Date.now() - lastClueRevealTimeRef.current < 200) return
     const focusedItem = focusableItems[selectedFocusIndex]
-    if (focusedItem?.type === 'clue') return // Não rolar ao navegar entre pistas
+    if (focusedItem?.type === 'clue') return
     const el = document.querySelector('.investigation .terminal-content [data-focused="true"]')
     if (el) {
       requestAnimationFrame(() => {
         el.scrollIntoView({ behavior: 'smooth', block: 'center' })
       })
     }
+    lastNavWasKeyboardRef.current = false
   }, [selectedFocusIndex, accusationFocusIndex, selectedWitnessIndex, showWitnesses, showAccusation, focusableItems])
 
   // Reset accusationFocusIndex ao abrir formulário de acusação
@@ -269,9 +272,11 @@ function Investigation({ crime, state, onDiscoverClue, onViewWitness, onMakeAccu
         ]
         if (e.key === 'ArrowDown') {
           e.preventDefault()
+          lastNavWasKeyboardRef.current = true
           setAccusationFocusIndex(prev => Math.min(prev + 1, accItems.length - 1))
         } else if (e.key === 'ArrowUp') {
           e.preventDefault()
+          lastNavWasKeyboardRef.current = true
           setAccusationFocusIndex(prev => Math.max(prev - 1, 0))
         } else if (e.key === 'Enter') {
           e.preventDefault()
@@ -291,6 +296,7 @@ function Investigation({ crime, state, onDiscoverClue, onViewWitness, onMakeAccu
           .filter(i => !witnessesViewed.includes(i))
         if (e.key === 'ArrowDown') {
           e.preventDefault()
+          lastNavWasKeyboardRef.current = true
           if (selectedWitnessIndex >= witnessButtons.length - 1) {
             setWitnessNavActive(false)
             const suspectsIdx = availableClues.length + 1
@@ -300,6 +306,7 @@ function Investigation({ crime, state, onDiscoverClue, onViewWitness, onMakeAccu
           }
         } else if (e.key === 'ArrowUp') {
           e.preventDefault()
+          lastNavWasKeyboardRef.current = true
           if (selectedWitnessIndex === 0) {
             setWitnessNavActive(false)
             const cluesIdx = Math.max(0, availableClues.length - 1)
@@ -324,9 +331,11 @@ function Investigation({ crime, state, onDiscoverClue, onViewWitness, onMakeAccu
         // Navegação por setas: pula entre itens focáveis (pistas + botões)
         if (e.key === 'ArrowDown') {
           e.preventDefault()
+          lastNavWasKeyboardRef.current = true
           setSelectedFocusIndex(prev => Math.min(prev + 1, focusableItems.length - 1))
         } else if (e.key === 'ArrowUp') {
           e.preventDefault()
+          lastNavWasKeyboardRef.current = true
           setSelectedFocusIndex(prev => Math.max(prev - 1, 0))
         } else if (e.key === 'Enter') {
           e.preventDefault()
@@ -362,8 +371,12 @@ function Investigation({ crime, state, onDiscoverClue, onViewWitness, onMakeAccu
     return <CaseView crime={crime} onBack={() => setShowCaseView(false)} />
   }
 
+  const handleMouseInteraction = () => {
+    lastNavWasKeyboardRef.current = false
+  }
+
   return (
-    <div className="investigation">
+    <div className="investigation" onMouseDown={handleMouseInteraction} onPointerDown={handleMouseInteraction}>
       <div className="terminal-header">
         <div className="separator separator-full-width">{'═'.repeat(150)}</div>
         <div className="case-title-animated" style={{

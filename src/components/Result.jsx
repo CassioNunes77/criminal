@@ -151,7 +151,7 @@ https://nexoterminal.netlify.app/`
       <div className="terminal-header">
         <div className="separator separator-full-width">{'═'.repeat(150)}</div>
         <div className={`title ${state.solved ? 'flash-green' : 'error'}`}>
-          {state.solved ? 'CASO RESOLVIDO' : 'CASO ENCERRADO'}
+          {state.solved ? 'CASO RESOLVIDO' : 'CASO ENCERRADO. VOCE FALHOU.'}
         </div>
         <div className="separator separator-full-width">{'═'.repeat(150)}</div>
       </div>
@@ -171,8 +171,14 @@ https://nexoterminal.netlify.app/`
         </div>
 
         {state.solved && (
-          <div className="solution-destination" style={{ marginTop: '12px', fontStyle: 'italic', fontSize: '13px', opacity: 0.9 }}>
-            O indiciado foi detido e conduzido à delegacia, ficando à disposição do Juízo para os devidos esclarecimentos.
+          <div className="solution-destination">
+            O suspeito foi detido e conduzido à delegacia, ficando à disposição do Juízo para os devidos esclarecimentos à Justiça.
+          </div>
+        )}
+
+        {!state.solved && isFailed && (
+          <div className="solution-destination solution-destination-failed">
+            O suspeito deixou de ser localizado. O caso foi encerrado sem conclusão e o indivíduo permanece em liberdade, aguardando novas diligências.
           </div>
         )}
 

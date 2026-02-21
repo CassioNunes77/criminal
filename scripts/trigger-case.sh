@@ -1,6 +1,7 @@
 #!/bin/bash
 # Atualiza o caso do dia pela DATA (referência por data, não por número do caso).
 # O caso é salvo/atualizado no documento da data (ex: 2025-02-09).
+# Se a data JÁ tem caso: preserva o número do caso e NÃO incrementa o contador.
 # Tema ALEATÓRIO por padrão. Use TEMA=... apenas se quiser tema fixo.
 #
 # Uso:

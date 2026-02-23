@@ -84,9 +84,9 @@ Exemplos: "Registro de ponto indica que o último funcionário saiu às 18:45; o
 Relação: O horário deve eliminar ou apontar suspeitos conforme seus álibis, rotinas ou possibilidade de estar no local.
 
 ### 2. LOCAL
-Apresentar Indícios do local exato do crime, sem declarar literalmente onde foi o local. (vestígios, sinais, objetos, layout).
+Apresentar Indícios do local exato do crime, sem declarar literalmente onde foi o local. (vestígios, sinais, objetos, layout). Ex: 'x' vestigio foi encontrado no local 'x'.
 - Esse campo vai sugerir indícios no local do crime. (no balcão.., na sessão.., na área.. e qualquer outro local específico, dentro da cena do crime)
-Relação: O local deve ser coerente com o método e com quem tinha acesso ou conhecimento do espaço.
+Relação: O local deve ser coerente com o método e com quem tinha acesso ou conhecimento do local.
 
 ### 3. ACESSO
 Como o autor chegou ao local (chaves, entradas, conhecimento do lugar).
@@ -171,8 +171,10 @@ A depender do crime veículo não será avistado. **garantir a lógica e coerên
 
 ## LOCAIS (4 opções) e MÉTODOS (4 opções)
 
-- É Obrigatório que o local do crime seja específico. Ex: na sessão de fitas raras, no CDP do banco, no estoque, na área administrativa da loja. 
-- use métodos bem distintos, não use métodos similares para que eles não sejam confundidos.
+- É Obrigatório que o local do crime seja específico.
+- É Obrigatório que o local esteja declarado em uma pista ou depoimento ou na descrição do caso.
+- Use Métodos bem distintos, não use métodos similares para que eles não sejam confundidos.
+- É Obrigatório que o Método esteja declarado em uma pista ou depoimento ou na descrição do caso.
 
 ---
 

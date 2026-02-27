@@ -25,6 +25,17 @@ Gere um novo caso criminal para o jogo Nexo Terminal. O caso gerado DEVE obedece
 
 ---
 
+## REFINAMENTO NARRATIVO E COERÊNCIA TOTAL (OBRIGATÓRIO)
+
+- **Sem pontas soltas:** toda informação relevante citada deve ser retomada e ter função lógica na solução.
+- **Vínculo obrigatório da solução:** **método**, **local** e **horário** devem aparecer com evidência em pelo menos **2 fontes independentes** (descrição, pistas ou testemunhas verdadeiras).
+- **Horário funcional:** a pista HORÁRIO deve estar ligada a um evento verificável (registro, rotina, câmera, relógio, recibo, chamada, abertura/fechamento), não apenas “hora solta”.
+- **Correlação forte:** cada suspeito deve ser testável por pistas e depoimentos; o culpado deve ter maior convergência de evidências.
+- **Narrativa de detetive:** linguagem com tensão investigativa, atmosfera noir dos anos 80, sem perder clareza lógica do jogo.
+- **Dossier conclusivo:** deve fechar o caso sem lacunas, provando com cadeia lógica: fato -> inferência -> conclusão.
+
+---
+
 ## EVIDÊNCIAS OBRIGATÓRIAS
 
 - Deve existir **1 evidência física** (seja na descrição, em alguma testemunha ou pistas).
@@ -82,6 +93,7 @@ Crie exatamente 7 pistas, uma de cada tipo: **HORARIO, LOCAL, ACESSO, ALIBI, COM
 Registros de tempo ligados ao crime (relógios, registros, câmeras, rotinas).
 Exemplos: "Registro de ponto indica que o último funcionário saiu às 18:45; o crime ocorreu entre 19:00 e 19:30." "Relógio de parede parado às 21:17." "Extrato do caixa mostra última operação às 14:22; o furto foi detectado às 15:00."
 Relação: O horário deve eliminar ou apontar suspeitos conforme seus álibis, rotinas ou possibilidade de estar no local.
+- O horário deve obrigatoriamente se conectar com **ação concreta** do caso (entrada, saída, movimentação, desligamento, testemunho com referência temporal ou registro técnico).
 
 ### 2. LOCAL
 Apresentar Indícios do local exato do crime, sem declarar literalmente onde foi o local. (vestígios, sinais, objetos, layout). Ex: 'x' vestigio foi encontrado no local 'x'.
@@ -193,6 +205,9 @@ A depender do crime veículo não será avistado. **garantir a lógica e coerên
 - **PROVE:** Local.
 - **PROVE:** Método.
 - **Declarar falsos positivos**, se houver.
+- Estruture a prova com sequência lógica: **fato observado -> inferência investigativa -> conclusão**.
+- Mostrar por que não há lacunas: explicar como descrição, pistas e testemunhas verdadeiras convergem para a mesma solução.
+- Invalidar claramente alternativas plausíveis dos outros suspeitos.
 
 ---
 

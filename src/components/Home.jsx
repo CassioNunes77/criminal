@@ -120,6 +120,22 @@ function Home({ crime, streak, onStart, onAcceptMission, onShowStats }) {
     setInfoComplete(true)
   }
 
+  const completeMissionAnimation = useCallback(() => {
+    if (window.__cancelMissionAnimation) window.__cancelMissionAnimation()
+    const raw = crime?.description
+    const lines = Array.isArray(raw)
+      ? raw.map(l => (typeof l === 'string' ? l : String(l ?? '')))
+      : typeof raw === 'string'
+        ? raw.split('\n')
+        : raw && typeof raw === 'object'
+          ? Object.values(raw).map(v => (typeof v === 'string' ? v : String(v ?? '')))
+          : []
+    setMissionLines(lines)
+    setMissionCurrentLineIndex(Math.max(0, lines.length - 1))
+    setMissionDots('')
+    setMissionComplete(true)
+  }, [crime])
+
   useEffect(() => {
     const onResize = () => {
       setIsDesktop(window.innerWidth >= 768)
@@ -657,22 +673,6 @@ function Home({ crime, streak, onStart, onAcceptMission, onShowStats }) {
       setMissionComplete(false)
     }
   }, [showMissionPreview, crime])
-
-  const completeMissionAnimation = useCallback(() => {
-    if (window.__cancelMissionAnimation) window.__cancelMissionAnimation()
-    const raw = crime?.description
-    const lines = Array.isArray(raw)
-      ? raw.map(l => (typeof l === 'string' ? l : String(l ?? '')))
-      : typeof raw === 'string'
-        ? raw.split('\n')
-        : raw && typeof raw === 'object'
-          ? Object.values(raw).map(v => (typeof v === 'string' ? v : String(v ?? '')))
-          : []
-    setMissionLines(lines)
-    setMissionCurrentLineIndex(Math.max(0, lines.length - 1))
-    setMissionDots('')
-    setMissionComplete(true)
-  }, [crime])
 
   const dosFiles = [
     { name: 'INICIAR.EXE', action: 'start' },

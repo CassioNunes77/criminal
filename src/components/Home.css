@@ -314,10 +314,12 @@
 
   .dos-panel-left {
     max-width: none;
+    order: 2;
   }
 
   .dos-panel-right {
     min-height: 180px;
+    order: 1;
   }
 
   .dos-hero-line-1 {

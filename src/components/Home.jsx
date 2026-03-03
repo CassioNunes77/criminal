@@ -168,33 +168,30 @@ function Home({ crime, streak, onStart, onShowStats }) {
     return () => clearInterval(interval)
   }, [])
 
-  // CRT monitor glitch effects
+  // CRT monitor glitch effects - intensificados para simulação de monitor velho
   useEffect(() => {
     if (showAbout) return // Don't apply glitches on about screen
 
     const glitchInterval = setInterval(() => {
-      // Random glitch (flicker) - happens more frequently
-      if (Math.random() < 0.35) { // 35% chance (increased from 15%)
+      if (Math.random() < 0.45) {
         setCrtGlitch(true)
-        setTimeout(() => setCrtGlitch(false), 80 + Math.random() * 150) // Longer duration
+        setTimeout(() => setCrtGlitch(false), 100 + Math.random() * 200)
       }
-    }, 1500 + Math.random() * 2000) // Every 1.5-3.5 seconds (more frequent)
+    }, 1000 + Math.random() * 1500)
 
     const flickerInterval = setInterval(() => {
-      // More intense flicker - happens more often
-      if (Math.random() < 0.5) { // 50% chance (increased from 30%)
+      if (Math.random() < 0.6) {
         setCrtFlicker(true)
-        setTimeout(() => setCrtFlicker(false), 30 + Math.random() * 60) // Longer duration
+        setTimeout(() => setCrtFlicker(false), 40 + Math.random() * 80)
       }
-    }, 800 + Math.random() * 1200) // Every 0.8-2 seconds (more frequent)
+    }, 500 + Math.random() * 800)
 
     const distortionInterval = setInterval(() => {
-      // More frequent horizontal distortion
-      if (Math.random() < 0.2) { // 20% chance (increased from 8%)
-        setCrtDistortion(2 + Math.random() * 4) // Stronger distortion (increased from 1-3)
-        setTimeout(() => setCrtDistortion(0), 150 + Math.random() * 300) // Longer duration
+      if (Math.random() < 0.3) {
+        setCrtDistortion(3 + Math.random() * 5)
+        setTimeout(() => setCrtDistortion(0), 200 + Math.random() * 400)
       }
-    }, 2000 + Math.random() * 3000) // Every 2-5 seconds (more frequent)
+    }, 1500 + Math.random() * 2500)
 
     return () => {
       clearInterval(glitchInterval)
@@ -786,15 +783,14 @@ function Home({ crime, streak, onStart, onShowStats }) {
           </div>
         </div>
 
-        {/* Painel direito - mensagem de transferência */}
-        <div className="dos-panel dos-panel-right">
-          <div className="dos-transfer-box">
-            <div className="dos-transfer-title">--TRANSFER-MESSAGE--</div>
-            <div className="dos-transfer-content">
-              OK, sending now. check it
-              <br />
-              out. just run iniciar.exe
-            </div>
+        {/* Painel direito - NEXO TERMINAL em destaque */}
+        <div className="dos-panel dos-panel-right dos-hero-panel">
+          <div className="dos-hero-content">
+            <div className="dos-hero-subtitle">---Proudly Presents---</div>
+            <div className="dos-hero-line dos-hero-line-1">NEXO</div>
+            <div className="dos-hero-line dos-hero-line-2">TERMINAL</div>
+            <div className="dos-hero-subtitle dos-hero-subtitle-2">Full Version of Nexo Terminal</div>
+            <div className="dos-hero-subtitle dos-hero-subtitle-3">Released 1987 · Intelligence Division</div>
           </div>
         </div>
       </div>

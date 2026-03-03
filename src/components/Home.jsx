@@ -207,11 +207,20 @@ function Home({ crime, streak, onStart, onAcceptMission, onShowStats }) {
     }
   }, [showAbout])
 
-  // Keyboard: desktop = command-line mode, mobile = arrow keys, mission = Aceitar/Recusar
+  // Keyboard: desktop = command-line mode, mobile = arrow keys, mission = Aceitar/Recusar, about/info = completar ou VOLTAR
   useEffect(() => {
-    if (showAbout || showInfo) return
-
     const handleKeyDown = (e) => {
+      // ARQUIVO ou INFO: Enter completa animação ou volta
+      if (showAbout || showInfo) {
+        if (e.key === 'Enter') {
+          e.preventDefault()
+          if (showAbout && !aboutComplete) completeAboutAnimation()
+          else if (showInfo && !infoComplete) completeInfoAnimation()
+          else { setShowAbout(false); setShowInfo(false) }
+        }
+        return
+      }
+
       // Quando em preview de missão: completar animação ou Aceitar/Recusar
       if (showMissionPreview) {
         if (e.key === 'Enter') {
@@ -290,45 +299,7 @@ function Home({ crime, streak, onStart, onAcceptMission, onShowStats }) {
 
     window.addEventListener('keydown', handleKeyDown)
     return () => window.removeEventListener('keydown', handleKeyDown)
-  }, [showAbout, showInfo, showMissionPreview, missionComplete, missionButtonSelected, selectedButton, completeMissionAnimation, onAcceptMission, onShowStats, isCommandLineMode, isMobileLandscape, commandInput])
-
-  useEffect(() => {
-    // Initialize typewriter sound
-    if (!typewriterSoundRef.current) {
-      typewriterSoundRef.current = new TypewriterSound()
-      typewriterSoundRef.current.init()
-    }
-
-    // Handle Enter key - skip animation if typing, go back if complete
-    const handleKeyPress = (e) => {
-      if (e.key === 'Enter') {
-        e.preventDefault()
-        if (showAbout) {
-          if (!aboutComplete) {
-            completeAboutAnimation()
-          } else {
-            setShowAbout(false)
-          }
-        } else if (showInfo) {
-          if (!infoComplete) {
-            completeInfoAnimation()
-          } else {
-            setShowInfo(false)
-          }
-        }
-      }
-    }
-
-    if (showAbout || showInfo) {
-      window.addEventListener('keydown', handleKeyPress)
-      return () => {
-        window.removeEventListener('keydown', handleKeyPress)
-        if (typingTimeoutRef.current) {
-          clearTimeout(typingTimeoutRef.current)
-        }
-      }
-    }
-  }, [showAbout, showInfo, aboutComplete, infoComplete])
+  }, [showAbout, showInfo, aboutComplete, infoComplete, showMissionPreview, missionComplete, missionButtonSelected, selectedButton, completeMissionAnimation, onAcceptMission, onShowStats, isCommandLineMode, isMobileLandscape, commandInput])
 
   useEffect(() => {
     // Initialize typewriter sound
@@ -569,179 +540,6 @@ function Home({ crime, streak, onStart, onAcceptMission, onShowStats }) {
     }
   }, [showInfo])
 
-  const formatDate = () => {
-    const today = new Date()
-    const day = String(today.getDate()).padStart(2, '0')
-    const month = String(today.getMonth() + 1).padStart(2, '0')
-    return `${day}/${month}/1994`
-  }
-
-  if (showAbout) {
-    return (
-      <div 
-        className="home" 
-        style={{
-          fontFamily: "'PxPlus IBM VGA8', monospace",
-          color: '#00CC55',
-          background: '#020403',
-          cursor: 'pointer',
-          minHeight: '100vh'
-        }}
-        onClick={completeAboutAnimation}
-        role="button"
-        tabIndex={0}
-        aria-label="Toque ou clique para avançar a animação"
-      >
-        <div className="terminal-content" style={{
-          lineHeight: '1.8',
-          fontSize: '14px',
-          marginTop: '24px'
-        }}>
-          <div style={{
-            whiteSpace: 'pre-wrap',
-            wordWrap: 'break-word',
-            color: '#00CC55',
-            fontFamily: "'PxPlus IBM VGA8', monospace",
-            minHeight: '200px',
-            lineHeight: '1.8'
-          }}>
-            {aboutLines.map((line, index) => (
-              <div key={index} style={{ 
-                marginBottom: line === '' ? '12px' : '4px',
-                minHeight: line === '' ? '12px' : 'auto'
-              }}>
-                {line}
-                {index === currentLineIndex && !aboutComplete && !dots && (
-                  <span className="cursor-blink" style={{
-                    color: '#00FF66',
-                    animation: 'blink 1s step-end infinite',
-                    marginLeft: '2px'
-                  }}>█</span>
-                )}
-              </div>
-            ))}
-            {dots && (
-              <span style={{ color: '#00CC55' }}>{dots}</span>
-            )}
-            {aboutComplete && (
-              <button 
-                className="terminal-button" 
-                onClick={() => setShowAbout(false)}
-                style={{
-                  background: 'none',
-                  border: 'none',
-                  color: '#00FF66',
-                  fontFamily: "'PxPlus IBM VGA8', monospace",
-                  fontSize: '16px',
-                  cursor: 'pointer',
-                  padding: '8px 0',
-                  margin: '24px 0 8px 0',
-                  textAlign: 'left',
-                  width: '100%',
-                  transition: 'color 0.2s ease',
-                  display: 'flex',
-                  alignItems: 'center'
-                }}
-                onMouseEnter={(e) => e.target.style.color = '#00FF66'}
-                onMouseLeave={(e) => e.target.style.color = '#00CC55'}
-              >
-                &gt; VOLTAR
-                <span className="cursor-blink" style={{
-                  color: '#00FF66',
-                  animation: 'blink 1s step-end infinite',
-                  marginLeft: '4px'
-                }}>█</span>
-              </button>
-            )}
-          </div>
-        </div>
-      </div>
-    )
-  }
-
-  if (showInfo) {
-    return (
-      <div 
-        className={`home ${crtGlitch ? 'crt-glitch' : ''} ${crtFlicker ? 'crt-flicker' : ''}`}
-        style={{
-          fontFamily: "'PxPlus IBM VGA8', monospace",
-          color: '#00CC55',
-          background: '#020403',
-          cursor: 'pointer',
-          minHeight: '100vh'
-        }}
-        onClick={completeInfoAnimation}
-        role="button"
-        tabIndex={0}
-        aria-label="Toque ou clique para avançar a animação"
-      >
-        <div className="terminal-content" style={{
-          lineHeight: '1.8',
-          fontSize: '14px',
-          marginTop: '24px'
-        }}>
-          <div style={{
-            whiteSpace: 'pre-wrap',
-            wordWrap: 'break-word',
-            color: '#00CC55',
-            fontFamily: "'PxPlus IBM VGA8', monospace",
-            minHeight: '200px',
-            lineHeight: '1.8'
-          }}>
-            {infoLines.map((line, index) => (
-              <div key={index} style={{ 
-                marginBottom: line === '' ? '12px' : '4px',
-                minHeight: line === '' ? '12px' : 'auto'
-              }}>
-                {line}
-                {index === currentLineIndex && !infoComplete && !dots && (
-                  <span className="cursor-blink" style={{
-                    color: '#00FF66',
-                    animation: 'blink 1s step-end infinite',
-                    marginLeft: '2px'
-                  }}>█</span>
-                )}
-              </div>
-            ))}
-            {dots && (
-              <span style={{ color: '#00CC55' }}>{dots}</span>
-            )}
-            {infoComplete && (
-              <button 
-                className="terminal-button" 
-                onClick={() => setShowInfo(false)}
-                style={{
-                  background: 'none',
-                  border: 'none',
-                  color: '#00FF66',
-                  fontFamily: "'PxPlus IBM VGA8', monospace",
-                  fontSize: '16px',
-                  cursor: 'pointer',
-                  padding: '8px 0',
-                  margin: '24px 0 8px 0',
-                  textAlign: 'left',
-                  width: '100%',
-                  transition: 'color 0.2s ease',
-                  display: 'flex',
-                  alignItems: 'center'
-                }}
-                onMouseEnter={(e) => e.target.style.color = '#00FF66'}
-                onMouseLeave={(e) => e.target.style.color = '#00CC55'}
-              >
-                &gt; VOLTAR
-                <span className="cursor-blink" style={{
-                  color: '#00FF66',
-                  animation: 'blink 1s step-end infinite',
-                  marginLeft: '4px'
-                }}>█</span>
-              </button>
-            )}
-          </div>
-        </div>
-      </div>
-    )
-  }
-
   useEffect(() => {
     const t = setInterval(() => {
       const d = new Date()
@@ -885,10 +683,19 @@ function Home({ crime, streak, onStart, onAcceptMission, onShowStats }) {
   const dosFolders = ['CASOS', 'DOSSIE', 'SETTINGS']
 
   const handleFileAction = (action) => {
-    if (action === 'start') setShowMissionPreview(true)
-    else if (action === 'about') setShowAbout(true)
-    else if (action === 'info') setShowInfo(true)
-    else if (action === 'stats') onShowStats?.()
+    if (action === 'start') {
+      setShowMissionPreview(true)
+      setShowAbout(false)
+      setShowInfo(false)
+    } else if (action === 'about') {
+      setShowAbout(true)
+      setShowInfo(false)
+      setShowMissionPreview(false)
+    } else if (action === 'info') {
+      setShowInfo(true)
+      setShowAbout(false)
+      setShowMissionPreview(false)
+    } else if (action === 'stats') onShowStats?.()
   }
 
   const handleAcceptMission = () => {
@@ -942,9 +749,49 @@ function Home({ crime, streak, onStart, onAcceptMission, onShowStats }) {
           </div>
         </div>
 
-        {/* Painel direito - NEXO TERMINAL ou Missão e descrição */}
+        {/* Painel direito - NEXO TERMINAL, Missão, ARQUIVO ou INFO */}
         <div className="dos-panel dos-panel-right dos-hero-panel">
-          {showMissionPreview && crime ? (
+          {showAbout ? (
+            <div
+              className="dos-mission-content"
+              onClick={!aboutComplete ? completeAboutAnimation : undefined}
+              onTouchStart={!aboutComplete ? (e) => { e.preventDefault(); completeAboutAnimation() } : undefined}
+              style={{ cursor: !aboutComplete ? 'pointer' : 'default', touchAction: 'manipulation' }}
+            >
+              <div className="dos-mission-title">ARQUIVO</div>
+              <div className="dos-mission-description">
+                {aboutLines.map((line, index) => (
+                  <div key={index}>
+                    {line}
+                    {index === currentLineIndex && !aboutComplete && !dots && (
+                      <span className="cursor-blink" style={{ color: '#00FF66', marginLeft: '2px' }}>█</span>
+                    )}
+                  </div>
+                ))}
+                {dots && <span style={{ color: '#00CC55' }}>{dots}</span>}
+              </div>
+            </div>
+          ) : showInfo ? (
+            <div
+              className="dos-mission-content"
+              onClick={!infoComplete ? completeInfoAnimation : undefined}
+              onTouchStart={!infoComplete ? (e) => { e.preventDefault(); completeInfoAnimation() } : undefined}
+              style={{ cursor: !infoComplete ? 'pointer' : 'default', touchAction: 'manipulation' }}
+            >
+              <div className="dos-mission-title">INFO</div>
+              <div className="dos-mission-description">
+                {infoLines.map((line, index) => (
+                  <div key={index}>
+                    {line}
+                    {index === currentLineIndex && !infoComplete && !dots && (
+                      <span className="cursor-blink" style={{ color: '#00FF66', marginLeft: '2px' }}>█</span>
+                    )}
+                  </div>
+                ))}
+                {dots && <span style={{ color: '#00CC55' }}>{dots}</span>}
+              </div>
+            </div>
+          ) : showMissionPreview && crime ? (
             <div
               className="dos-mission-content"
               onClick={!missionComplete ? completeMissionAnimation : undefined}
@@ -978,9 +825,16 @@ function Home({ crime, streak, onStart, onAcceptMission, onShowStats }) {
         </div>
       </div>
 
-      {/* Barra inferior - prompt C:\ e versão, ou Aceitar/Recusar */}
+      {/* Barra inferior - prompt C:\ e versão, Aceitar/Recusar, ou VOLTAR */}
       <div className="dos-bottom-bar">
-        {showMissionPreview ? (
+        {showAbout || showInfo ? (
+          <button
+            className="dos-mission-btn dos-file-selected"
+            onClick={() => { setShowAbout(false); setShowInfo(false) }}
+          >
+            VOLTAR
+          </button>
+        ) : showMissionPreview ? (
           <div className="dos-mission-buttons">
             <button
               className={`dos-mission-btn ${missionButtonSelected === 0 ? 'dos-file-selected' : ''}`}

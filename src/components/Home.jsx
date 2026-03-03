@@ -2,7 +2,7 @@ import { useState, useEffect, useRef } from 'react'
 import './Home.css'
 import { TypewriterSound } from '../utils/typewriterSound'
 
-function Home({ crime, streak, onStart, onShowStats }) {
+function Home({ crime, streak, onStart, onAcceptMission, onShowStats }) {
   const [displayedText, setDisplayedText] = useState('')
   const [showCursor, setShowCursor] = useState(true)
   const [titleAnimationComplete, setTitleAnimationComplete] = useState(false)
@@ -16,6 +16,8 @@ function Home({ crime, streak, onStart, onShowStats }) {
   const [aboutComplete, setAboutComplete] = useState(false)
   const [infoComplete, setInfoComplete] = useState(false)
   const [selectedButton, setSelectedButton] = useState(0) // 0 = iniciar, 1 = arquivo, 2 = info
+  const [showMissionPreview, setShowMissionPreview] = useState(false)
+  const [missionButtonSelected, setMissionButtonSelected] = useState(0) // 0 = aceitar, 1 = recusar
   const [commandInput, setCommandInput] = useState('')
   const x7ActiveRef = useRef(false)
   const [crtGlitch, setCrtGlitch] = useState(false)
@@ -200,11 +202,30 @@ function Home({ crime, streak, onStart, onShowStats }) {
     }
   }, [showAbout])
 
-  // Keyboard: desktop = command-line mode, mobile = arrow keys
+  // Keyboard: desktop = command-line mode, mobile = arrow keys, mission = Aceitar/Recusar
   useEffect(() => {
     if (showAbout || showInfo) return
 
     const handleKeyDown = (e) => {
+      // Quando em preview de missão: Aceitar/Recusar
+      if (showMissionPreview) {
+        if (e.key === 'ArrowDown') {
+          e.preventDefault()
+          setMissionButtonSelected(1)
+        } else if (e.key === 'ArrowUp') {
+          e.preventDefault()
+          setMissionButtonSelected(0)
+        } else if (e.key === 'Enter') {
+          e.preventDefault()
+          if (missionButtonSelected === 0) {
+            onAcceptMission?.(x7ActiveRef.current || chk() ? { x: 1 } : undefined)
+          } else {
+            setShowMissionPreview(false)
+          }
+        }
+        return
+      }
+
       // Skip when input is focused (mobile landscape) - input handles typing
       if (isMobileLandscape && commandInputRef.current?.contains?.(document.activeElement)) {
         return
@@ -219,11 +240,11 @@ function Home({ crime, streak, onStart, onShowStats }) {
           e.preventDefault()
           const cmd = commandInput.trim().toUpperCase()
           const cmdLower = commandInput.trim().toLowerCase()
-          if (cmd === 'INICIAR') {
-            onStart(x7ActiveRef.current || chk() ? { x: 1 } : undefined)
-          } else if (cmd === 'ARQUIVO') {
+          if (cmd === 'INICIAR' || cmd === 'INICIAR.EXE') {
+            setShowMissionPreview(true)
+          } else if (cmd === 'ARQUIVO' || cmd === 'ARQUIVO.TXT') {
             setShowAbout(true)
-          } else if (cmd === 'INFO') {
+          } else if (cmd === 'INFO' || cmd === 'INFO.TXT') {
             setShowInfo(true)
           } else if (cmd === '#*NEXO77') {
             x7ActiveRef.current = true
@@ -251,7 +272,7 @@ function Home({ crime, streak, onStart, onShowStats }) {
         } else if (e.key === 'Enter') {
           e.preventDefault()
           if (selectedButton === 0) {
-            onStart(x7ActiveRef.current || chk() ? { x: 1 } : undefined)
+            setShowMissionPreview(true)
           } else if (selectedButton === 1) {
             setShowAbout(true)
           } else if (selectedButton === 2) {
@@ -265,7 +286,7 @@ function Home({ crime, streak, onStart, onShowStats }) {
 
     window.addEventListener('keydown', handleKeyDown)
     return () => window.removeEventListener('keydown', handleKeyDown)
-  }, [showAbout, showInfo, selectedButton, onStart, onShowStats, isCommandLineMode, isMobileLandscape, commandInput])
+  }, [showAbout, showInfo, showMissionPreview, missionButtonSelected, selectedButton, onAcceptMission, onShowStats, isCommandLineMode, isMobileLandscape, commandInput])
 
   useEffect(() => {
     // Initialize typewriter sound
@@ -726,18 +747,26 @@ function Home({ crime, streak, onStart, onShowStats }) {
   }, [])
 
   const dosFiles = [
-    { name: 'iniciar.exe', action: 'start', label: 'INICIAR' },
-    { name: 'readme.txt', action: 'about', label: 'ARQUIVO' },
-    { name: 'info.txt', action: 'info', label: 'INFO' },
+    { name: 'INICIAR.EXE', action: 'start' },
+    { name: 'ARQUIVO.TXT', action: 'about' },
+    { name: 'INFO.TXT', action: 'info' },
   ]
-  if (onShowStats) dosFiles.push({ name: 'stats.exe', action: 'stats', label: 'STATS' })
+  if (onShowStats) dosFiles.push({ name: 'STATS.EXE', action: 'stats' })
   const dosFolders = ['CASOS', 'DOSSIE', 'SETTINGS']
 
   const handleFileAction = (action) => {
-    if (action === 'start') onStart(x7ActiveRef.current || chk() ? { x: 1 } : undefined)
+    if (action === 'start') setShowMissionPreview(true)
     else if (action === 'about') setShowAbout(true)
     else if (action === 'info') setShowInfo(true)
     else if (action === 'stats') onShowStats?.()
+  }
+
+  const handleAcceptMission = () => {
+    onAcceptMission?.(x7ActiveRef.current || chk() ? { x: 1 } : undefined)
+  }
+
+  const handleRefuseMission = () => {
+    setShowMissionPreview(false)
   }
 
   return (
@@ -769,7 +798,7 @@ function Home({ crime, streak, onStart, onShowStats }) {
                 onClick={() => handleFileAction(f.action)}
                 onMouseEnter={() => setSelectedButton(i)}
               >
-                {f.name} --FILE-&gt;
+                {f.name}
               </button>
             ))}
           </div>
@@ -783,20 +812,58 @@ function Home({ crime, streak, onStart, onShowStats }) {
           </div>
         </div>
 
-        {/* Painel direito - NEXO TERMINAL em destaque */}
+        {/* Painel direito - NEXO TERMINAL ou Missão e descrição */}
         <div className="dos-panel dos-panel-right dos-hero-panel">
-          <div className="dos-hero-content">
-            <div className="dos-hero-subtitle">---Proudly Presents---</div>
-            <div className="dos-hero-line dos-hero-line-1">NEXO</div>
-            <div className="dos-hero-line dos-hero-line-2">TERMINAL</div>
-            <div className="dos-hero-subtitle dos-hero-subtitle-2">Full Version of Nexo Terminal</div>
-            <div className="dos-hero-subtitle dos-hero-subtitle-3">Released 1987 · Intelligence Division</div>
-          </div>
+          {showMissionPreview && crime ? (
+            <div className="dos-mission-content">
+              <div className="dos-mission-title">MISSÃO</div>
+              <div className="dos-mission-case">
+                CASO #{crime.caseNumber || String(crime.id).slice(-4).padStart(4, '0')} · {crime.type || 'CRIME'}
+              </div>
+              <div className="dos-mission-description">
+                {(Array.isArray(crime.description)
+                  ? crime.description
+                  : typeof crime.description === 'string'
+                    ? crime.description.split('\n')
+                    : crime.description && typeof crime.description === 'object'
+                      ? Object.values(crime.description)
+                      : []
+                ).map((line, i) => (
+                  <div key={i}>{typeof line === 'string' ? line : String(line ?? '')}</div>
+                ))}
+              </div>
+            </div>
+          ) : (
+            <div className="dos-hero-content">
+              <div className="dos-hero-line dos-hero-line-1">NEXO</div>
+              <div className="dos-hero-line dos-hero-line-2">TERMINAL</div>
+              <div className="dos-hero-subtitle dos-hero-subtitle-2">Full Version of Nexo Terminal</div>
+              <div className="dos-hero-subtitle dos-hero-subtitle-3">Released 1987 · Intelligence Division</div>
+            </div>
+          )}
         </div>
       </div>
 
-      {/* Barra inferior - prompt C:\ e versão */}
+      {/* Barra inferior - prompt C:\ e versão, ou Aceitar/Recusar */}
       <div className="dos-bottom-bar">
+        {showMissionPreview ? (
+          <div className="dos-mission-buttons">
+            <button
+              className={`dos-mission-btn ${missionButtonSelected === 0 ? 'dos-file-selected' : ''}`}
+              onClick={handleAcceptMission}
+              onMouseEnter={() => setMissionButtonSelected(0)}
+            >
+              ACEITAR
+            </button>
+            <button
+              className={`dos-mission-btn ${missionButtonSelected === 1 ? 'dos-file-selected' : ''}`}
+              onClick={handleRefuseMission}
+              onMouseEnter={() => setMissionButtonSelected(1)}
+            >
+              RECUSAR
+            </button>
+          </div>
+        ) : (
         <div className="dos-prompt">
           {isCommandLineMode && titleAnimationComplete ? (
             isMobileLandscape ? (
@@ -817,9 +884,9 @@ function Home({ crime, streak, onStart, onShowStats }) {
                     if (e.key === 'Enter') {
                       e.preventDefault()
                       const cmd = commandInput.trim().toUpperCase()
-                      if (cmd === 'INICIAR') onStart(x7ActiveRef.current || chk() ? { x: 1 } : undefined)
-                      else if (cmd === 'ARQUIVO') setShowAbout(true)
-                      else if (cmd === 'INFO') setShowInfo(true)
+                      if (cmd === 'INICIAR' || cmd === 'INICIAR.EXE') setShowMissionPreview(true)
+                      else if (cmd === 'ARQUIVO' || cmd === 'ARQUIVO.TXT') setShowAbout(true)
+                      else if (cmd === 'INFO' || cmd === 'INFO.TXT') setShowInfo(true)
                       else if (cmd === '#*NEXO77') x7ActiveRef.current = true
                       else if (onShowStats && (cmd === 'STATS' || cmd === (typeof atob !== 'undefined' ? atob('c3RhdHM3Nw==') : 'stats77'))) onShowStats()
                       prevCommandRef.current = ''
@@ -851,6 +918,7 @@ function Home({ crime, streak, onStart, onShowStats }) {
             </>
           )}
         </div>
+        )}
         <div className="dos-version">Nexo-piOS-u1.0.01p</div>
       </div>
 

@@ -211,6 +211,10 @@ function App() {
           crime={currentCrime}
           streak={investigationState.streak}
           onStart={startInvestigation}
+          onAcceptMission={(opts) => {
+            setX7(!!(opts?.x))
+            setScreen('investigation')
+          }}
           onShowStats={() => setScreen('stats')}
         />
       )}

@@ -23,6 +23,11 @@ function Home({ crime, streak, onStart, onShowStats }) {
   const [crtDistortion, setCrtDistortion] = useState(0)
   const [isDesktop, setIsDesktop] = useState(typeof window !== 'undefined' && window.innerWidth >= 768)
   const [isLandscape, setIsLandscape] = useState(typeof window !== 'undefined' && window.innerWidth > window.innerHeight)
+  const [currentTime, setCurrentTime] = useState(() => {
+    if (typeof window === 'undefined') return '00:00'
+    const d = new Date()
+    return `${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`
+  })
   const commandInputRef = useRef(null)
   const prevCommandRef = useRef('')
   const typewriterSoundRef = useRef(null)
@@ -239,20 +244,23 @@ function Home({ crime, streak, onStart, onShowStats }) {
         }
       } else {
         // Mobile: arrow keys + Enter
+        const fileCount = onShowStats ? 4 : 3
         if (e.key === 'ArrowDown') {
           e.preventDefault()
-          setSelectedButton(prev => (prev + 1) % 3)
+          setSelectedButton(prev => (prev + 1) % fileCount)
         } else if (e.key === 'ArrowUp') {
           e.preventDefault()
-          setSelectedButton(prev => (prev - 1 + 3) % 3)
+          setSelectedButton(prev => (prev - 1 + fileCount) % fileCount)
         } else if (e.key === 'Enter') {
           e.preventDefault()
           if (selectedButton === 0) {
-            onStart(chk() ? { x: 1 } : undefined)
+            onStart(x7ActiveRef.current || chk() ? { x: 1 } : undefined)
           } else if (selectedButton === 1) {
             setShowAbout(true)
-          } else {
+          } else if (selectedButton === 2) {
             setShowInfo(true)
+          } else if (selectedButton === 3 && onShowStats) {
+            onShowStats()
           }
         }
       }
@@ -260,7 +268,7 @@ function Home({ crime, streak, onStart, onShowStats }) {
 
     window.addEventListener('keydown', handleKeyDown)
     return () => window.removeEventListener('keydown', handleKeyDown)
-  }, [showAbout, showInfo, selectedButton, onStart, isCommandLineMode, isMobileLandscape, commandInput])
+  }, [showAbout, showInfo, selectedButton, onStart, onShowStats, isCommandLineMode, isMobileLandscape, commandInput])
 
   useEffect(() => {
     // Initialize typewriter sound
@@ -712,9 +720,32 @@ function Home({ crime, streak, onStart, onShowStats }) {
     )
   }
 
+  useEffect(() => {
+    const t = setInterval(() => {
+      const d = new Date()
+      setCurrentTime(`${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`)
+    }, 1000)
+    return () => clearInterval(t)
+  }, [])
+
+  const dosFiles = [
+    { name: 'iniciar.exe', action: 'start', label: 'INICIAR' },
+    { name: 'readme.txt', action: 'about', label: 'ARQUIVO' },
+    { name: 'info.txt', action: 'info', label: 'INFO' },
+  ]
+  if (onShowStats) dosFiles.push({ name: 'stats.exe', action: 'stats', label: 'STATS' })
+  const dosFolders = ['CASOS', 'DOSSIE', 'SETTINGS']
+
+  const handleFileAction = (action) => {
+    if (action === 'start') onStart(x7ActiveRef.current || chk() ? { x: 1 } : undefined)
+    else if (action === 'about') setShowAbout(true)
+    else if (action === 'info') setShowInfo(true)
+    else if (action === 'stats') onShowStats?.()
+  }
+
   return (
     <div 
-      className={`home ${crtGlitch ? 'crt-glitch' : ''} ${crtFlicker ? 'crt-flicker' : ''}`}
+      className={`home home-dos ${crtGlitch ? 'crt-glitch' : ''} ${crtFlicker ? 'crt-flicker' : ''}`}
       style={{
         fontFamily: "'PxPlus IBM VGA8', monospace",
         color: '#00CC55',
@@ -723,235 +754,110 @@ function Home({ crime, streak, onStart, onShowStats }) {
         transition: crtDistortion > 0 ? 'none' : 'transform 0.1s ease-out'
       }}
     >
-      <div className="terminal-header">
-        <div className="separator separator-full-width" style={{
-          color: '#007A33',
-          fontSize: '14px',
-          margin: '12px 0',
-          fontFamily: "'PxPlus IBM VGA8', monospace"
-        }}>{'═'.repeat(150)}</div>
-        <div className="title terminal-text" style={{
-          fontFamily: "'PxPlus IBM VGA8', monospace",
-          fontSize: '32px',
-          padding: '8px 0',
-          color: '#00FF66',
-          textShadow: '0 0 2px rgba(0, 255, 100, 0.4), 0 0 4px rgba(0, 255, 100, 0.15)'
-        }}>
-          {displayedText}
-          {showCursor && <span className="cursor-blink" style={{
-            animation: 'blink 1s step-end infinite'
-          }}>█</span>}
+      {/* Top bar - linha superior + relógio */}
+      <div className="dos-top-bar">
+        <div className="dos-top-line" />
+        <div className="dos-clock">{currentTime}</div>
+      </div>
+
+      {/* Conteúdo principal - dois painéis */}
+      <div className="dos-main">
+        {/* Painel esquerdo - arquivos e pastas */}
+        <div className="dos-panel dos-panel-left">
+          <div className="dos-file-list">
+            {dosFiles.map((f, i) => (
+              <button
+                key={f.name}
+                className={`dos-file-item ${selectedButton === i ? 'dos-file-selected' : ''}`}
+                onClick={() => handleFileAction(f.action)}
+                onMouseEnter={() => setSelectedButton(i)}
+              >
+                {f.name} --FILE-&gt;
+              </button>
+            ))}
+          </div>
+          <div className="dos-folder-sep" />
+          <div className="dos-folder-list">
+            {dosFolders.map((folder) => (
+              <div key={folder} className="dos-folder-item">
+                {folder} &gt;FOLDER&lt;
+              </div>
+            ))}
+          </div>
         </div>
-        <div className="separator separator-full-width" style={{
-          color: '#007A33',
-          fontSize: '14px',
-          margin: '12px 0',
-          fontFamily: "'PxPlus IBM VGA8', monospace"
-        }}>{'═'.repeat(150)}</div>
-      </div>
 
-      <div className="terminal-content" style={{
-        lineHeight: '1.6'
-      }}>
-        {isCommandLineMode ? (
-          titleAnimationComplete && (
-            <div style={{
-              fontFamily: "'PxPlus IBM VGA8', monospace",
-              fontSize: '16px',
-              color: '#00CC55',
-              padding: '8px 0',
-              margin: '8px 0',
-              display: 'flex',
-              alignItems: 'center',
-              position: 'relative'
-            }}>
-              {isMobileLandscape ? (
-                <>
-                  <input
-                    ref={commandInputRef}
-                    type="text"
-                    value={commandInput}
-                    onChange={(e) => {
-                      const v = e.target.value
-                      const prev = prevCommandRef.current
-                      const added = v.slice(prev.length)
-                      prevCommandRef.current = v
-                      setCommandInput(v)
-                      if (added) {
-                        bufRef.current = [...bufRef.current.slice(-15), ...added].slice(-8)
-                      }
-                    }}
-                    onKeyDown={(e) => {
-                      if (e.key?.length === 1) {
-                        bufRef.current = [...bufRef.current.slice(-15), e.key].slice(-8)
-                      }
-                      if (e.key === 'Enter') {
-                        e.preventDefault()
-                        const cmd = commandInput.trim().toUpperCase()
-                        if (cmd === 'INICIAR') {
-                          onStart(x7ActiveRef.current || chk() ? { x: 1 } : undefined)
-                        } else if (cmd === 'ARQUIVO') {
-                          setShowAbout(true)
-                        } else if (cmd === 'INFO') {
-                          setShowInfo(true)
-                        } else if (cmd === '#*NEXO77') {
-                          x7ActiveRef.current = true
-                        }
-                        prevCommandRef.current = ''
-                        setCommandInput('')
-                      }
-                    }}
-                    style={{
-                      flex: 1,
-                      background: 'transparent',
-                      border: 'none',
-                      color: '#00CC55',
-                      fontFamily: "'PxPlus IBM VGA8', monospace",
-                      fontSize: '16px',
-                      outline: 'none',
-                      textTransform: 'uppercase',
-                      caretColor: 'transparent'
-                    }}
-                    placeholder=""
-                    autoComplete="off"
-                    autoCapitalize="characters"
-                    enterKeyHint="go"
-                  />
-                  <span className="cursor-blink" style={{
-                    color: '#00FF66',
-                    animation: 'blink 1s step-end infinite',
-                    marginLeft: '2px'
-                  }}>█</span>
-                </>
-              ) : (
-                <>
-                  <span style={{ color: '#00CC55' }}>{commandInput.toUpperCase()}</span>
-                  <span className="cursor-blink" style={{
-                    color: '#00FF66',
-                    animation: 'blink 1s step-end infinite',
-                    marginLeft: '2px'
-                  }}>█</span>
-                </>
-              )}
+        {/* Painel direito - mensagem de transferência */}
+        <div className="dos-panel dos-panel-right">
+          <div className="dos-transfer-box">
+            <div className="dos-transfer-title">--TRANSFER-MESSAGE--</div>
+            <div className="dos-transfer-content">
+              OK, sending now. check it
+              <br />
+              out. just run iniciar.exe
             </div>
-          )
-        ) : (
-          <>
-            <button 
-              className="terminal-button" 
-              onClick={() => {
-                const k = [0x23, 0x2a, 0x4e, 0x45, 0x58, 0x4f, 0x37, 0x37]
-                const b = bufRef.current
-                const ok = b.length >= 8 && window.innerWidth >= 768 && b.slice(-8).every((c, i) => (c.charCodeAt?.(0) ?? 0) === k[i])
-                onStart(ok ? { x: 1 } : undefined)
-              }}
-              style={{
-                background: 'none',
-                border: 'none',
-                color: selectedButton === 0 ? '#00FF66' : '#00CC55',
-                fontFamily: "'PxPlus IBM VGA8', monospace",
-                fontSize: '16px',
-                cursor: 'pointer',
-                padding: '8px 0',
-                margin: '8px 0',
-                textAlign: 'left',
-                width: '100%',
-                transition: 'color 0.2s ease',
-                display: 'flex',
-                alignItems: 'center'
-              }}
-              onMouseEnter={(e) => {
-                if (selectedButton !== 0) e.target.style.color = '#00FF66'
-                setSelectedButton(0)
-              }}
-              onMouseLeave={(e) => {
-                if (selectedButton !== 0) e.target.style.color = '#00CC55'
-              }}
-            >
-              &gt; INICIAR INVESTIGAÇÃO
-              {selectedButton === 0 && titleAnimationComplete && (
-                <span className="cursor-blink" style={{
-                  color: '#00FF66',
-                  animation: 'blink 1s step-end infinite',
-                  marginLeft: '4px'
-                }}>█</span>
-              )}
-            </button>
-
-            <button 
-              className="terminal-button" 
-              onClick={() => setShowAbout(true)}
-              style={{
-                background: 'none',
-                border: 'none',
-                color: selectedButton === 1 ? '#00FF66' : '#00CC55',
-                fontFamily: "'PxPlus IBM VGA8', monospace",
-                fontSize: '16px',
-                cursor: 'pointer',
-                padding: '8px 0',
-                margin: '8px 0',
-                textAlign: 'left',
-                width: '100%',
-                transition: 'color 0.2s ease',
-                display: 'flex',
-                alignItems: 'center'
-              }}
-              onMouseEnter={(e) => {
-                if (selectedButton !== 1) e.target.style.color = '#00FF66'
-                setSelectedButton(1)
-              }}
-              onMouseLeave={(e) => {
-                if (selectedButton !== 1) e.target.style.color = '#00CC55'
-              }}
-            >
-              &gt; ARQUIVO
-              {selectedButton === 1 && titleAnimationComplete && (
-                <span className="cursor-blink" style={{
-                  color: '#00FF66',
-                  animation: 'blink 1s step-end infinite',
-                  marginLeft: '4px'
-                }}>█</span>
-              )}
-            </button>
-
-            <button 
-              className="terminal-button" 
-              onClick={() => setShowInfo(true)}
-              style={{
-                background: 'none',
-                border: 'none',
-                color: selectedButton === 2 ? '#00FF66' : '#00CC55',
-                fontFamily: "'PxPlus IBM VGA8', monospace",
-                fontSize: '16px',
-                cursor: 'pointer',
-                padding: '8px 0',
-                margin: '8px 0',
-                textAlign: 'left',
-                width: '100%',
-                transition: 'color 0.2s ease',
-                display: 'flex',
-                alignItems: 'center'
-              }}
-              onMouseEnter={(e) => {
-                if (selectedButton !== 2) e.target.style.color = '#00FF66'
-                setSelectedButton(2)
-              }}
-              onMouseLeave={(e) => {
-                if (selectedButton !== 2) e.target.style.color = '#00CC55'
-              }}
-            >
-              &gt; INFO
-              {selectedButton === 2 && titleAnimationComplete && (
-                <span className="cursor-blink" style={{
-                  color: '#00FF66',
-                  animation: 'blink 1s step-end infinite',
-                  marginLeft: '4px'
-                }}>█</span>
-              )}
-            </button>
-          </>
-        )}
+          </div>
+        </div>
       </div>
+
+      {/* Barra inferior - prompt C:\ e versão */}
+      <div className="dos-bottom-bar">
+        <div className="dos-prompt">
+          {isCommandLineMode && titleAnimationComplete ? (
+            isMobileLandscape ? (
+              <>
+                C:\&gt;
+                <input
+                  ref={commandInputRef}
+                  type="text"
+                  value={commandInput}
+                  onChange={(e) => {
+                    const v = e.target.value
+                    prevCommandRef.current = v
+                    setCommandInput(v)
+                    bufRef.current = [...bufRef.current.slice(-15), ...v.slice(-1)].slice(-8)
+                  }}
+                  onKeyDown={(e) => {
+                    if (e.key?.length === 1) bufRef.current = [...bufRef.current.slice(-15), e.key].slice(-8)
+                    if (e.key === 'Enter') {
+                      e.preventDefault()
+                      const cmd = commandInput.trim().toUpperCase()
+                      if (cmd === 'INICIAR') onStart(x7ActiveRef.current || chk() ? { x: 1 } : undefined)
+                      else if (cmd === 'ARQUIVO') setShowAbout(true)
+                      else if (cmd === 'INFO') setShowInfo(true)
+                      else if (cmd === '#*NEXO77') x7ActiveRef.current = true
+                      else if (onShowStats && (cmd === 'STATS' || cmd === (typeof atob !== 'undefined' ? atob('c3RhdHM3Nw==') : 'stats77'))) onShowStats()
+                      prevCommandRef.current = ''
+                      setCommandInput('')
+                    }
+                  }}
+                  className="dos-prompt-input"
+                  placeholder=""
+                  autoComplete="off"
+                  autoCapitalize="characters"
+                />
+                <span className="cursor-blink">█</span>
+              </>
+            ) : (
+              <>
+                C:\&gt;{commandInput.toUpperCase()}
+                <span className="cursor-blink">█</span>
+              </>
+            )
+          ) : (
+            <>
+              C:\&gt;
+              {!titleAnimationComplete ? (
+                <span className="dos-boot-text">
+                  {displayedText}
+                  {showCursor && <span className="cursor-blink">█</span>}
+                </span>
+              ) : null}
+            </>
+          )}
+        </div>
+        <div className="dos-version">Nexo-piOS-u1.0.01p</div>
+      </div>
+
     </div>
   )
 }

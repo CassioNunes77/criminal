@@ -7,6 +7,186 @@
   image-rendering: pixelated;
 }
 
+/* ========== DOS Clássico - Layout ========== */
+.home-dos {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  padding: 12px 16px;
+  position: relative;
+}
+
+.dos-top-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+  padding-top: 2px;
+  border-top: 2px solid var(--text-highlight);
+}
+
+.dos-top-line {
+  flex: 1;
+  height: 2px;
+  background: var(--text-secondary);
+  margin-right: 12px;
+}
+
+.dos-clock {
+  color: var(--text-primary);
+  font-size: 14px;
+  min-width: 48px;
+}
+
+.dos-main {
+  flex: 1;
+  display: flex;
+  gap: 24px;
+  margin-bottom: 16px;
+  min-height: 200px;
+}
+
+.dos-panel {
+  border: 1px solid var(--text-secondary);
+  padding: 12px 16px;
+  background: rgba(0, 0, 0, 0.3);
+}
+
+.dos-panel-left {
+  flex: 1;
+  min-width: 0;
+  max-width: 320px;
+}
+
+.dos-panel-right {
+  flex: 1;
+  min-width: 180px;
+}
+
+.dos-file-list {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.dos-file-item {
+  background: none;
+  border: none;
+  color: var(--text-primary);
+  font-family: 'PxPlus IBM VGA8', monospace;
+  font-size: 13px;
+  cursor: pointer;
+  padding: 4px 0;
+  text-align: left;
+  transition: color 0.15s ease;
+}
+
+.dos-file-item:hover,
+.dos-file-selected {
+  color: var(--text-highlight);
+  text-shadow: 0 0 4px var(--glow-color);
+}
+
+.dos-folder-sep {
+  height: 1px;
+  background: var(--text-secondary);
+  margin: 12px 0;
+  opacity: 0.7;
+}
+
+.dos-folder-list {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.dos-folder-item {
+  color: var(--text-secondary);
+  font-size: 12px;
+  padding: 2px 0;
+}
+
+.dos-transfer-box {
+  border: 1px solid var(--text-secondary);
+  padding: 8px;
+  height: 100%;
+  min-height: 80px;
+}
+
+.dos-transfer-title {
+  color: var(--text-secondary);
+  font-size: 11px;
+  margin-bottom: 8px;
+  border-bottom: 1px solid var(--text-secondary);
+  padding-bottom: 4px;
+}
+
+.dos-transfer-content {
+  color: var(--text-primary);
+  font-size: 12px;
+  line-height: 1.6;
+}
+
+.dos-bottom-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 0;
+  border-top: 1px solid var(--text-secondary);
+  font-size: 13px;
+}
+
+.dos-prompt {
+  color: var(--text-primary);
+  display: flex;
+  align-items: center;
+  flex: 1;
+  min-width: 0;
+}
+
+.dos-prompt-input {
+  flex: 1;
+  background: transparent;
+  border: none;
+  color: var(--text-primary);
+  font-family: 'PxPlus IBM VGA8', monospace;
+  font-size: 13px;
+  outline: none;
+  text-transform: uppercase;
+  caret-color: transparent;
+  min-width: 60px;
+}
+
+.dos-version {
+  color: var(--text-secondary);
+  font-size: 11px;
+  margin-left: 12px;
+}
+
+.dos-boot-text {
+  color: var(--text-highlight);
+}
+
+@media (max-width: 768px) {
+  .dos-main {
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  .dos-panel-left {
+    max-width: none;
+  }
+
+  .dos-panel-right {
+    min-height: 100px;
+  }
+
+  .dos-file-item {
+    padding: 10px 0;
+    font-size: 14px;
+  }
+}
+
 .terminal-header {
   margin-bottom: 24px;
   margin-left: -16px;

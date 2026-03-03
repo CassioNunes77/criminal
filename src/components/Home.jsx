@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect, useRef, useCallback } from 'react'
 import './Home.css'
 import { TypewriterSound } from '../utils/typewriterSound'
 
@@ -18,6 +18,11 @@ function Home({ crime, streak, onStart, onAcceptMission, onShowStats }) {
   const [selectedButton, setSelectedButton] = useState(0) // 0 = iniciar, 1 = arquivo, 2 = info
   const [showMissionPreview, setShowMissionPreview] = useState(false)
   const [missionButtonSelected, setMissionButtonSelected] = useState(0) // 0 = aceitar, 1 = recusar
+  const [missionLines, setMissionLines] = useState([])
+  const [missionCurrentLineIndex, setMissionCurrentLineIndex] = useState(0)
+  const [missionDots, setMissionDots] = useState('')
+  const [missionComplete, setMissionComplete] = useState(false)
+  const missionTypingTimeoutRef = useRef(null)
   const [commandInput, setCommandInput] = useState('')
   const x7ActiveRef = useRef(false)
   const [crtGlitch, setCrtGlitch] = useState(false)
@@ -207,21 +212,20 @@ function Home({ crime, streak, onStart, onAcceptMission, onShowStats }) {
     if (showAbout || showInfo) return
 
     const handleKeyDown = (e) => {
-      // Quando em preview de missão: Aceitar/Recusar
+      // Quando em preview de missão: completar animação ou Aceitar/Recusar
       if (showMissionPreview) {
-        if (e.key === 'ArrowDown') {
+        if (e.key === 'Enter') {
           e.preventDefault()
-          setMissionButtonSelected(1)
-        } else if (e.key === 'ArrowUp') {
-          e.preventDefault()
-          setMissionButtonSelected(0)
-        } else if (e.key === 'Enter') {
-          e.preventDefault()
-          if (missionButtonSelected === 0) {
+          if (!missionComplete) {
+            completeMissionAnimation()
+          } else if (missionButtonSelected === 0) {
             onAcceptMission?.(x7ActiveRef.current || chk() ? { x: 1 } : undefined)
           } else {
             setShowMissionPreview(false)
           }
+        } else if (missionComplete && (e.key === 'ArrowDown' || e.key === 'ArrowUp')) {
+          e.preventDefault()
+          setMissionButtonSelected(prev => (prev + 1) % 2)
         }
         return
       }
@@ -286,7 +290,7 @@ function Home({ crime, streak, onStart, onAcceptMission, onShowStats }) {
 
     window.addEventListener('keydown', handleKeyDown)
     return () => window.removeEventListener('keydown', handleKeyDown)
-  }, [showAbout, showInfo, showMissionPreview, missionButtonSelected, selectedButton, onAcceptMission, onShowStats, isCommandLineMode, isMobileLandscape, commandInput])
+  }, [showAbout, showInfo, showMissionPreview, missionComplete, missionButtonSelected, selectedButton, completeMissionAnimation, onAcceptMission, onShowStats, isCommandLineMode, isMobileLandscape, commandInput])
 
   useEffect(() => {
     // Initialize typewriter sound
@@ -746,6 +750,132 @@ function Home({ crime, streak, onStart, onAcceptMission, onShowStats }) {
     return () => clearInterval(t)
   }, [])
 
+  // Efeito typewriter na missão
+  useEffect(() => {
+    if (!typewriterSoundRef.current) {
+      typewriterSoundRef.current = new TypewriterSound()
+      typewriterSoundRef.current.init()
+    }
+
+    if (showMissionPreview && crime) {
+      setMissionLines([])
+      setMissionCurrentLineIndex(0)
+      setMissionDots('')
+      setMissionComplete(false)
+
+      const raw = crime.description
+      const lines = Array.isArray(raw)
+        ? raw.map(l => (typeof l === 'string' ? l : String(l ?? '')))
+        : typeof raw === 'string'
+          ? raw.split('\n')
+          : raw && typeof raw === 'object'
+            ? Object.values(raw).map(v => (typeof v === 'string' ? v : String(v ?? '')))
+            : []
+
+      let lineIndex = 0
+      let charIndex = 0
+      let dotsCount = 0
+      let timeoutId = null
+      let isCancelled = false
+
+      const showDots = () => {
+        if (isCancelled || missionComplete) return
+        if (dotsCount < 3) {
+          setMissionDots('.'.repeat(dotsCount + 1))
+          dotsCount++
+          timeoutId = setTimeout(showDots, 300)
+        } else {
+          setMissionDots('')
+          dotsCount = 0
+          lineIndex++
+          if (lineIndex < lines.length) {
+            setMissionCurrentLineIndex(lineIndex)
+            charIndex = 0
+            timeoutId = setTimeout(typeLine, 50)
+          } else {
+            setMissionComplete(true)
+          }
+        }
+      }
+
+      const typeLine = () => {
+        if (isCancelled || missionComplete) return
+        if (lineIndex >= lines.length) {
+          setMissionComplete(true)
+          return
+        }
+        const currentLine = lines[lineIndex]
+        if (currentLine === '') {
+          timeoutId = setTimeout(showDots, 200)
+          return
+        }
+        if (charIndex < currentLine.length) {
+          if (currentLine[charIndex] !== ' ') {
+            typewriterSoundRef.current?.play()
+          }
+          setMissionLines(prev => {
+            const newLines = [...prev]
+            if (!newLines[lineIndex]) newLines[lineIndex] = ''
+            newLines[lineIndex] = currentLine.slice(0, charIndex + 1)
+            return newLines
+          })
+          charIndex++
+          timeoutId = setTimeout(typeLine, 20)
+        } else {
+          if (lineIndex < lines.length - 1) {
+            timeoutId = setTimeout(showDots, 300)
+          } else {
+            setMissionComplete(true)
+          }
+        }
+      }
+
+      missionTypingTimeoutRef.current = setTimeout(() => {
+        if (!isCancelled) typeLine()
+      }, 500)
+
+      const cancelAnimation = () => {
+        isCancelled = true
+        if (missionTypingTimeoutRef.current) {
+          clearTimeout(missionTypingTimeoutRef.current)
+          missionTypingTimeoutRef.current = null
+        }
+        if (timeoutId) {
+          clearTimeout(timeoutId)
+          timeoutId = null
+        }
+      }
+
+      window.__cancelMissionAnimation = cancelAnimation
+
+      return () => {
+        cancelAnimation()
+        delete window.__cancelMissionAnimation
+      }
+    } else {
+      setMissionLines([])
+      setMissionCurrentLineIndex(0)
+      setMissionDots('')
+      setMissionComplete(false)
+    }
+  }, [showMissionPreview, crime])
+
+  const completeMissionAnimation = useCallback(() => {
+    if (window.__cancelMissionAnimation) window.__cancelMissionAnimation()
+    const raw = crime?.description
+    const lines = Array.isArray(raw)
+      ? raw.map(l => (typeof l === 'string' ? l : String(l ?? '')))
+      : typeof raw === 'string'
+        ? raw.split('\n')
+        : raw && typeof raw === 'object'
+          ? Object.values(raw).map(v => (typeof v === 'string' ? v : String(v ?? '')))
+          : []
+    setMissionLines(lines)
+    setMissionCurrentLineIndex(Math.max(0, lines.length - 1))
+    setMissionDots('')
+    setMissionComplete(true)
+  }, [crime])
+
   const dosFiles = [
     { name: 'INICIAR.EXE', action: 'start' },
     { name: 'ARQUIVO.TXT', action: 'about' },
@@ -815,22 +945,26 @@ function Home({ crime, streak, onStart, onAcceptMission, onShowStats }) {
         {/* Painel direito - NEXO TERMINAL ou Missão e descrição */}
         <div className="dos-panel dos-panel-right dos-hero-panel">
           {showMissionPreview && crime ? (
-            <div className="dos-mission-content">
+            <div
+              className="dos-mission-content"
+              onClick={!missionComplete ? completeMissionAnimation : undefined}
+              onTouchStart={!missionComplete ? (e) => { e.preventDefault(); completeMissionAnimation() } : undefined}
+              style={{ cursor: !missionComplete ? 'pointer' : 'default', touchAction: 'manipulation' }}
+            >
               <div className="dos-mission-title">MISSÃO</div>
               <div className="dos-mission-case">
                 CASO #{crime.caseNumber || String(crime.id).slice(-4).padStart(4, '0')} · {crime.type || 'CRIME'}
               </div>
               <div className="dos-mission-description">
-                {(Array.isArray(crime.description)
-                  ? crime.description
-                  : typeof crime.description === 'string'
-                    ? crime.description.split('\n')
-                    : crime.description && typeof crime.description === 'object'
-                      ? Object.values(crime.description)
-                      : []
-                ).map((line, i) => (
-                  <div key={i}>{typeof line === 'string' ? line : String(line ?? '')}</div>
+                {missionLines.map((line, i) => (
+                  <div key={i}>
+                    {line}
+                    {i === missionCurrentLineIndex && !missionComplete && !missionDots && (
+                      <span className="cursor-blink" style={{ color: '#00FF66', marginLeft: '2px' }}>█</span>
+                    )}
+                  </div>
                 ))}
+                {missionDots && <span style={{ color: '#00CC55' }}>{missionDots}</span>}
               </div>
             </div>
           ) : (

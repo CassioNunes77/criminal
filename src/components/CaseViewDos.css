@@ -1,0 +1,39 @@
+/* Estilos específicos para CaseView */
+
+.case-view-content {
+  align-items: flex-start !important;
+  justify-content: flex-start !important;
+  text-align: left !important;
+  padding-top: 0 !important;
+  margin-top: 0 !important;
+}
+
+.case-view-content .dos-mission-title {
+  text-align: left !important;
+  margin-bottom: 8px !important;
+  margin-top: 0 !important;
+  padding-top: 0 !important;
+}
+
+.case-view-content .dos-mission-case {
+  text-align: left !important;
+  margin-bottom: 12px !important;
+}
+
+.case-view-content .dos-mission-description {
+  text-align: left !important;
+  line-height: 1.6 !important;
+  font-size: 12px !important;
+}
+
+.case-view-content .dos-mission-description div {
+  margin-bottom: 4px !important;
+  text-align: left !important;
+}
+
+/* Remover centralização do painel direito quando for CaseView */
+.dos-panel-right .case-view-content {
+  display: block !important;
+  height: auto !important;
+  overflow-y: auto !important;
+}

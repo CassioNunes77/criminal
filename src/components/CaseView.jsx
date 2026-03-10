@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import './CaseView.css'
 import './Home.css'
+import './CaseViewDos.css'
 
 function CaseView({ crime, onBack }) {
   const [selectedButton, setSelectedButton] = useState(0)
@@ -89,8 +90,8 @@ function CaseView({ crime, onBack }) {
         </div>
 
         {/* Painel direito - CASO */}
-        <div className="dos-panel dos-panel-right dos-hero-panel">
-          <div className="dos-mission-content">
+        <div className="dos-panel dos-panel-right">
+          <div className="dos-mission-content case-view-content">
             <div className="dos-mission-title">CASO</div>
             <div className="dos-mission-case">
               CASO #{crime.caseNumber || String(crime.id).slice(-4).padStart(4, '0')} · {crime.type || 'CRIME'}

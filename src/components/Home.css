@@ -236,7 +236,9 @@
   font-family: 'PxPlus IBM VGA8', monospace;
   font-size: 13px;
   cursor: pointer;
-  padding: 4px 0;
+  padding: 2px 0;
+  margin: 0;
+  line-height: 1.2;
   text-align: left;
   transition: color 0.15s ease;
 }
@@ -332,8 +334,10 @@
   }
 
   .dos-file-item {
-    padding: 4px 0;
+    padding: 2px 0;
     font-size: 14px;
+    margin: 0;
+    line-height: 1.2;
   }
 }
 

@@ -650,26 +650,82 @@ function Investigation({ crime, state, onDiscoverClue, onViewWitness, onMakeAccu
                 {feedback}
               </div>
             )}
-            <div className="accusation-options">
-              <button
-                className={`dos-mission-btn ${accusationFocusIndex === 0 ? 'dos-file-selected' : ''}`}
-                onClick={() => setSelectedSuspect(suspectsWithRecords[0]?.name || '')}
-              >
-                SUSPEITO: {selectedSuspect || 'SELECIONAR'}
-              </button>
-              <button
-                className={`dos-mission-btn ${accusationFocusIndex === 1 ? 'dos-file-selected' : ''}`}
-                onClick={() => setSelectedLocation(crime.locations[0] || '')}
-              >
-                LOCAL: {selectedLocation || 'SELECIONAR'}
-              </button>
-              <button
-                className={`dos-mission-btn ${accusationFocusIndex === 2 ? 'dos-file-selected' : ''}`}
-                onClick={() => setSelectedMethod(crime.methods[0] || '')}
-              >
-                METODO: {selectedMethod || 'SELECIONAR'}
-              </button>
+            <div className="form-group">
+              <div className="form-label">SUSPEITO:</div>
+              <div className="form-options">
+                {suspectsWithRecords.map((suspect) => {
+                  const suspectName = typeof suspect === 'object' ? (suspect.name ?? suspect.displayName ?? '') : String(suspect)
+                  const suspectDisplay = typeof suspect === 'object' ? (suspect.displayName ?? suspect.name ?? '') : String(suspect)
+                  return (
+                    <button
+                      key={String(suspectName)}
+                      className={`option-button ${selectedSuspect === suspectName ? 'selected' : ''}`}
+                      onClick={() => setSelectedSuspect(suspectName)}
+                    >
+                      &gt; {String(suspectDisplay)}
+                      {typeof suspect === 'object' && suspect.cargo ? ` (${String(suspect.cargo)})` : ''}
+                    </button>
+                  )
+                })}
+              </div>
             </div>
+
+            <div className="form-group">
+              <div className="form-label">LOCAL:</div>
+              <div className="form-options">
+                {crime.locations.map((location, locIdx) => {
+                  const locStr = typeof location === 'string' ? location : (location?.type ?? location?.name ?? location?.value ?? String(location ?? ''))
+                  return (
+                    <button
+                      key={locIdx}
+                      className={`option-button ${selectedLocation === locStr ? 'selected' : ''}`}
+                      onClick={() => setSelectedLocation(locStr)}
+                    >
+                      &gt; {locStr}
+                    </button>
+                  )
+                })}
+              </div>
+            </div>
+
+            <div className="form-group">
+              <div className="form-label">METODO:</div>
+              <div className="form-options">
+                {crime.methods.map((method, methodIdx) => {
+                  const methodStr = typeof method === 'string' ? method : (method?.type ?? method?.name ?? method?.value ?? String(method ?? ''))
+                  return (
+                    <button
+                      key={methodIdx}
+                      className={`option-button ${selectedMethod === methodStr ? 'selected' : ''}`}
+                      onClick={() => setSelectedMethod(methodStr)}
+                    >
+                      &gt; {methodStr}
+                    </button>
+                  )
+                })}
+              </div>
+            </div>
+
+            <button 
+              className="terminal-button highlight"
+              onClick={handleAccusation}
+              style={{
+                opacity: remainingAttempts <= 0 ? 0.5 : 1,
+                cursor: remainingAttempts <= 0 ? 'not-allowed' : 'pointer',
+                display: 'flex',
+                alignItems: 'center'
+              }}
+            >
+              &gt; CONFIRMAR ACUSACAO
+            </button>
+
+            <button 
+              className="terminal-button secondary"
+              onClick={() => setShowAccusation(false)}
+              style={{ display: 'flex', alignItems: 'center' }}
+            >
+              &gt; CANCELAR
+            </button>
           </div>
         ) : (
           <div className="dos-prompt">

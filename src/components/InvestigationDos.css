@@ -216,6 +216,8 @@
   flex-direction: column;
   gap: 8px;
   width: 100%;
+  max-height: 300px;
+  overflow-y: auto;
 }
 
 .investigation-dos .accusation-title {
@@ -226,17 +228,60 @@
   text-align: left !important;
 }
 
-.investigation-dos .accusation-options {
-  display: flex;
-  gap: 12px;
-  align-items: center;
-  flex-wrap: wrap;
+.investigation-dos .form-group {
+  margin-bottom: 8px;
 }
 
-.investigation-dos .accusation-options .dos-mission-btn {
+.investigation-dos .form-label {
+  font-size: 12px;
+  font-weight: bold;
+  color: var(--text-secondary);
+  margin-bottom: 4px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.investigation-dos .form-options {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.investigation-dos .form-options .option-button {
   font-size: 11px;
+  padding: 3px 8px;
+  margin: 1px 0;
+  text-align: left;
+}
+
+.investigation-dos .terminal-button {
+  background: none;
+  border: none;
+  color: var(--text-primary);
+  font-family: 'PxPlus IBM VGA8', monospace;
+  font-size: 12px;
+  cursor: pointer;
   padding: 6px 12px;
-  min-width: 120px;
+  margin: 4px 0;
+  text-align: left;
+  transition: color 0.15s ease;
+  display: block;
+  width: 100%;
+}
+
+.investigation-dos .terminal-button.highlight {
+  color: var(--text-highlight);
+  border: 1px solid var(--text-highlight);
+}
+
+.investigation-dos .terminal-button.secondary {
+  color: var(--text-secondary);
+  border: 1px solid var(--text-secondary);
+}
+
+.investigation-dos .terminal-button:hover {
+  color: var(--text-highlight);
+  text-shadow: 0 0 4px var(--glow-color);
 }
 
 /* Estilos para seções de acusação no painel esquerdo */

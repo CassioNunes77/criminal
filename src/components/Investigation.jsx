@@ -496,6 +496,21 @@ function Investigation({ crime, state, onDiscoverClue, onViewWitness, onMakeAccu
             <div className="dos-folder-item">SYSTEM &gt;FOLDER&lt;</div>
             <div className="dos-folder-item">SETTINGS &gt;FOLDER&lt;</div>
           </div>
+          
+          {/* Hipótese atual */}
+          <div className="dos-folder-sep" />
+          <div className="dos-folder-list">
+            <div className="dos-folder-item">HIPOTESE &gt;FOLDER&lt;</div>
+            <div className="hypothesis-item">
+              SUSPEITO: {showViewResult && state.hypothesis?.suspect ? state.hypothesis.suspect : (selectedSuspect || '?')}
+            </div>
+            <div className="hypothesis-item">
+              LOCAL: {showViewResult && state.hypothesis?.location ? state.hypothesis.location : (selectedLocation || '?')}
+            </div>
+            <div className="hypothesis-item">
+              METODO: {showViewResult && state.hypothesis?.method ? state.hypothesis.method : (selectedMethod || '?')}
+            </div>
+          </div>
         </div>
 
         {/* Painel direito - conteúdo da investigação */}
@@ -621,20 +636,6 @@ function Investigation({ crime, state, onDiscoverClue, onViewWitness, onMakeAccu
                   ))}
                 </div>
               )}
-              
-              {/* Hipótese atual */}
-              <div className="hypothesis-section">
-                <div className="section-title">HIPOTESE ATUAL:</div>
-                <div className="hypothesis-line">
-                  SUSPEITO: {showViewResult && state.hypothesis?.suspect ? state.hypothesis.suspect : (selectedSuspect || '?')}
-                </div>
-                <div className="hypothesis-line">
-                  LOCAL: {showViewResult && state.hypothesis?.location ? state.hypothesis.location : (selectedLocation || '?')}
-                </div>
-                <div className="hypothesis-line">
-                  METODO: {showViewResult && state.hypothesis?.method ? state.hypothesis.method : (selectedMethod || '?')}
-                </div>
-              </div>
             </div>
           </div>
         </div>

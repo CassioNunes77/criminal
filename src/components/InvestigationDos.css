@@ -175,6 +175,15 @@
   text-align: left !important;
 }
 
+.investigation-dos .hypothesis-item {
+  font-size: 10px;
+  color: var(--text-primary);
+  padding: 2px 0;
+  margin: 1px 0;
+  font-family: 'PxPlus IBM VGA8', monospace;
+  line-height: 1.3;
+}
+
 .investigation-dos .hypothesis-section {
   margin: 12px 0;
   padding: 8px 0;

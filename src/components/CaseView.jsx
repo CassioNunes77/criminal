@@ -1,8 +1,22 @@
 import { useState, useEffect } from 'react'
 import './CaseView.css'
+import './Home.css'
 
 function CaseView({ crime, onBack }) {
   const [selectedButton, setSelectedButton] = useState(0)
+  const [currentTime, setCurrentTime] = useState(() => {
+    if (typeof window === 'undefined') return '00:00'
+    const d = new Date()
+    return `${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`
+  })
+
+  useEffect(() => {
+    const t = setInterval(() => {
+      const d = new Date()
+      setCurrentTime(`${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`)
+    }, 1000)
+    return () => clearInterval(t)
+  }, [])
 
   // Keyboard navigation
   useEffect(() => {
@@ -22,85 +36,88 @@ function CaseView({ crime, onBack }) {
     }
   }, [onBack])
 
+  const dosFiles = [
+    { name: 'VOLTAR.EXE', action: 'back' },
+  ]
+  const dosFolders = ['CASOS', 'DOSSIE', 'SETTINGS']
+
+  const handleFileAction = (action) => {
+    if (action === 'back') {
+      onBack()
+    }
+  }
+
   return (
-    <div className="case-view" style={{
-      fontFamily: "'PxPlus IBM VGA8', monospace",
-      color: '#00CC55',
-      background: '#020403'
-    }}>
-      <div className="terminal-header">
-        <div className="separator separator-full-width" style={{
-          color: '#007A33',
-          fontSize: '14px',
-          margin: '12px 0'
-        }}>{'═'.repeat(150)}</div>
-        <div className="title" style={{
-          fontFamily: "'PxPlus IBM VGA8', monospace",
-          fontSize: '32px',
-          padding: '8px 0',
-          color: '#00FF66'
-        }}>
-          CASO
-        </div>
-        <div className="separator separator-full-width" style={{
-          color: '#007A33',
-          fontSize: '14px',
-          margin: '12px 0'
-        }}>{'═'.repeat(150)}</div>
+    <div 
+      className="home home-dos"
+      style={{
+        fontFamily: "'PxPlus IBM VGA8', monospace",
+        color: '#00CC55',
+        background: '#020403'
+      }}
+    >
+      {/* Top bar - linha superior + relógio */}
+      <div className="dos-top-bar">
+        <div className="dos-top-line" />
+        <div className="dos-clock">{currentTime}</div>
       </div>
 
-      <div className="terminal-content" style={{
-        lineHeight: '1.8',
-        fontSize: '14px',
-        marginTop: '20px'
-      }}>
-        <div style={{
-          whiteSpace: 'pre-wrap',
-          wordWrap: 'break-word',
-          color: '#00CC55',
-          fontFamily: "'PxPlus IBM VGA8', monospace",
-          minHeight: '200px',
-          lineHeight: '1.8'
-        }}>
-          {crime.description.map((line, index) => (
-            <div key={index} style={{ 
-              marginBottom: line === '' ? '12px' : '4px',
-              minHeight: line === '' ? '12px' : 'auto'
-            }}>
-              {line}
-            </div>
-          ))}
+      {/* Conteúdo principal - dois painéis */}
+      <div className="dos-main">
+        {/* Painel esquerdo - arquivos e pastas */}
+        <div className="dos-panel dos-panel-left">
+          <div className="dos-file-list">
+            {dosFiles.map((f, i) => (
+              <button
+                key={f.name}
+                className={`dos-file-item ${selectedButton === i ? 'dos-file-selected' : ''}`}
+                onClick={() => handleFileAction(f.action)}
+                onMouseEnter={() => setSelectedButton(i)}
+              >
+                {f.name}
+              </button>
+            ))}
+          </div>
+          <div className="dos-folder-sep" />
+          <div className="dos-folder-list">
+            {dosFolders.map((folder) => (
+              <div key={folder} className="dos-folder-item">
+                {folder} &gt;FOLDER&lt;
+              </div>
+            ))}
+          </div>
         </div>
 
-        <button 
-          className="terminal-button" 
+        {/* Painel direito - CASO */}
+        <div className="dos-panel dos-panel-right dos-hero-panel">
+          <div className="dos-mission-content">
+            <div className="dos-mission-title">CASO</div>
+            <div className="dos-mission-case">
+              CASO #{crime.caseNumber || String(crime.id).slice(-4).padStart(4, '0')} · {crime.type || 'CRIME'}
+            </div>
+            <div className="dos-mission-description">
+              {crime.description.map((line, index) => (
+                <div key={index}>
+                  {line}
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Barra inferior - VOLTAR */}
+      <div className="dos-bottom-bar">
+        <button
+          className="dos-mission-btn dos-file-selected"
           onClick={onBack}
-          style={{
-            background: 'none',
-            border: 'none',
-            color: selectedButton === 0 ? '#00FF66' : '#00CC55',
-            fontFamily: "'PxPlus IBM VGA8', monospace",
-            fontSize: '16px',
-            cursor: 'pointer',
-            padding: '8px 0',
-            margin: '8px 0',
-            textAlign: 'left',
-            width: '100%',
-            transition: 'color 0.2s ease',
-            display: 'flex',
-            alignItems: 'center'
-          }}
           onMouseEnter={() => setSelectedButton(0)}
         >
-          &gt; VOLTAR
-          {selectedButton === 0 && (
-            <span className="cursor-blink" style={{
-              color: '#00FF66',
-              animation: 'blink 1s step-end infinite',
-              marginLeft: '4px'
-            }}>█</span>
-          )}
+          VOLTAR
         </button>
+        <div className="dos-version">
+          NEXO TERMINAL v1.0
+        </div>
       </div>
     </div>
   )

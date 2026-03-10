@@ -499,7 +499,7 @@ function Investigation({ crime, state, onDiscoverClue, onViewWitness, onMakeAccu
         </div>
 
         {/* Painel direito - conteúdo da investigação */}
-        <div className="dos-panel dos-panel-right dos-hero-panel">
+        <div className="dos-panel dos-panel-right">
           <div className="dos-mission-content investigation-content">
             {/* Header com título do caso */}
             <div className="dos-mission-title">

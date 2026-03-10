@@ -2,6 +2,8 @@ import { useState, useEffect, useRef } from 'react'
 import { TypewriterSound } from '../utils/typewriterSound'
 import CaseView from './CaseView'
 import './Investigation.css'
+import './Home.css'
+import './InvestigationDos.css'
 
 function Investigation({ crime, state, onDiscoverClue, onViewWitness, onMakeAccusation, onBack, onViewResult, x7 }) {
   const typewriterSoundRef = useRef(null)
@@ -32,6 +34,19 @@ function Investigation({ crime, state, onDiscoverClue, onViewWitness, onMakeAccu
   const [titleAnimationComplete, setTitleAnimationComplete] = useState(false)
   const [dateGlitched, setDateGlitched] = useState(false)
   const [dateGlitchAnim, setDateGlitchAnim] = useState(false)
+  const [currentTime, setCurrentTime] = useState(() => {
+    if (typeof window === 'undefined') return '00:00'
+    const d = new Date()
+    return `${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`
+  })
+
+  useEffect(() => {
+    const t = setInterval(() => {
+      const d = new Date()
+      setCurrentTime(`${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`)
+    }, 1000)
+    return () => clearInterval(t)
+  }, [])
 
   // Title animation - typewriter effect like Home screen
   useEffect(() => {
@@ -376,68 +391,93 @@ function Investigation({ crime, state, onDiscoverClue, onViewWitness, onMakeAccu
   }
 
   return (
-    <div className="investigation" onMouseDown={handleMouseInteraction} onPointerDown={handleMouseInteraction}>
-      <div className="terminal-header">
-        <div className="separator separator-full-width">{'═'.repeat(150)}</div>
-        <div className="case-title-animated" style={{
-          fontFamily: "'PxPlus IBM VGA8', monospace",
-          fontSize: '18px',
-          padding: '8px 0',
-          color: '#00FF66',
-          lineHeight: 1.6
-        }}>
-          <div>
-            {titleLine1}
-            {!titleAnimationComplete && titleLine2 === '' && titleLine1 && <span className="cursor-blink" style={{ animation: 'blink 1s step-end infinite' }}>█</span>}
-          </div>
-          <div>
-            {titleLine2}
-            {!titleAnimationComplete && titleLine2 && titleLine3 === '' && <span className="cursor-blink" style={{ animation: 'blink 1s step-end infinite' }}>█</span>}
-          </div>
-          <div className={dateGlitchAnim ? 'date-glitch' : ''}>
-            {titleLine3}
-            {!titleAnimationComplete && titleLine3 && !dateGlitchAnim && <span className="cursor-blink" style={{ animation: 'blink 1s step-end infinite' }}>█</span>}
-          </div>
-        </div>
-        <div className="separator separator-full-width">{'═'.repeat(150)}</div>
+    <div 
+      className="home home-dos investigation-dos"
+      onMouseDown={handleMouseInteraction} 
+      onPointerDown={handleMouseInteraction}
+      style={{
+        fontFamily: "'PxPlus IBM VGA8', monospace",
+        color: '#00CC55',
+        background: '#020403'
+      }}
+    >
+      {/* Top bar - linha superior + relógio */}
+      <div className="dos-top-bar">
+        <div className="dos-top-line" />
+        <div className="dos-clock">{currentTime}</div>
       </div>
 
-      <div className="terminal-content">
-        {/* Attempts counter */}
-        <div className="section-title">
-          TENTATIVAS: {maxAttempts > 3 ? currentAttempts : `${currentAttempts}/${maxAttempts} ${remainingAttempts > 0 ? `(${remainingAttempts} RESTANTES)` : '(ESGOTADAS)'}`}
-        </div>
-
-        {showViewResult && (
-          <div className={`feedback ${state.solved ? 'success' : 'error'}`}>
-            {state.solved ? 'CASO RESOLVIDO!' : 'CASO ENCERRADO. VOCE FALHOU.'}
+      {/* Conteúdo principal - dois painéis */}
+      <div className="dos-main">
+        {/* Painel esquerdo - arquivos e pastas */}
+        <div className="dos-panel dos-panel-left">
+          <div className="dos-file-list">
+            {mainButtons.map((buttonId, index) => {
+              const buttonLabels = {
+                witnesses: 'TESTEMUNHAS.EXE',
+                suspects: 'SUSPEITOS.EXE',
+                case: 'CASO.EXE',
+                accusation: remainingAttempts > 0 ? 'ACUSACAO.EXE' : 'ACUSACAO.BLOCKED',
+                viewResult: 'RESULTADO.EXE',
+                back: 'VOLTAR.EXE'
+              }
+              const isFocused = titleAnimationComplete && !showWitnesses && !showAccusation && focusableItems[selectedFocusIndex]?.id === buttonId
+              return (
+                <button
+                  key={buttonId}
+                  className={`dos-file-item ${isFocused ? 'dos-file-selected' : ''}`}
+                  onClick={() => {
+                    if (buttonId === 'witnesses') { setShowWitnesses(true); setWitnessNavActive(true) }
+                    else if (buttonId === 'suspects') setShowSuspects(true)
+                    else if (buttonId === 'case') setShowCaseView(true)
+                    else if (buttonId === 'accusation') setShowAccusation(true)
+                    else if (buttonId === 'viewResult') onViewResult()
+                    else if (buttonId === 'back') onBack()
+                  }}
+                  data-focused={isFocused ? 'true' : undefined}
+                  onMouseEnter={() => {
+                    const idx = focusableItems.findIndex(item => item.id === buttonId)
+                    if (idx >= 0) setSelectedFocusIndex(idx)
+                  }}
+                  style={{
+                    opacity: buttonId === 'accusation' && remainingAttempts <= 0 ? 0.5 : 1,
+                    cursor: buttonId === 'accusation' && remainingAttempts <= 0 ? 'not-allowed' : 'pointer'
+                  }}
+                >
+                  {buttonLabels[buttonId]}
+                  {isFocused && (
+                    <span className="cursor-blink" style={{
+                      color: '#00FF66',
+                      animation: 'blink 1s step-end infinite',
+                      marginLeft: '4px'
+                    }}>█</span>
+                  )}
+                </button>
+              )
+            })}
           </div>
-        )}
-
-        {/* Clues Section */}
-        <div className="clues-section">
-          <div className="section-title progress-inline">
-            PISTAS DISPONIVEIS: {revealedClues.length}/{crime.clues.length}
-            <span className="progress-bar">{renderProgressBar(revealedClues.length, crime.clues.length)}</span>
-          </div>
-
+          
+          {/* Pistas disponíveis */}
           {canDiscoverMore && (
-            <div className="clue-selection">
-              <div className="form-label">
-                {showViewResult ? 'PISTAS NAO REVELADAS (visualizar nao altera estatisticas):' : 'ESCOLHA QUAL PISTA REVELAR:'}
-              </div>
-              <div className="form-options">
+            <>
+              <div className="dos-folder-sep" />
+              <div className="dos-folder-list">
+                <div className="dos-folder-item">PISTAS &gt;FOLDER&lt;</div>
                 {availableClues.map((clue, index) => {
-                  const isSelected = titleAnimationComplete && !showWitnesses && !showAccusation && focusableItems[selectedFocusIndex]?.type === 'clue' && focusableItems[selectedFocusIndex]?.index === index
+                  const isFocused = titleAnimationComplete && !showWitnesses && !showAccusation && focusableItems[selectedFocusIndex]?.type === 'clue' && focusableItems[selectedFocusIndex]?.index === index
                   return (
                     <button
                       key={index}
-                      className={`option-button ${isSelected ? 'selected' : ''}`}
+                      className={`dos-file-item ${isFocused ? 'dos-file-selected' : ''}`}
                       onClick={() => handleDiscoverClue(clue.type)}
-                      data-focused={isSelected ? 'true' : undefined}
+                      data-focused={isFocused ? 'true' : undefined}
+                      onMouseEnter={() => {
+                        const idx = focusableItems.findIndex(item => item.type === 'clue' && item.index === index)
+                        if (idx >= 0) setSelectedFocusIndex(idx)
+                      }}
                     >
-                      &gt; {clue.type}..
-                      {isSelected && (
+                      {clue.type}.DAT
+                      {isFocused && (
                         <span className="cursor-blink" style={{
                           color: '#00FF66',
                           animation: 'blink 1s step-end infinite',
@@ -448,373 +488,196 @@ function Investigation({ crime, state, onDiscoverClue, onViewWitness, onMakeAccu
                   )
                 })}
               </div>
-            </div>
+            </>
           )}
-
-          {revealedClues.length > 0 && (
-            <div className="clues-list">
-              <div className="section-title">PISTAS REVELADAS:</div>
-              {revealedClues.map((clue, index) => (
-                <div key={index} className="clue-item">
-                  <span className="clue-text">[{clue.type}]: {clue.text}</span>
-                </div>
-              ))}
-            </div>
-          )}
+          
+          <div className="dos-folder-sep" />
+          <div className="dos-folder-list">
+            <div className="dos-folder-item">SYSTEM &gt;FOLDER&lt;</div>
+            <div className="dos-folder-item">SETTINGS &gt;FOLDER&lt;</div>
+          </div>
         </div>
 
-        {/* Witnesses Section */}
-        <div className="witnesses-section">
-          <div className="section-title progress-inline">
-            TESTEMUNHAS: {witnessesViewed.length}/{crime.witnesses.length}
-            <span className="progress-bar">{renderProgressBar(witnessesViewed.length, crime.witnesses.length)}</span>
-          </div>
-
-          {!showWitnesses && (
-            <button 
-              className="terminal-button" 
-              onClick={() => { setShowWitnesses(true); setWitnessNavActive(true) }}
-              data-focused={titleAnimationComplete && !showAccusation && focusableItems[selectedFocusIndex]?.id === 'witnesses' ? 'true' : undefined}
-            >
-              &gt; VER TESTEMUNHAS
-              {titleAnimationComplete && !showAccusation && focusableItems[selectedFocusIndex]?.id === 'witnesses' && (
-                <span className="cursor-blink" style={{
-                  color: '#00FF66',
-                  animation: 'blink 1s step-end infinite',
-                  marginLeft: '4px'
-                }}>█</span>
+        {/* Painel direito - conteúdo da investigação */}
+        <div className="dos-panel dos-panel-right dos-hero-panel">
+          <div className="dos-mission-content investigation-content">
+            {/* Header com título do caso */}
+            <div className="dos-mission-title">
+              <div>
+                {titleLine1}
+                {!titleAnimationComplete && titleLine2 === '' && titleLine1 && <span className="cursor-blink" style={{ animation: 'blink 1s step-end infinite' }}>█</span>}
+              </div>
+              <div>
+                {titleLine2}
+                {!titleAnimationComplete && titleLine2 && titleLine3 === '' && <span className="cursor-blink" style={{ animation: 'blink 1s step-end infinite' }}>█</span>}
+              </div>
+              <div className={dateGlitchAnim ? 'date-glitch' : ''}>
+                {titleLine3}
+                {!titleAnimationComplete && titleLine3 && !dateGlitchAnim && <span className="cursor-blink" style={{ animation: 'blink 1s step-end infinite' }}>█</span>}
+              </div>
+            </div>
+            
+            {/* Status e tentativas */}
+            <div className="dos-mission-description">
+              <div className="status-line">
+                TENTATIVAS: {maxAttempts > 3 ? currentAttempts : `${currentAttempts}/${maxAttempts} ${remainingAttempts > 0 ? `(${remainingAttempts} RESTANTES)` : '(ESGOTADAS)'}`}
+              </div>
+              
+              {showViewResult && (
+                <div className={`feedback ${state.solved ? 'success' : 'error'}`}>
+                  {state.solved ? 'CASO RESOLVIDO!' : 'CASO ENCERRADO. VOCE FALHOU.'}
+                </div>
               )}
-            </button>
-          )}
 
-          {(showWitnesses || witnessesViewed.length === crime.witnesses.length) && (() => {
-            const witnessButtons = crime.witnesses
-              .map((_, i) => i)
-              .filter(i => !witnessesViewed.includes(i))
-            return (
-            <div className="witnesses-list">
-              {crime.witnesses.map((witness, index) => {
-                const buttonIdx = witnessButtons.indexOf(index)
-                const isFocused = !showAccusation && buttonIdx >= 0 && buttonIdx === selectedWitnessIndex
-                return (
-                  <div key={index} className="witness-item">
-                    <div className="witness-header">
-                      <span className="witness-name">
-                        {witness.name}
-                        {witness.cargo && (
-                          <span className="witness-cargo"> ({witness.cargo})</span>
+              {/* Pistas reveladas */}
+              {revealedClues.length > 0 && (
+                <div className="revealed-clues">
+                  <div className="section-title">PISTAS REVELADAS ({revealedClues.length}/{crime.clues.length}):</div>
+                  {revealedClues.map((clue, index) => (
+                    <div key={index} className="clue-item">
+                      <span className="clue-text">[{clue.type}]: {clue.text}</span>
+                    </div>
+                  ))}
+                </div>
+              )}
+              
+              {/* Testemunhas */}
+              {(showWitnesses || witnessesViewed.length > 0) && (
+                <div className="witnesses-content">
+                  <div className="section-title">TESTEMUNHAS ({witnessesViewed.length}/{crime.witnesses.length}):</div>
+                  {crime.witnesses.map((witness, index) => {
+                    const buttonIdx = crime.witnesses.map((_, i) => i).filter(i => !witnessesViewed.includes(i)).indexOf(index)
+                    const isFocused = !showAccusation && buttonIdx >= 0 && buttonIdx === selectedWitnessIndex
+                    return (
+                      <div key={index} className="witness-item">
+                        <div className="witness-header">
+                          <span className="witness-name">
+                            {witness.name}
+                            {witness.cargo && (
+                              <span className="witness-cargo"> ({witness.cargo})</span>
+                            )}
+                          </span>
+                          {witnessesViewed.includes(index) && (
+                            <span className={`witness-status ${witness.isTruthful ? 'truthful' : 'false'}`}>
+                              {witness.isTruthful ? '[VERDADEIRA]' : '[PODE SER FALSA]'}
+                            </span>
+                          )}
+                        </div>
+                        {witnessesViewed.includes(index) ? (
+                          <div className="witness-statement">{witness.statement}</div>
+                        ) : (
+                          <button
+                            className={`option-button ${isFocused ? 'selected' : ''}`}
+                            onClick={() => handleViewWitness(index)}
+                            data-focused={isFocused ? 'true' : undefined}
+                          >
+                            &gt; VER DEPOIMENTO
+                            {isFocused && (
+                              <span className="cursor-blink" style={{
+                                color: '#00FF66',
+                                animation: 'blink 1s step-end infinite',
+                                marginLeft: '4px'
+                              }}>█</span>
+                            )}
+                          </button>
                         )}
-                      </span>
-                      {witnessesViewed.includes(index) && (
-                        <span className={`witness-status ${witness.isTruthful ? 'truthful' : 'false'}`}>
-                          {witness.isTruthful ? '[VERDADEIRA]' : '[PODE SER FALSA]'}
-                        </span>
+                      </div>
+                    )
+                  })}
+                </div>
+              )}
+              
+              {/* Suspeitos */}
+              {showSuspects && (
+                <div className="suspects-content">
+                  <div className="section-title">BANCO DE DADOS DOS SUSPEITOS:</div>
+                  {suspectsWithRecords.map((suspect, index) => (
+                    <div key={index} className="suspect-record">
+                      <div className="suspect-name">
+                        {suspect.displayName || suspect.name}
+                        {suspect.cargo && (
+                          <span className="suspect-cargo"> ({suspect.cargo})</span>
+                        )}
+                      </div>
+                      <div className="suspect-record-text">
+                        HISTORICO: {suspect.criminalRecord}
+                      </div>
+                      {suspect.comportamento && (
+                        <div className="suspect-record-text">
+                          COMPORTAMENTO: {suspect.comportamento}
+                        </div>
+                      )}
+                      {suspect.caracteristica && (
+                        <div className="suspect-record-text">
+                          CARACTERISTICA: {suspect.caracteristica}
+                        </div>
+                      )}
+                      {suspect.veiculo && (
+                        <div className="suspect-record-text">
+                          VEICULO: {suspect.veiculo}
+                        </div>
                       )}
                     </div>
-                    {witnessesViewed.includes(index) ? (
-                      <div className="witness-statement">{witness.statement}</div>
-                    ) : (
-                      <button
-                        className={`option-button ${isFocused ? 'selected' : ''}`}
-                        onClick={() => handleViewWitness(index)}
-                        data-focused={isFocused ? 'true' : undefined}
-                      >
-                        &gt; VER DEPOIMENTO
-                        {isFocused && (
-                          <span className="cursor-blink" style={{
-                            color: '#00FF66',
-                            animation: 'blink 1s step-end infinite',
-                            marginLeft: '4px'
-                          }}>█</span>
-                        )}
-                      </button>
-                    )}
-                  </div>
-                )
-              })}
-            </div>
-            )
-          })()}
-        </div>
-
-        {/* Suspects Database */}
-        <div className="suspects-section">
-          {!showSuspects ? (
-            <button 
-              className="terminal-button" 
-              onClick={() => setShowSuspects(true)}
-              data-focused={titleAnimationComplete && !showWitnesses && !showAccusation && focusableItems[selectedFocusIndex]?.id === 'suspects' ? 'true' : undefined}
-            >
-              &gt; BANCO DE DADOS DOS SUSPEITOS
-              {titleAnimationComplete && !showWitnesses && !showAccusation && focusableItems[selectedFocusIndex]?.id === 'suspects' && (
-                <span className="cursor-blink" style={{
-                  color: '#00FF66',
-                  animation: 'blink 1s step-end infinite',
-                  marginLeft: '4px'
-                }}>█</span>
+                  ))}
+                </div>
               )}
-            </button>
-          ) : (
-            <div className="suspects-database">
-              <div className="section-title">BANCO DE DADOS DOS SUSPEITOS:</div>
-              {suspectsWithRecords.map((suspect, index) => (
-                <div key={index} className="suspect-record">
-                  <div className="suspect-name">
-                    {suspect.displayName || suspect.name}
-                    {suspect.cargo && (
-                      <span className="suspect-cargo"> ({suspect.cargo})</span>
-                    )}
-                  </div>
-                  <div className="suspect-record-text">
-                    HISTORICO: {suspect.criminalRecord}
-                  </div>
-                  {suspect.comportamento && (
-                    <div className="suspect-record-text">
-                      COMPORTAMENTO: {suspect.comportamento}
-                    </div>
-                  )}
-                  {suspect.caracteristica && (
-                    <div className="suspect-record-text">
-                      CARACTERISTICA: {suspect.caracteristica}
-                    </div>
-                  )}
-                  {suspect.veiculo && (
-                    <div className="suspect-record-text">
-                      VEICULO: {suspect.veiculo}
-                    </div>
-                  )}
+              
+              {/* Hipótese atual */}
+              <div className="hypothesis-section">
+                <div className="section-title">HIPOTESE ATUAL:</div>
+                <div className="hypothesis-line">
+                  SUSPEITO: {showViewResult && state.hypothesis?.suspect ? state.hypothesis.suspect : (selectedSuspect || '?')}
                 </div>
-              ))}
-            </div>
-          )}
-        </div>
-
-        {/* Case Description Section */}
-        <div className="case-section">
-          <button 
-            className="terminal-button" 
-            onClick={() => setShowCaseView(true)}
-            data-focused={titleAnimationComplete && !showWitnesses && !showAccusation && focusableItems[selectedFocusIndex]?.id === 'case' ? 'true' : undefined}
-          >
-            &gt; CASO
-            {titleAnimationComplete && !showWitnesses && !showAccusation && focusableItems[selectedFocusIndex]?.id === 'case' && (
-              <span className="cursor-blink" style={{
-                color: '#00FF66',
-                animation: 'blink 1s step-end infinite',
-                marginLeft: '4px'
-              }}>█</span>
-            )}
-          </button>
-        </div>
-
-        {/* Hypothesis Section */}
-        <div className="hypothesis-section">
-          <div className="section-title">HIPOTESE ATUAL:</div>
-          <div className="hypothesis-line">
-            SUSPEITO: {showViewResult && state.hypothesis?.suspect ? state.hypothesis.suspect : (selectedSuspect || '?')}
-          </div>
-          <div className="hypothesis-line">
-            LOCAL: {showViewResult && state.hypothesis?.location ? state.hypothesis.location : (selectedLocation || '?')}
-          </div>
-          <div className="hypothesis-line">
-            METODO: {showViewResult && state.hypothesis?.method ? state.hypothesis.method : (selectedMethod || '?')}
-          </div>
-        </div>
-
-        {/* Accusation Form */}
-        {!showAccusation ? (
-          <button 
-            className="terminal-button"
-            onClick={() => setShowAccusation(true)}
-            style={{
-              opacity: remainingAttempts <= 0 ? 0.85 : 1,
-              cursor: 'pointer'
-            }}
-            data-focused={titleAnimationComplete && !showWitnesses && !showAccusation && focusableItems[selectedFocusIndex]?.id === 'accusation' ? 'true' : undefined}
-          >
-            &gt; FAZER ACUSACAO ({remainingAttempts > 0 ? `${remainingAttempts} TENTATIVA${remainingAttempts !== 1 ? 'S' : ''} RESTANTE${remainingAttempts !== 1 ? 'S' : ''}` : 'ESGOTADAS'})
-            {titleAnimationComplete && !showWitnesses && !showAccusation && focusableItems[selectedFocusIndex]?.id === 'accusation' && (
-              <span className="cursor-blink" style={{
-                color: '#00FF66',
-                animation: 'blink 1s step-end infinite',
-                marginLeft: '4px'
-              }}>█</span>
-            )}
-          </button>
-        ) : showAccusation ? (
-          (() => {
-            const confirmIdx = suspectsWithRecords.length + crime.locations.length + crime.methods.length
-            const cancelIdx = confirmIdx + 1
-            let idx = 0
-            return (
-              <div className="accusation-form">
-                <div className="form-group">
-                  <div className="form-label">SUSPEITO:</div>
-                  <div className="form-options">
-                    {suspectsWithRecords.map((suspect) => {
-                      const curIdx = idx++
-                      const isFocused = accusationFocusIndex === curIdx
-                      const suspectName = typeof suspect === 'object' ? (suspect.name ?? suspect.displayName ?? '') : String(suspect)
-                      const suspectDisplay = typeof suspect === 'object' ? (suspect.displayName ?? suspect.name ?? '') : String(suspect)
-                      return (
-                        <button
-                          key={String(suspectName)}
-                          className={`option-button ${selectedSuspect === suspectName ? 'selected' : ''} ${isFocused ? 'focused' : ''}`}
-                          onClick={() => setSelectedSuspect(suspectName)}
-                          data-focused={showAccusation && isFocused ? 'true' : undefined}
-                        >
-                          &gt; {String(suspectDisplay)}
-                          {typeof suspect === 'object' && suspect.cargo ? ` (${String(suspect.cargo)})` : ''}
-                          {isFocused && (
-                            <span className="cursor-blink" style={{
-                              color: '#00FF66',
-                              animation: 'blink 1s step-end infinite',
-                              marginLeft: '4px'
-                            }}>█</span>
-                          )}
-                        </button>
-                      )
-                    })}
-                  </div>
+                <div className="hypothesis-line">
+                  LOCAL: {showViewResult && state.hypothesis?.location ? state.hypothesis.location : (selectedLocation || '?')}
                 </div>
-
-                <div className="form-group">
-                  <div className="form-label">LOCAL:</div>
-                  <div className="form-options">
-                    {crime.locations.map((location, locIdx) => {
-                      const curIdx = idx++
-                      const isFocused = accusationFocusIndex === curIdx
-                      const locStr = typeof location === 'string' ? location : (location?.type ?? location?.name ?? location?.value ?? String(location ?? ''))
-                      return (
-                        <button
-                          key={locIdx}
-                          className={`option-button ${selectedLocation === locStr ? 'selected' : ''} ${isFocused ? 'focused' : ''}`}
-                          onClick={() => setSelectedLocation(locStr)}
-                          data-focused={showAccusation && isFocused ? 'true' : undefined}
-                        >
-                          &gt; {locStr}
-                          {isFocused && (
-                            <span className="cursor-blink" style={{
-                              color: '#00FF66',
-                              animation: 'blink 1s step-end infinite',
-                              marginLeft: '4px'
-                            }}>█</span>
-                          )}
-                        </button>
-                      )
-                    })}
-                  </div>
+                <div className="hypothesis-line">
+                  METODO: {showViewResult && state.hypothesis?.method ? state.hypothesis.method : (selectedMethod || '?')}
                 </div>
-
-                <div className="form-group">
-                  <div className="form-label">METODO:</div>
-                  <div className="form-options">
-                    {crime.methods.map((method, methodIdx) => {
-                      const curIdx = idx++
-                      const isFocused = accusationFocusIndex === curIdx
-                      const methodStr = typeof method === 'string' ? method : (method?.type ?? method?.name ?? method?.value ?? String(method ?? ''))
-                      return (
-                        <button
-                          key={methodIdx}
-                          className={`option-button ${selectedMethod === methodStr ? 'selected' : ''} ${isFocused ? 'focused' : ''}`}
-                          onClick={() => setSelectedMethod(methodStr)}
-                          data-focused={showAccusation && isFocused ? 'true' : undefined}
-                        >
-                          &gt; {methodStr}
-                          {isFocused && (
-                            <span className="cursor-blink" style={{
-                              color: '#00FF66',
-                              animation: 'blink 1s step-end infinite',
-                              marginLeft: '4px'
-                            }}>█</span>
-                          )}
-                        </button>
-                      )
-                    })}
-                  </div>
-                </div>
-
-                {feedback && (
-                  <div className={`feedback ${feedback.includes('CORRETA') ? 'success' : feedback.includes('PERTO') ? 'warning' : 'error'}`}>
-                    {feedback}
-                  </div>
-                )}
-
-                <button 
-                  className={`terminal-button highlight ${accusationFocusIndex === confirmIdx ? 'focused' : ''}`}
-                  onClick={handleAccusation}
-                  data-focused={showAccusation && accusationFocusIndex === confirmIdx ? 'true' : undefined}
-                  style={{
-                    opacity: remainingAttempts <= 0 ? 0.5 : 1,
-                    cursor: remainingAttempts <= 0 ? 'not-allowed' : 'pointer',
-                    display: 'flex',
-                    alignItems: 'center'
-                  }}
-                >
-                  &gt; CONFIRMAR ACUSACAO
-                  {accusationFocusIndex === confirmIdx && (
-                    <span className="cursor-blink" style={{
-                      color: '#00FF66',
-                      animation: 'blink 1s step-end infinite',
-                      marginLeft: '4px'
-                    }}>█</span>
-                  )}
-                </button>
-
-                <button 
-                  className={`terminal-button secondary ${accusationFocusIndex === cancelIdx ? 'focused' : ''}`}
-                  onClick={() => setShowAccusation(false)}
-                  data-focused={showAccusation && accusationFocusIndex === cancelIdx ? 'true' : undefined}
-                  style={{ display: 'flex', alignItems: 'center' }}
-                >
-                  &gt; CANCELAR
-                  {accusationFocusIndex === cancelIdx && (
-                    <span className="cursor-blink" style={{
-                      color: '#00FF66',
-                      animation: 'blink 1s step-end infinite',
-                      marginLeft: '4px'
-                    }}>█</span>
-                  )}
-                </button>
               </div>
-            )
-          })()
-        ) : null}
+            </div>
+          </div>
+        </div>
+      </div>
 
-        {/* Ver resultado - ao final, quando caso resolvido ou tentativas esgotadas */}
-        {showViewResult && (
-          <>
-            <button 
-              className="terminal-button highlight"
-              onClick={onViewResult}
-              data-focused={titleAnimationComplete && !showWitnesses && !showAccusation && focusableItems[selectedFocusIndex]?.id === 'viewResult' ? 'true' : undefined}
-            >
-              &gt; VER RESULTADO
-              {titleAnimationComplete && !showWitnesses && !showAccusation && focusableItems[selectedFocusIndex]?.id === 'viewResult' && (
-                <span className="cursor-blink" style={{
-                  color: '#00FF66',
-                  animation: 'blink 1s step-end infinite',
-                  marginLeft: '4px'
-                }}>█</span>
-              )}
-            </button>
-          </>
+      {/* Barra inferior - formulário de acusação ou navegação */}
+      <div className="dos-bottom-bar">
+        {showAccusation ? (
+          <div className="accusation-form-dos">
+            <div className="accusation-title">FAZER ACUSACAO</div>
+            {feedback && (
+              <div className={`feedback ${feedback.includes('CORRETA') ? 'success' : feedback.includes('PERTO') ? 'warning' : 'error'}`}>
+                {feedback}
+              </div>
+            )}
+            <div className="accusation-options">
+              <button
+                className={`dos-mission-btn ${accusationFocusIndex === 0 ? 'dos-file-selected' : ''}`}
+                onClick={() => setSelectedSuspect(suspectsWithRecords[0]?.name || '')}
+              >
+                SUSPEITO: {selectedSuspect || 'SELECIONAR'}
+              </button>
+              <button
+                className={`dos-mission-btn ${accusationFocusIndex === 1 ? 'dos-file-selected' : ''}`}
+                onClick={() => setSelectedLocation(crime.locations[0] || '')}
+              >
+                LOCAL: {selectedLocation || 'SELECIONAR'}
+              </button>
+              <button
+                className={`dos-mission-btn ${accusationFocusIndex === 2 ? 'dos-file-selected' : ''}`}
+                onClick={() => setSelectedMethod(crime.methods[0] || '')}
+              >
+                METODO: {selectedMethod || 'SELECIONAR'}
+              </button>
+            </div>
+          </div>
+        ) : (
+          <div className="dos-prompt">
+            <div className="dos-version">
+              NEXO TERMINAL v1.0 · PRECISAO: {Math.max(0, 100 - (revealedClues.length * 5) - (witnessesViewed.length * 3) - (currentAttempts * 10))}%
+            </div>
+          </div>
         )}
-
-        <button 
-          className="terminal-button secondary"
-          onClick={onBack}
-          data-focused={titleAnimationComplete && !showWitnesses && !showAccusation && focusableItems[selectedFocusIndex]?.id === 'back' ? 'true' : undefined}
-        >
-          &gt; VOLTAR AO INICIO
-          {titleAnimationComplete && !showWitnesses && !showAccusation && focusableItems[selectedFocusIndex]?.id === 'back' && (
-            <span className="cursor-blink" style={{
-              color: '#00FF66',
-              animation: 'blink 1s step-end infinite',
-              marginLeft: '4px'
-            }}>█</span>
-          )}
-        </button>
       </div>
     </div>
   )

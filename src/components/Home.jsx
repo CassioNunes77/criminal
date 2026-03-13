@@ -758,14 +758,14 @@ function Home({ crime, streak, onStart, onAcceptMission, onShowStats }) {
                   onClick={handleAcceptMission}
                   onMouseEnter={() => setMissionButtonSelected(0)}
                 >
-                  ACEITAR.EXE
+                  ACEITAR
                 </button>
                 <button
                   className={`dos-file-item ${missionButtonSelected === 1 ? 'dos-file-selected' : ''}`}
                   onClick={handleRefuseMission}
                   onMouseEnter={() => setMissionButtonSelected(1)}
                 >
-                  RECUSAR.EXE
+                  RECUSAR
                 </button>
               </div>
             </>

@@ -191,30 +191,30 @@ function Home({ crime, streak, onStart, onAcceptMission, onShowStats }) {
     return () => clearInterval(interval)
   }, [])
 
-  // CRT monitor glitch effects - intensificados para simulação de monitor velho
+  // CRT monitor glitch effects - reduzidos para menos intensidade
   useEffect(() => {
     if (showAbout) return // Don't apply glitches on about screen
 
     const glitchInterval = setInterval(() => {
-      if (Math.random() < 0.45) {
+      if (Math.random() < 0.15) {
         setCrtGlitch(true)
-        setTimeout(() => setCrtGlitch(false), 100 + Math.random() * 200)
+        setTimeout(() => setCrtGlitch(false), 50 + Math.random() * 100)
       }
-    }, 1000 + Math.random() * 1500)
+    }, 3000 + Math.random() * 2000)
 
     const flickerInterval = setInterval(() => {
-      if (Math.random() < 0.6) {
+      if (Math.random() < 0.08) {
         setCrtFlicker(true)
-        setTimeout(() => setCrtFlicker(false), 40 + Math.random() * 80)
+        setTimeout(() => setCrtFlicker(false), 30 + Math.random() * 50)
       }
-    }, 500 + Math.random() * 800)
+    }, 4000 + Math.random() * 3000)
 
     const distortionInterval = setInterval(() => {
-      if (Math.random() < 0.3) {
-        setCrtDistortion(3 + Math.random() * 5)
-        setTimeout(() => setCrtDistortion(0), 200 + Math.random() * 400)
+      if (Math.random() < 0.1) {
+        setCrtDistortion(1 + Math.random() * 2)
+        setTimeout(() => setCrtDistortion(0), 50 + Math.random() * 100)
       }
-    }, 1500 + Math.random() * 2500)
+    }, 5000 + Math.random() * 3000)
 
     return () => {
       clearInterval(glitchInterval)
@@ -747,6 +747,29 @@ function Home({ crime, streak, onStart, onAcceptMission, onShowStats }) {
               </div>
             ))}
           </div>
+          
+          {/* Botões ACEITAR e RECUSAR quando em missão */}
+          {showMissionPreview && (
+            <>
+              <div className="dos-folder-sep" />
+              <div className="dos-file-list">
+                <button
+                  className={`dos-file-item ${missionButtonSelected === 0 ? 'dos-file-selected' : ''}`}
+                  onClick={handleAcceptMission}
+                  onMouseEnter={() => setMissionButtonSelected(0)}
+                >
+                  ACEITAR.EXE
+                </button>
+                <button
+                  className={`dos-file-item ${missionButtonSelected === 1 ? 'dos-file-selected' : ''}`}
+                  onClick={handleRefuseMission}
+                  onMouseEnter={() => setMissionButtonSelected(1)}
+                >
+                  RECUSAR.EXE
+                </button>
+              </div>
+            </>
+          )}
         </div>
 
         {/* Painel direito - NEXO TERMINAL, Missão, ARQUIVO ou INFO */}
@@ -834,25 +857,8 @@ function Home({ crime, streak, onStart, onAcceptMission, onShowStats }) {
           >
             VOLTAR
           </button>
-        ) : showMissionPreview ? (
-          <div className="dos-mission-buttons">
-            <button
-              className={`dos-mission-btn ${missionButtonSelected === 0 ? 'dos-file-selected' : ''}`}
-              onClick={handleAcceptMission}
-              onMouseEnter={() => setMissionButtonSelected(0)}
-            >
-              ACEITAR
-            </button>
-            <button
-              className={`dos-mission-btn ${missionButtonSelected === 1 ? 'dos-file-selected' : ''}`}
-              onClick={handleRefuseMission}
-              onMouseEnter={() => setMissionButtonSelected(1)}
-            >
-              RECUSAR
-            </button>
-          </div>
         ) : (
-        <div className="dos-prompt">
+          <div className="dos-prompt">
           {isCommandLineMode && titleAnimationComplete ? (
             isMobileLandscape ? (
               <>

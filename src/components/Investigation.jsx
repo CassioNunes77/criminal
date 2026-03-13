@@ -609,9 +609,54 @@ function Investigation({ crime, state, onDiscoverClue, onViewWitness, onMakeAccu
           </div>
         </div>
 
-        {/* Painel direito - conteúdo da investigação */}
+        {/* Painel direito - conteúdo da investigação ou tela de caso encerrado */}
         <div className="dos-panel dos-panel-right">
-          <div className="dos-mission-content investigation-content">
+          {showViewResult ? (
+            <div className="dos-mission-content investigation-content">
+              <div className="dos-mission-title">CASO ENCERRADO</div>
+              <div className="dos-mission-case">
+                CASO #{crime.caseNumber || String(crime.id).slice(-4).padStart(4, '0')} · {crime.type || 'CRIME'}
+              </div>
+              <div className="dos-mission-description">
+                <div className={`feedback ${state.solved ? 'success' : 'error'}`} style={{ fontSize: '14px', marginBottom: '16px', textAlign: 'center' }}>
+                  {state.solved ? 'CASO RESOLVIDO COM SUCESSO!' : 'CASO ENCERRADO. VOCE FALHOU.'}
+                </div>
+                
+                <div className="section-title" style={{ textAlign: 'center', marginBottom: '12px' }}>RESULTADO FINAL:</div>
+                
+                <div className="hypothesis-section" style={{ border: '1px solid var(--text-secondary)', padding: '12px', margin: '0' }}>
+                  <div className="section-title">HIPOTESE CORRETA:</div>
+                  <div className="hypothesis-line">
+                    SUSPEITO: {state.hypothesis?.suspect || 'N/A'}
+                  </div>
+                  <div className="hypothesis-line">
+                    LOCAL: {state.hypothesis?.location || 'N/A'}
+                  </div>
+                  <div className="hypothesis-line">
+                    METODO: {state.hypothesis?.method || 'N/A'}
+                  </div>
+                </div>
+                
+                <div className="status-line" style={{ textAlign: 'center', marginTop: '16px' }}>
+                  TENTATIVAS UTILIZADAS: {currentAttempts}/{maxAttempts}
+                </div>
+                
+                <div className="status-line" style={{ textAlign: 'center', marginTop: '8px' }}>
+                  PRECISAO FINAL: {Math.max(0, 100 - (revealedClues.length * 5) - (witnessesViewed.length * 3) - (currentAttempts * 10))}%
+                </div>
+                
+                <div style={{ textAlign: 'center', marginTop: '20px' }}>
+                  <button
+                    className="dos-mission-btn dos-file-selected"
+                    onClick={onBack}
+                  >
+                    VOLTAR
+                  </button>
+                </div>
+              </div>
+            </div>
+          ) : (
+            <div className="dos-mission-content investigation-content">
             {/* Header com título do caso */}
             <div className="dos-mission-title">
               <div>

@@ -532,6 +532,67 @@ function Investigation({ crime, state, onDiscoverClue, onViewWitness, onMakeAccu
             })()}
           </div>
           
+          {/* Campos de acusação quando ativo */}
+          {showAccusation && (
+            <>
+              <div className="dos-folder-sep" />
+              <div className="dos-folder-list">
+                <div className="dos-folder-item">ACUSACAO &gt;FOLDER&lt;</div>
+                <div className="accusation-item">
+                  SUSPEITO: {selectedSuspect || 'SELECIONAR'}
+                </div>
+                <div className="accusation-item">
+                  LOCAL: {selectedLocation || 'SELECIONAR'}
+                </div>
+                <div className="accusation-item">
+                  METODO: {selectedMethod || 'SELECIONAR'}
+                </div>
+                {feedback && (
+                  <div className={`accusation-feedback ${feedback.includes('CORRETA') ? 'success' : feedback.includes('PERTO') ? 'warning' : 'error'}`}>
+                    {feedback}
+                  </div>
+                )}
+              </div>
+              <div className="dos-folder-sep" />
+              <div className="dos-file-list">
+                <button
+                  className="dos-file-item"
+                  onClick={() => {
+                    if (selectedSuspect && selectedLocation && selectedMethod && remainingAttempts > 0) {
+                      const isCorrect = onMakeAccusation(selectedSuspect, selectedLocation, selectedMethod)
+                      if (!isCorrect) {
+                        const feedbackMsg = getFeedbackMessage(selectedSuspect, selectedLocation, selectedMethod)
+                        setFeedback(feedbackMsg)
+                        setTimeout(() => setFeedback(null), 3000)
+                        
+                        if (remainingAttempts <= 1) {
+                          setTimeout(() => {
+                            setFeedback('CASO ENCERRADO. VOCE FALHOU.')
+                          }, 3000)
+                        }
+                      }
+                    }
+                  }}
+                  style={{
+                    opacity: remainingAttempts <= 0 ? 0.5 : 1,
+                    cursor: remainingAttempts <= 0 ? 'not-allowed' : 'pointer'
+                  }}
+                >
+                  CONFIRMAR.EXE
+                </button>
+                <button
+                  className="dos-file-item"
+                  onClick={() => {
+                    setShowAccusation(false)
+                    setFeedback(null)
+                  }}
+                >
+                  VOLTAR.EXE
+                </button>
+              </div>
+            </>
+          )}
+          
           {/* Hipótese atual */}
           <div className="dos-folder-sep" />
           <div className="dos-folder-list">
@@ -676,94 +737,9 @@ function Investigation({ crime, state, onDiscoverClue, onViewWitness, onMakeAccu
         </div>
       </div>
 
-      {/* Barra inferior - formulário de acusação ou navegação */}
+      {/* Barra inferior - apenas versão quando não em acusação */}
       <div className="dos-bottom-bar">
-        {showAccusation ? (
-          <div className="accusation-form-dos">
-            <div className="accusation-title">FAZER ACUSACAO</div>
-            {feedback && (
-              <div className={`feedback ${feedback.includes('CORRETA') ? 'success' : feedback.includes('PERTO') ? 'warning' : 'error'}`}>
-                {feedback}
-              </div>
-            )}
-            <div className="form-group">
-              <div className="form-label">SUSPEITO:</div>
-              <div className="form-options">
-                {suspectsWithRecords.map((suspect) => {
-                  const suspectName = typeof suspect === 'object' ? (suspect.name ?? suspect.displayName ?? '') : String(suspect)
-                  const suspectDisplay = typeof suspect === 'object' ? (suspect.displayName ?? suspect.name ?? '') : String(suspect)
-                  return (
-                    <button
-                      key={String(suspectName)}
-                      className={`option-button ${selectedSuspect === suspectName ? 'selected' : ''}`}
-                      onClick={() => setSelectedSuspect(suspectName)}
-                    >
-                      &gt; {String(suspectDisplay)}
-                      {typeof suspect === 'object' && suspect.cargo ? ` (${String(suspect.cargo)})` : ''}
-                    </button>
-                  )
-                })}
-              </div>
-            </div>
-
-            <div className="form-group">
-              <div className="form-label">LOCAL:</div>
-              <div className="form-options">
-                {crime.locations.map((location, locIdx) => {
-                  const locStr = typeof location === 'string' ? location : (location?.type ?? location?.name ?? location?.value ?? String(location ?? ''))
-                  return (
-                    <button
-                      key={locIdx}
-                      className={`option-button ${selectedLocation === locStr ? 'selected' : ''}`}
-                      onClick={() => setSelectedLocation(locStr)}
-                    >
-                      &gt; {locStr}
-                    </button>
-                  )
-                })}
-              </div>
-            </div>
-
-            <div className="form-group">
-              <div className="form-label">METODO:</div>
-              <div className="form-options">
-                {crime.methods.map((method, methodIdx) => {
-                  const methodStr = typeof method === 'string' ? method : (method?.type ?? method?.name ?? method?.value ?? String(method ?? ''))
-                  return (
-                    <button
-                      key={methodIdx}
-                      className={`option-button ${selectedMethod === methodStr ? 'selected' : ''}`}
-                      onClick={() => setSelectedMethod(methodStr)}
-                    >
-                      &gt; {methodStr}
-                    </button>
-                  )
-                })}
-              </div>
-            </div>
-
-            <button 
-              className="terminal-button highlight"
-              onClick={handleAccusation}
-              style={{
-                opacity: remainingAttempts <= 0 ? 0.5 : 1,
-                cursor: remainingAttempts <= 0 ? 'not-allowed' : 'pointer',
-                display: 'flex',
-                alignItems: 'center'
-              }}
-            >
-              &gt; CONFIRMAR ACUSACAO
-            </button>
-
-            <button 
-              className="terminal-button secondary"
-              onClick={() => setShowAccusation(false)}
-              style={{ display: 'flex', alignItems: 'center' }}
-            >
-              &gt; CANCELAR
-            </button>
-          </div>
-        ) : (
+        {!showAccusation && (
           <div className="dos-prompt">
             <div className="dos-version">
               NEXO TERMINAL v1.0 · PRECISAO: {Math.max(0, 100 - (revealedClues.length * 5) - (witnessesViewed.length * 3) - (currentAttempts * 10))}%

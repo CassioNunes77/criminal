@@ -417,7 +417,6 @@ function Investigation({ crime, state, onDiscoverClue, onViewWitness, onMakeAccu
                 witnesses: 'TESTEMUNHAS.EXE',
                 suspects: 'SUSPEITOS.EXE',
                 case: 'CASO.EXE',
-                accusation: remainingAttempts > 0 ? 'ACUSACAO.EXE' : 'ACUSACAO.BLOCKED',
                 viewResult: 'RESULTADO.EXE',
                 back: 'VOLTAR.EXE'
               }
@@ -495,6 +494,42 @@ function Investigation({ crime, state, onDiscoverClue, onViewWitness, onMakeAccu
           <div className="dos-folder-list">
             <div className="dos-folder-item">SYSTEM &gt;FOLDER&lt;</div>
             <div className="dos-folder-item">SETTINGS &gt;FOLDER&lt;</div>
+          </div>
+          
+          {/* Botão ACUSAÇÃO */}
+          <div className="dos-folder-sep" />
+          <div className="dos-file-list">
+            {(() => {
+              const buttonId = 'accusation'
+              const isFocused = titleAnimationComplete && !showWitnesses && !showAccusation && focusableItems[selectedFocusIndex]?.id === buttonId
+              return (
+                <button
+                  key={buttonId}
+                  className={`dos-file-item ${isFocused ? 'dos-file-selected' : ''}`}
+                  onClick={() => {
+                    if (buttonId === 'accusation') setShowAccusation(true)
+                  }}
+                  data-focused={isFocused ? 'true' : undefined}
+                  onMouseEnter={() => {
+                    const idx = focusableItems.findIndex(item => item.id === buttonId)
+                    if (idx >= 0) setSelectedFocusIndex(idx)
+                  }}
+                  style={{
+                    opacity: buttonId === 'accusation' && remainingAttempts <= 0 ? 0.5 : 1,
+                    cursor: buttonId === 'accusation' && remainingAttempts <= 0 ? 'not-allowed' : 'pointer'
+                  }}
+                >
+                  ACUSAÇÃO.EXE
+                  {isFocused && (
+                    <span className="cursor-blink" style={{
+                      color: '#00FF66',
+                      animation: 'blink 1s step-end infinite',
+                      marginLeft: '4px'
+                    }}>█</span>
+                  )}
+                </button>
+              )
+            })()}
           </div>
           
           {/* Hipótese atual */}

@@ -61,16 +61,12 @@ function Investigation({ crime, state, onDiscoverClue, onViewWitness, onMakeAccu
     const today = new Date()
     const day = String(today.getDate()).padStart(2, '0')
     const month = String(today.getMonth() + 1).padStart(2, '0')
-    const year = today.getFullYear()
-    const line3Current = `${day}/${month}/${year}`
-    const line3Glitched = `${day}/${month}/1987`
+    const line3 = `${day}/${month}/1987`
 
     setTitleLine1('')
     setTitleLine2('')
     setTitleLine3('')
     setTitleAnimationComplete(false)
-    setDateGlitched(false)
-    setDateGlitchAnim(false)
 
     let phase = 0
     let charIndex = 0
@@ -102,24 +98,14 @@ function Investigation({ crime, state, onDiscoverClue, onViewWitness, onMakeAccu
           timeoutId = setTimeout(typeNext, 400)
         }
       } else if (phase === 2) {
-        // Line 3: date (current)
-        if (charIndex < line3Current.length) {
-          if (line3Current[charIndex] !== '/') typewriterSoundRef.current?.play()
-          setTitleLine3(line3Current.slice(0, charIndex + 1))
+        // Line 3: date (dd/mm/1987)
+        if (charIndex < line3.length) {
+          if (line3[charIndex] !== '/') typewriterSoundRef.current?.play()
+          setTitleLine3(line3.slice(0, charIndex + 1))
           charIndex++
           timeoutId = setTimeout(typeNext, 30)
         } else {
-          // Wait 1 second, then glitch to 1987
-          timeoutId = setTimeout(() => {
-            typewriterSoundRef.current?.playGlitch?.()
-            setDateGlitchAnim(true)
-            setTimeout(() => {
-              setTitleLine3(line3Glitched)
-              setDateGlitched(true)
-              setDateGlitchAnim(false)
-              setTitleAnimationComplete(true)
-            }, 150)
-          }, 1000)
+          setTitleAnimationComplete(true)
         }
       }
     }
@@ -398,7 +384,7 @@ function Investigation({ crime, state, onDiscoverClue, onViewWitness, onMakeAccu
       style={{
         fontFamily: "'PxPlus IBM VGA8', monospace",
         color: '#00CC55',
-        background: '#020403'
+        background: '#000'
       }}
     >
       {/* Top bar - linha superior + relógio */}

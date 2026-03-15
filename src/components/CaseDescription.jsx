@@ -194,7 +194,7 @@ function CaseDescription({ crime, onAccept, onBack }) {
       style={{
         fontFamily: "'PxPlus IBM VGA8', monospace",
         color: '#00CC55',
-        background: '#020403',
+        background: '#000',
         cursor: !descriptionComplete ? 'pointer' : 'default',
         minHeight: '100vh',
         touchAction: 'manipulation'

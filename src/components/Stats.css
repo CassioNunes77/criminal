@@ -2,7 +2,10 @@
   max-width: 800px;
   margin: 0 auto;
   padding: 16px;
-  font-family: 'IBM Plex Mono', monospace;
+  font-family: 'PxPlus IBM VGA8', monospace;
+  -webkit-font-smoothing: none;
+  -moz-osx-font-smoothing: unset;
+  color: var(--text-primary);
 }
 
 .stats-header {
@@ -84,7 +87,7 @@
 }
 
 .status-fail {
-  color: #CC5500;
+  color: var(--text-secondary);
 }
 
 .stats-empty {

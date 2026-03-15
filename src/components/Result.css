@@ -1,5 +1,8 @@
 .result {
-  font-family: 'IBM Plex Mono', monospace;
+  font-family: 'PxPlus IBM VGA8', monospace;
+  -webkit-font-smoothing: none;
+  -moz-osx-font-smoothing: unset;
+  color: var(--text-primary);
 }
 
 .case-code-section {
@@ -84,7 +87,7 @@
   font-size: 24px;
   margin: 16px 0;
   color: var(--text-highlight);
-  font-family: 'VT323', monospace;
+  font-family: 'PxPlus IBM VGA8', monospace;
 }
 
 .accuracy-text {
@@ -118,7 +121,7 @@
 }
 
 .solution-destination-failed {
-  color: #CC7733;
+  color: var(--text-secondary);
   font-style: normal;
 }
 

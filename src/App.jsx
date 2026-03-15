@@ -1,10 +1,5 @@
 import { useState, useEffect } from 'react'
 import Home from './components/Home'
-import CaseDescription from './components/CaseDescription'
-import Investigation from './components/Investigation'
-import Result from './components/Result'
-import Dossier from './components/Dossier'
-import Stats from './components/Stats'
 import LoadingScreen from './components/LoadingScreen'
 import { getDailyCrimeFromFirebase, normalizeCrime } from './utils/crimeService'
 import { getDailyCrime } from './utils/dailySeed'
@@ -92,15 +87,6 @@ function App() {
   useEffect(() => {
     load()
   }, [])
-
-  const startInvestigation = (opts) => {
-    setX7(!!(opts?.x))
-    setScreen('caseDescription')
-  }
-
-  const acceptMission = () => {
-    setScreen('investigation')
-  }
 
   const viewWitness = (witnessIndex) => {
     if (!currentCrime) return
@@ -197,64 +183,22 @@ function App() {
   }
 
   return (
-    <div className="app" style={{
-      minHeight: '100vh',
-      padding: '16px',
-      maxWidth: '1200px',
-      margin: '0 auto',
-      background: '#020403',
-      color: '#00CC55',
-      fontFamily: "'IBM Plex Mono', monospace"
-    }}>
-      {screen === 'home' && (
-        <Home 
-          crime={currentCrime}
-          streak={investigationState.streak}
-          onStart={startInvestigation}
-          onAcceptMission={(opts) => {
-            setX7(!!(opts?.x))
-            setScreen('investigation')
-          }}
-          onShowStats={() => setScreen('stats')}
-        />
-      )}
-      {screen === 'caseDescription' && (
-        <CaseDescription
-          crime={currentCrime}
-          onAccept={acceptMission}
-          onBack={() => setScreen('home')}
-        />
-      )}
-      {screen === 'investigation' && (
-        <Investigation
-          crime={currentCrime}
-          state={investigationState}
-          x7={x7}
-          onDiscoverClue={discoverClue}
-          onViewWitness={viewWitness}
-          onMakeAccusation={makeAccusation}
-          onViewResult={() => setScreen('result')}
-          onBack={() => setScreen('home')}
-        />
-      )}
-      {screen === 'result' && (
-        <Result
-          crime={currentCrime}
-          state={investigationState}
-          onBack={() => setScreen('home')}
-          onBackToInvestigation={() => setScreen('investigation')}
-          onViewDossier={() => setScreen('dossier')}
-        />
-      )}
-      {screen === 'dossier' && (
-        <Dossier
-          crime={currentCrime}
-          onBack={() => setScreen('result')}
-        />
-      )}
-      {screen === 'stats' && (
-        <Stats onBack={() => setScreen('home')} />
-      )}
+    <div className="app app-crt-dos">
+      <Home
+        screen={screen}
+        setScreen={setScreen}
+        crime={currentCrime}
+        investigationState={investigationState}
+        x7={x7}
+        onAcceptMission={(opts) => {
+          setX7(!!(opts?.x))
+          setScreen('investigation')
+        }}
+        onDiscoverClue={discoverClue}
+        onViewWitness={viewWitness}
+        onMakeAccusation={makeAccusation}
+        onShowStats={() => setScreen('stats')}
+      />
     </div>
   )
 }

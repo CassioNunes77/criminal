@@ -27,7 +27,7 @@ try {
 } catch (error) {
   console.error('Error rendering app:', error)
   rootElement.innerHTML = `
-    <div style="color: #00FF66; font-family: monospace; padding: 20px; background: #020403; min-height: 100vh; display: flex; align-items: center; justify-content: center;">
+    <div style="color: #00CC55; font-family: 'PxPlus IBM VGA8', monospace; padding: 20px; background: #000; min-height: 100vh; display: flex; align-items: center; justify-content: center;">
       ERRO AO CARREGAR TERMINAL<br>
       ${error.message}
     </div>

@@ -54,7 +54,7 @@ function CaseView({ crime, onBack }) {
       style={{
         fontFamily: "'PxPlus IBM VGA8', monospace",
         color: '#00CC55',
-        background: '#020403'
+        background: '#000'
       }}
     >
       {/* Top bar - linha superior + relógio */}

@@ -191,7 +191,7 @@ function Dossier({ crime, onBack }) {
         position: 'relative',
         fontFamily: "'PxPlus IBM VGA8', monospace",
         color: '#00CC55',
-        background: '#020403',
+        background: '#000',
         cursor: !dossierComplete ? 'pointer' : 'default',
         minHeight: '100vh',
         touchAction: 'manipulation'

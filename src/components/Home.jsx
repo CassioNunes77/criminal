@@ -1,8 +1,23 @@
 import { useState, useEffect, useRef, useCallback } from 'react'
 import './Home.css'
 import { TypewriterSound } from '../utils/typewriterSound'
+import Investigation from './Investigation'
+import Result from './Result'
+import Dossier from './Dossier'
+import Stats from './Stats'
 
-function Home({ crime, streak, onStart, onAcceptMission, onShowStats }) {
+function Home({
+  screen,
+  setScreen,
+  crime,
+  investigationState,
+  x7,
+  onAcceptMission,
+  onDiscoverClue,
+  onViewWitness,
+  onMakeAccusation,
+  onShowStats
+}) {
   const [displayedText, setDisplayedText] = useState('')
   const [showCursor, setShowCursor] = useState(true)
   const [titleAnimationComplete, setTitleAnimationComplete] = useState(false)
@@ -684,14 +699,17 @@ function Home({ crime, streak, onStart, onAcceptMission, onShowStats }) {
 
   const handleFileAction = (action) => {
     if (action === 'start') {
+      setScreen?.('home')
       setShowMissionPreview(true)
       setShowAbout(false)
       setShowInfo(false)
     } else if (action === 'about') {
+      setScreen?.('home')
       setShowAbout(true)
       setShowInfo(false)
       setShowMissionPreview(false)
     } else if (action === 'info') {
+      setScreen?.('home')
       setShowInfo(true)
       setShowAbout(false)
       setShowMissionPreview(false)
@@ -712,7 +730,7 @@ function Home({ crime, streak, onStart, onAcceptMission, onShowStats }) {
       style={{
         fontFamily: "'PxPlus IBM VGA8', monospace",
         color: '#00CC55',
-        background: '#020403',
+        background: '#000',
         transform: crtDistortion > 0 ? `translateX(${Math.sin(Date.now() / 10) * crtDistortion}px)` : 'none',
         transition: crtDistortion > 0 ? 'none' : 'transform 0.1s ease-out'
       }}
@@ -772,9 +790,43 @@ function Home({ crime, streak, onStart, onAcceptMission, onShowStats }) {
           )}
         </div>
 
-        {/* Painel direito - NEXO TERMINAL, Missão, ARQUIVO ou INFO */}
-        <div className="dos-panel dos-panel-right dos-hero-panel">
-          {showAbout ? (
+        {/* Painel direito - NEXO TERMINAL, Missão, ARQUIVO, INFO ou telas embutidas */}
+        <div className={`dos-panel dos-panel-right ${screen !== 'home' ? 'dos-panel-embedded' : 'dos-hero-panel'}`}>
+          {screen === 'investigation' ? (
+            <div className="dos-embedded-content">
+              <Investigation
+                crime={crime}
+                state={investigationState}
+                x7={x7}
+                onDiscoverClue={onDiscoverClue}
+                onViewWitness={onViewWitness}
+                onMakeAccusation={onMakeAccusation}
+                onViewResult={() => setScreen('result')}
+                onBack={() => setScreen('home')}
+              />
+            </div>
+          ) : screen === 'result' ? (
+            <div className="dos-embedded-content">
+              <Result
+                crime={crime}
+                state={investigationState}
+                onBack={() => setScreen('home')}
+                onBackToInvestigation={() => setScreen('investigation')}
+                onViewDossier={() => setScreen('dossier')}
+              />
+            </div>
+          ) : screen === 'dossier' ? (
+            <div className="dos-embedded-content">
+              <Dossier
+                crime={crime}
+                onBack={() => setScreen('result')}
+              />
+            </div>
+          ) : screen === 'stats' ? (
+            <div className="dos-embedded-content">
+              <Stats onBack={() => setScreen('home')} />
+            </div>
+          ) : showAbout ? (
             <div
               className="dos-mission-content"
               onClick={!aboutComplete ? completeAboutAnimation : undefined}
@@ -850,7 +902,18 @@ function Home({ crime, streak, onStart, onAcceptMission, onShowStats }) {
 
       {/* Barra inferior - prompt C:\ e versão, Aceitar/Recusar, ou VOLTAR */}
       <div className="dos-bottom-bar">
-        {showAbout || showInfo ? (
+        {screen !== 'home' ? (
+          <div className="dos-prompt">
+            C:\&gt;
+            <button
+              className="dos-mission-btn"
+              onClick={() => setScreen?.('home')}
+              style={{ marginLeft: '8px', background: 'none', border: 'none', cursor: 'pointer', color: 'inherit' }}
+            >
+              [VOLTAR]
+            </button>
+          </div>
+        ) : showAbout || showInfo ? (
           <button
             className="dos-mission-btn dos-file-selected"
             onClick={() => { setShowAbout(false); setShowInfo(false) }}

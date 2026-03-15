@@ -13,23 +13,26 @@
 }
 
 :root {
-  --bg-primary: #020403;
+  --bg-primary: #000;
   --text-primary: #00CC55;
   --text-highlight: #00FF66;
   --text-secondary: #007A33;
   --text-disabled: #003311;
-  --glow-color: rgba(0, 255, 100, 0.4);
+  --glow-color: rgba(0, 255, 100, 0.35);
 }
 
 html {
-  background: #020403;
+  background: #000;
   touch-action: manipulation; /* evita double-tap zoom */
 }
 
 body {
-  font-family: 'IBM Plex Mono', monospace;
-  background: #020403;
-  background-color: var(--bg-primary);
+  font-family: 'PxPlus IBM VGA8', monospace;
+  -webkit-font-smoothing: none;
+  -moz-osx-font-smoothing: unset;
+  font-smooth: never;
+  background: #000;
+  background-color: #000;
   color: var(--text-primary);
   min-height: 100vh;
   overflow-x: hidden;
@@ -39,6 +42,7 @@ body {
   touch-action: manipulation;
 }
 
+/* Scanlines CRT - simulação monitor antigo */
 body::before {
   content: '';
   position: fixed;
@@ -46,33 +50,39 @@ body::before {
   left: 0;
   width: 100%;
   height: 100%;
-  background: 
-    repeating-linear-gradient(
-      0deg,
-      rgba(0, 255, 100, 0.02) 0px,
-      transparent 1px,
-      transparent 2px,
-      rgba(0, 255, 100, 0.02) 3px
-    );
+  background: repeating-linear-gradient(
+    0deg,
+    transparent 0px,
+    transparent 1px,
+    rgba(0, 0, 0, 0.12) 2px,
+    rgba(0, 0, 0, 0.12) 3px
+  );
   pointer-events: none;
-  z-index: 1000;
-  opacity: 0.5;
+  z-index: 9999;
+  opacity: 0.6;
 }
 
 #root {
   min-height: 100vh;
   position: relative;
   z-index: 1;
-  background: #020403;
-  color: #00CC55;
-  font-family: 'IBM Plex Mono', monospace;
+  background: #000;
+  color: var(--text-primary);
+  font-family: 'PxPlus IBM VGA8', monospace;
 }
 
-/* Terminal text glow - mais sutil para estilo anos 80 */
+/* Erro/sucesso - sempre verde (DOS clássico) */
+.error,
+.title.error,
+.feedback.error {
+  color: var(--text-highlight) !important;
+}
+
+/* Terminal text - brilho fosforescente CRT */
 .terminal-text {
   text-shadow:
-    0 0 2px var(--glow-color),
-    0 0 4px rgba(0, 255, 100, 0.15);
+    0 0 3px var(--glow-color),
+    0 0 6px rgba(0, 255, 100, 0.12);
 }
 
 /* Blinking cursor */

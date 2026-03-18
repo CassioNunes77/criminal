@@ -147,7 +147,7 @@ https://nexoterminal.netlify.app/`
   }, [selectedFocusIndex, isDesktop])
 
   return (
-    <div className="result">
+    <div className={`result${state.solved ? ' result--solved' : ''}`}>
       <div className="terminal-header">
         <div className="separator separator-full-width">{'═'.repeat(150)}</div>
         <div className={`title ${state.solved ? 'flash-green' : 'error'}`}>
@@ -206,10 +206,10 @@ https://nexoterminal.netlify.app/`
           <div className="accuracy-text">
             {accuracy}% DE PRECISAO
           </div>
-          <button 
-            className="terminal-button highlight"
+          <button
+            type="button"
+            className="terminal-button highlight result-share-btn"
             onClick={copyToClipboard}
-            style={{ marginTop: '12px' }}
             data-focused={isDesktop && focusableItems[selectedFocusIndex] === 'share' ? 'true' : undefined}
           >
             &gt; COMPARTILHAR RESULTADO

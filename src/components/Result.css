@@ -144,3 +144,136 @@
     text-align: center;
   }
 }
+
+/* ========== Caso resolvido: mesma densidade do terminal / investigação ========== */
+.result.result--solved .terminal-header {
+  margin-bottom: 6px;
+}
+
+.result.result--solved .terminal-header .separator-full-width {
+  margin: 3px 0;
+  font-size: 8px;
+  line-height: 1;
+  opacity: 0.65;
+  letter-spacing: 0;
+}
+
+.result.result--solved .terminal-header .title {
+  font-family: 'PxPlus IBM VGA8', monospace !important;
+  font-size: 16px !important;
+  font-weight: bold;
+  padding: 2px 0 4px !important;
+  line-height: 1.25;
+  letter-spacing: 0.06em;
+}
+
+.result.result--solved .terminal-content {
+  line-height: 1.38;
+}
+
+.result.result--solved .solution-section {
+  margin: 4px 0 6px;
+}
+
+.result.result--solved .solution-section .section-title {
+  font-size: 11px;
+  font-weight: bold;
+  color: var(--text-highlight);
+  margin: 0 0 3px;
+  padding: 0;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.result.result--solved .solution-item {
+  font-size: 11px;
+  margin: 1px 0;
+  line-height: 1.35;
+}
+
+.result.result--solved .solution-item .highlight {
+  font-weight: bold;
+}
+
+.result.result--solved .solution-destination {
+  font-size: 11px;
+  margin-top: 6px;
+  line-height: 1.4;
+  padding: 0;
+}
+
+.result.result--solved .separator:not(.separator-full-width) {
+  margin: 5px 0;
+  font-size: 10px;
+  line-height: 1.2;
+}
+
+.result.result--solved .stats-section {
+  margin: 4px 0;
+}
+
+.result.result--solved .stat-item {
+  font-size: 11px;
+  margin: 1px 0;
+  line-height: 1.35;
+}
+
+.result.result--solved .result-section {
+  margin: 8px 0 4px;
+}
+
+.result.result--solved .result-section .section-title {
+  font-size: 11px;
+  margin: 0 0 3px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.result.result--solved .accuracy-bar {
+  font-size: 14px;
+  margin: 4px 0;
+  line-height: 1.15;
+}
+
+.result.result--solved .accuracy-text {
+  font-size: 11px;
+  margin-top: 2px;
+}
+
+.result.result--solved .result-share-btn {
+  margin-top: 6px !important;
+}
+
+.result.result--solved .terminal-button {
+  margin-top: 4px;
+  margin-bottom: 2px;
+  padding: 3px 0;
+  font-size: 12px;
+  line-height: 1.3;
+}
+
+.result.result--solved .share-feedback {
+  margin: 6px 0;
+  padding: 4px 6px;
+  font-size: 11px;
+}
+
+.result.result--solved .case-code-section {
+  margin-top: 10px;
+  padding-top: 6px;
+  font-size: 11px;
+}
+
+.result.result--solved .case-code-line {
+  gap: 6px;
+}
+
+@media (max-width: 768px) {
+  .result.result--solved .terminal-header .title {
+    font-size: 15px !important;
+  }
+
+  .result.result--solved .result-section {
+    text-align: center;
+  }
+}

@@ -765,6 +765,7 @@ function Investigation({ crime, state, onDiscoverClue, onViewWitness, onMakeAccu
               )}
             </div>
           </div>
+        )}
         </div>
       </div>
 

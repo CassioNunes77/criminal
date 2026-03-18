@@ -184,18 +184,9 @@ function Dossier({ crime, onBack }) {
 
   return (
     <div
-      className="dossier-screen"
+      className={`dossier-screen${dossierComplete ? ' dossier-complete' : ''}`}
       onClick={handleComplete}
       onTouchStart={(e) => { if (!dossierComplete) { e.preventDefault(); completeAnimation() } }}
-      style={{
-        position: 'relative',
-        fontFamily: "'PxPlus IBM VGA8', monospace",
-        color: '#00CC55',
-        background: '#000',
-        cursor: !dossierComplete ? 'pointer' : 'default',
-        minHeight: '100vh',
-        touchAction: 'manipulation'
-      }}
     >
       {isMobileLandscape && (
         <input
@@ -204,24 +195,12 @@ function Dossier({ crime, onBack }) {
           tabIndex={0}
           autoComplete="off"
           aria-label="Campo para ativar teclado"
-          style={{
-            position: 'absolute',
-            top: 0,
-            left: 0,
-            width: '1px',
-            height: '1px',
-            opacity: 0,
-            pointerEvents: 'none',
-            border: 'none',
-            outline: 'none'
-          }}
+          className="dossier-keyboard-hook"
         />
       )}
       <div className="terminal-header">
         <div className="separator separator-full-width">{'═'.repeat(150)}</div>
-        <div className="title" style={{ color: '#00FF66' }}>
-          DOSSIER DO CASO
-        </div>
+        <div className="title">DOSSIER DO CASO</div>
         <div className="separator separator-full-width">{'═'.repeat(150)}</div>
       </div>
 
@@ -236,19 +215,10 @@ function Dossier({ crime, onBack }) {
       <div
         className="dossier-content"
         onClick={!dossierComplete ? handleComplete : undefined}
-        style={{
-          lineHeight: '1.8',
-          fontSize: '14px',
-          marginTop: '20px',
-          cursor: !dossierComplete ? 'pointer' : 'default',
-          whiteSpace: 'pre-wrap',
-          wordWrap: 'break-word',
-          minHeight: '200px'
-        }}
       >
         {dossierLines.length > 0 ? (
           dossierLines.map((line, index) => (
-            <div key={index} style={{ marginBottom: '4px' }}>
+            <div key={index} className="dossier-line">
               {line}
               {index === currentLineIndex && !dossierComplete && !dots && (
                 <span className="cursor-blink" style={{
@@ -264,26 +234,12 @@ function Dossier({ crime, onBack }) {
             Dossier nao disponivel para este caso.
           </div>
         )}
-        {dots && <span style={{ color: '#00CC55' }}>{dots}</span>}
+        {dots && <span className="dossier-dots">{dots}</span>}
 
         {dossierComplete && (
           <>
-            <div className="separator" style={{ margin: '24px 0 12px 0' }}>------------------------------------</div>
-            <button
-              className="terminal-button"
-              onClick={onBack}
-              style={{
-                background: 'none',
-                border: 'none',
-                color: '#00FF66',
-                fontFamily: "'PxPlus IBM VGA8', monospace",
-                fontSize: '16px',
-                cursor: 'pointer',
-                padding: '8px 0',
-                textAlign: 'left',
-                width: '100%'
-              }}
-            >
+            <div className="separator dossier-footer-sep">------------------------------------</div>
+            <button type="button" className="dossier-back-btn" onClick={onBack}>
               &gt; VOLTAR
             </button>
           </>

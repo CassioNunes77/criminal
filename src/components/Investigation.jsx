@@ -1,7 +1,8 @@
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect, useRef, useCallback } from 'react'
 import { TypewriterSound } from '../utils/typewriterSound'
 import CaseView from './CaseView'
 import SuspectsView from './SuspectsView'
+import WitnessesView from './WitnessesView'
 import './Investigation.css'
 import './Home.css'
 import './InvestigationDos.css'
@@ -17,6 +18,7 @@ function Investigation({
   x7,
   fullDosMain = false,
   onSuspectsDbOpenChange,
+  onWitnessesViewOpenChange,
   skipInvestigationTitleAnimation = false,
   onMarkInvestigationTitleIntroSeen
 }) {
@@ -28,14 +30,12 @@ function Investigation({
   const [selectedLocation, setSelectedLocation] = useState(null)
   const [selectedMethod, setSelectedMethod] = useState(null)
   const [feedback, setFeedback] = useState(null)
-  const [showWitnesses, setShowWitnesses] = useState(false)
-  const [witnessNavActive, setWitnessNavActive] = useState(false)
+  const [showWitnessesView, setShowWitnessesView] = useState(false)
   const witnessesViewed = state.witnessesViewed || []
   const [showSuspects, setShowSuspects] = useState(false)
   const [showCaseView, setShowCaseView] = useState(false)
   const [selectedFocusIndex, setSelectedFocusIndex] = useState(0)
   const [selectedClueIndex, setSelectedClueIndex] = useState(0)
-  const [selectedWitnessIndex, setSelectedWitnessIndex] = useState(0)
   const [selectedSuspectIndex, setSelectedSuspectIndex] = useState(0)
   const [selectedLocationIndex, setSelectedLocationIndex] = useState(0)
   const [selectedMethodIndex, setSelectedMethodIndex] = useState(0)
@@ -161,10 +161,16 @@ function Investigation({
   )
 
   const topMenuButtons = [
-    !showWitnesses && 'witnesses',
+    'investigation',
+    ...(crime.witnesses?.length ? ['witnesses'] : []),
     'case',
     'suspects'
-  ].filter(Boolean)
+  ]
+
+  const goToInvestigationMain = useCallback(() => {
+    setShowWitnessesView(false)
+    setShowAccusation(false)
+  }, [])
 
   const actionButtons = [
     'accusation',
@@ -205,23 +211,12 @@ function Investigation({
       })
     }
     lastNavWasKeyboardRef.current = false
-  }, [selectedFocusIndex, accusationFocusIndex, selectedWitnessIndex, showWitnesses, showAccusation, focusableItems])
+  }, [selectedFocusIndex, accusationFocusIndex, showAccusation, focusableItems])
 
   // Reset accusationFocusIndex ao abrir formulário de acusação
   useEffect(() => {
     if (showAccusation) setAccusationFocusIndex(0)
   }, [showAccusation])
-
-  // Reset e clamp selectedWitnessIndex para testemunhas
-  useEffect(() => {
-    if (showWitnesses) {
-      const count = crime.witnesses.filter((_, i) => !witnessesViewed.includes(i)).length
-      setSelectedWitnessIndex(prev => {
-        if (count === 0) return 0
-        return Math.min(prev, count - 1)
-      })
-    }
-  }, [showWitnesses, witnessesViewed.length, crime.witnesses.length])
 
   const handleDiscoverClue = (clueType) => {
     if (cluesRevealed.includes(clueType)) return
@@ -327,37 +322,8 @@ function Investigation({
           e.preventDefault()
           setShowAccusation(false)
         }
-      } else if (showWitnesses && witnessNavActive) {
-        const witnessButtons = crime.witnesses
-          .map((_, i) => i)
-          .filter(i => !witnessesViewed.includes(i))
-        if (e.key === 'ArrowDown') {
-          e.preventDefault()
-          lastNavWasKeyboardRef.current = true
-          if (selectedWitnessIndex >= witnessButtons.length - 1) {
-            setWitnessNavActive(false)
-            const suspectsIdx = focusableItems.findIndex(item => item.type === 'button' && item.id === 'suspects')
-            if (suspectsIdx >= 0) setSelectedFocusIndex(suspectsIdx)
-          } else {
-            setSelectedWitnessIndex(prev => prev + 1)
-          }
-        } else if (e.key === 'ArrowUp') {
-          e.preventDefault()
-          lastNavWasKeyboardRef.current = true
-          if (selectedWitnessIndex === 0) {
-            setWitnessNavActive(false)
-            setSelectedFocusIndex(lastClueFocusIndex)
-          } else {
-            setSelectedWitnessIndex(prev => prev - 1)
-          }
-        } else if (e.key === 'Enter' && witnessButtons[selectedWitnessIndex] !== undefined) {
-          e.preventDefault()
-          handleViewWitness(witnessButtons[selectedWitnessIndex])
-        } else if (e.key === 'Escape') {
-          e.preventDefault()
-          setShowWitnesses(false)
-          setWitnessNavActive(false)
-        }
+      } else if (showCaseView || showWitnessesView) {
+        /* CaseView / WitnessesView tratam o teclado */
       } else if (showSuspects) {
         if (e.key === 'Escape') {
           e.preventDefault()
@@ -379,13 +345,14 @@ function Investigation({
           if (!item) return
           if (item.type === 'clue') {
             handleDiscoverClue(item.clueType)
+          } else if (item.id === 'investigation') {
+            goToInvestigationMain()
           } else if (item.id === 'case') {
             setShowCaseView(true)
           } else if (item.id === 'accusation') {
             setShowAccusation(true)
           } else if (item.id === 'witnesses') {
-            setShowWitnesses(true)
-            setWitnessNavActive(true)
+            setShowWitnessesView(true)
           } else if (item.id === 'suspects') {
             setShowSuspects(true)
           } else if (item.id === 'viewResult') {
@@ -399,7 +366,7 @@ function Investigation({
     return () => {
       window.removeEventListener('keydown', handleKeyPress)
     }
-  }, [showAccusation, accusationFocusIndex, selectedSuspect, selectedLocation, selectedMethod, selectedWitnessIndex, suspectsWithRecords, crime, canDiscoverMore, showWitnesses, witnessNavActive, showSuspects, isFailed, remainingAttempts, witnessesViewed, selectedFocusIndex, focusableItems, availableClues, lastClueFocusIndex, handleAccusation, handleViewWitness, onViewWitness, onViewResult, onBack])
+  }, [showAccusation, accusationFocusIndex, selectedSuspect, selectedLocation, selectedMethod, suspectsWithRecords, crime, canDiscoverMore, showCaseView, showWitnessesView, showSuspects, isFailed, remainingAttempts, witnessesViewed, selectedFocusIndex, focusableItems, availableClues, lastClueFocusIndex, handleAccusation, handleViewWitness, onViewWitness, onViewResult, onBack, goToInvestigationMain])
 
   useEffect(() => {
     onSuspectsDbOpenChange?.(showSuspects)
@@ -407,6 +374,13 @@ function Investigation({
       if (showSuspects) onSuspectsDbOpenChange?.(false)
     }
   }, [showSuspects, onSuspectsDbOpenChange])
+
+  useEffect(() => {
+    onWitnessesViewOpenChange?.(showWitnessesView)
+    return () => {
+      if (showWitnessesView) onWitnessesViewOpenChange?.(false)
+    }
+  }, [showWitnessesView, onWitnessesViewOpenChange])
 
   if (showCaseView) {
     return <CaseView crime={crime} fullDosMain={fullDosMain} onBack={() => setShowCaseView(false)} />
@@ -419,6 +393,18 @@ function Investigation({
         suspectsWithRecords={suspectsWithRecords}
         fullDosMain={fullDosMain}
         onBack={() => setShowSuspects(false)}
+      />
+    )
+  }
+
+  if (showWitnessesView) {
+    return (
+      <WitnessesView
+        crime={crime}
+        witnessesViewed={witnessesViewed}
+        onViewWitness={handleViewWitness}
+        fullDosMain={fullDosMain}
+        onBack={() => setShowWitnessesView(false)}
       />
     )
   }
@@ -451,18 +437,20 @@ function Investigation({
           <div className="dos-file-list">
             {topMenuButtons.map((buttonId) => {
               const buttonLabels = {
+                investigation: 'INVESTIGACAO.EXE',
                 witnesses: 'TESTEMUNHAS.EXE',
                 case: 'CASO.EXE',
                 suspects: 'BANCO_SUSPEITOS.EXE'
               }
-              const isFocused = titleAnimationComplete && !showWitnesses && !showAccusation && focusableItems[selectedFocusIndex]?.id === buttonId
+              const isFocused = titleAnimationComplete && !showAccusation && focusableItems[selectedFocusIndex]?.id === buttonId
               return (
                 <button
                   key={buttonId}
                   type="button"
                   className={`dos-file-item ${isFocused ? 'dos-file-selected' : ''}`}
                   onClick={() => {
-                    if (buttonId === 'witnesses') { setShowWitnesses(true); setWitnessNavActive(true) }
+                    if (buttonId === 'investigation') goToInvestigationMain()
+                    else if (buttonId === 'witnesses') setShowWitnessesView(true)
                     else if (buttonId === 'suspects') setShowSuspects(true)
                     else if (buttonId === 'case') setShowCaseView(true)
                   }}
@@ -496,7 +484,6 @@ function Investigation({
                   const isFocused =
                     !isRevealed &&
                     titleAnimationComplete &&
-                    !showWitnesses &&
                     !showAccusation &&
                     focusableItems[selectedFocusIndex]?.type === 'clue' &&
                     focusableItems[selectedFocusIndex]?.clueType === clue.type
@@ -540,14 +527,14 @@ function Investigation({
             </>
           )}
 
-          <div className="dos-menu-sep-dashes" aria-hidden>--------------</div>
+          <div className="dos-menu-sep-line" aria-hidden />
           <div className="dos-file-list">
             {actionButtons.map((buttonId) => {
               const buttonLabels = {
                 accusation: 'ACUSAÇÃO.EXE',
                 viewResult: 'RESULTADO.EXE'
               }
-              const isFocused = titleAnimationComplete && !showWitnesses && !showAccusation && focusableItems[selectedFocusIndex]?.id === buttonId
+              const isFocused = titleAnimationComplete && !showAccusation && focusableItems[selectedFocusIndex]?.id === buttonId
               return (
                 <button
                   key={buttonId}
@@ -580,8 +567,8 @@ function Investigation({
             })}
           </div>
 
-          <div className="dos-menu-sep-dashes" aria-hidden>--------------</div>
-          
+          <div className="dos-menu-sep-line" aria-hidden />
+
           {/* Hipótese atual */}
           <div className="dos-folder-list">
             <div className="dos-folder-item">HIPOTESE &gt;FOLDER&lt;</div>
@@ -600,44 +587,30 @@ function Investigation({
         {/* Painel direito - conteúdo da investigação ou tela de caso encerrado */}
         <div className="dos-panel dos-panel-right">
           {showViewResult ? (
-            <div className="dos-mission-content investigation-content">
+            <div className="dos-mission-content investigation-content investigation-case-closed">
               <div className="dos-mission-title">CASO ENCERRADO</div>
               <div className="dos-mission-case">
                 CASO #{crime.caseNumber || String(crime.id).slice(-4).padStart(4, '0')} · {crime.type || 'CRIME'}
               </div>
-              <div className="dos-mission-description">
-                <div className={`feedback ${state.solved ? 'success' : 'error'}`} style={{ fontSize: '14px', marginBottom: '16px', textAlign: 'center' }}>
+              <div className="dos-mission-description investigation-case-closed-body">
+                <div className={`case-closed-feedback feedback ${state.solved ? 'success' : 'error'}`}>
                   {state.solved ? 'CASO RESOLVIDO COM SUCESSO!' : 'CASO ENCERRADO. VOCE FALHOU.'}
                 </div>
-                
-                <div className="section-title" style={{ textAlign: 'center', marginBottom: '12px' }}>RESULTADO FINAL:</div>
-                
-                <div className="hypothesis-section" style={{ border: '1px solid var(--text-secondary)', padding: '12px', margin: '0' }}>
-                  <div className="section-title">HIPOTESE CORRETA:</div>
-                  <div className="hypothesis-line">
-                    SUSPEITO: {state.hypothesis?.suspect || 'N/A'}
-                  </div>
-                  <div className="hypothesis-line">
-                    LOCAL: {state.hypothesis?.location || 'N/A'}
-                  </div>
-                  <div className="hypothesis-line">
-                    METODO: {state.hypothesis?.method || 'N/A'}
-                  </div>
+                <div className="case-closed-section-title">RESULTADO FINAL</div>
+                <div className="case-closed-hypothesis-box">
+                  <div className="case-closed-box-title">HIPOTESE CORRETA</div>
+                  <div className="case-closed-line">SUSPEITO: {state.hypothesis?.suspect || 'N/A'}</div>
+                  <div className="case-closed-line">LOCAL: {state.hypothesis?.location || 'N/A'}</div>
+                  <div className="case-closed-line">METODO: {state.hypothesis?.method || 'N/A'}</div>
                 </div>
-                
-                <div className="status-line" style={{ textAlign: 'center', marginTop: '16px' }}>
+                <div className="case-closed-status">
                   TENTATIVAS UTILIZADAS: {currentAttempts}/{maxAttempts}
                 </div>
-                
-                <div className="status-line" style={{ textAlign: 'center', marginTop: '8px' }}>
+                <div className="case-closed-status">
                   PRECISAO FINAL: {Math.max(0, 100 - (revealedClues.length * 5) - (witnessesViewed.length * 3) - (currentAttempts * 10))}%
                 </div>
-                
-                <div style={{ textAlign: 'center', marginTop: '20px' }}>
-                  <button
-                    className="dos-mission-btn dos-file-selected"
-                    onClick={onBack}
-                  >
+                <div className="case-closed-actions">
+                  <button type="button" className="dos-mission-btn dos-file-selected" onClick={onBack}>
                     VOLTAR
                   </button>
                 </div>
@@ -675,9 +648,6 @@ function Investigation({
                 return (
                   <div className="accusation-form-dos">
                     <div className="accusation-title">ACUSAÇÃO — SELECIONE SUSPEITO, LOCAL E MÉTODO</div>
-                    <div className="form-hint" style={{ fontSize: '10px', color: 'var(--text-secondary)', marginBottom: '8px' }}>
-                      Setas ↑↓ + Enter para escolher · ou clique nas opções
-                    </div>
 
                     <div className="form-group">
                       <div className="form-label">SUSPEITO</div>
@@ -811,49 +781,10 @@ function Investigation({
                 </div>
               )}
               
-              {/* Testemunhas */}
-              {(showWitnesses || witnessesViewed.length > 0) && (
-                <div className="witnesses-content">
-                  <div className="section-title">TESTEMUNHAS ({witnessesViewed.length}/{crime.witnesses.length}):</div>
-                  {crime.witnesses.map((witness, index) => {
-                    const buttonIdx = crime.witnesses.map((_, i) => i).filter(i => !witnessesViewed.includes(i)).indexOf(index)
-                    const isFocused = !showAccusation && buttonIdx >= 0 && buttonIdx === selectedWitnessIndex
-                    return (
-                      <div key={index} className="witness-item">
-                        <div className="witness-header">
-                          <span className="witness-name">
-                            {witness.name}
-                            {witness.cargo && (
-                              <span className="witness-cargo"> ({witness.cargo})</span>
-                            )}
-                          </span>
-                          {witnessesViewed.includes(index) && (
-                            <span className={`witness-status ${witness.isTruthful ? 'truthful' : 'false'}`}>
-                              {witness.isTruthful ? '[VERDADEIRA]' : '[PODE SER FALSA]'}
-                            </span>
-                          )}
-                        </div>
-                        {witnessesViewed.includes(index) ? (
-                          <div className="witness-statement">{witness.statement}</div>
-                        ) : (
-                          <button
-                            className={`option-button ${isFocused ? 'selected' : ''}`}
-                            onClick={() => handleViewWitness(index)}
-                            data-focused={isFocused ? 'true' : undefined}
-                          >
-                            &gt; VER DEPOIMENTO
-                            {isFocused && (
-                              <span className="cursor-blink" style={{
-                                color: '#00FF66',
-                                animation: 'blink 1s step-end infinite',
-                                marginLeft: '4px'
-                              }}>█</span>
-                            )}
-                          </button>
-                        )}
-                      </div>
-                    )
-                  })}
+              {crime.witnesses?.length > 0 && (
+                <div className="witnesses-hint-dos" style={{ marginTop: '14px', fontSize: '11px', color: 'var(--text-secondary)' }}>
+                  TESTEMUNHAS: {witnessesViewed.length}/{crime.witnesses.length} depoimentos registrados — abra{' '}
+                  <strong style={{ color: 'var(--text-primary)' }}>TESTEMUNHAS.EXE</strong> no menu.
                 </div>
               )}
               </>

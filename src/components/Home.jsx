@@ -39,6 +39,7 @@ function Home({
   const [missionComplete, setMissionComplete] = useState(false)
   const missionTypingTimeoutRef = useRef(null)
   const [suspectsDbOpen, setSuspectsDbOpen] = useState(false)
+  const [witnessesViewOpen, setWitnessesViewOpen] = useState(false)
   /** Por crime.id: após sair da investigação uma vez, não repetir typewriter do título ao voltar */
   const [investigationTitleIntroSeen, setInvestigationTitleIntroSeen] = useState({})
   const markInvestigationTitleIntroSeen = useCallback((crimeId) => {
@@ -773,25 +774,30 @@ function Home({
             onViewResult={() => setScreen('result')}
             onBack={() => setScreen('home')}
             onSuspectsDbOpenChange={setSuspectsDbOpen}
+            onWitnessesViewOpenChange={setWitnessesViewOpen}
             skipInvestigationTitleAnimation={!!investigationTitleIntroSeen[crime?.id]}
             onMarkInvestigationTitleIntroSeen={markInvestigationTitleIntroSeen}
           />
         ) : (
           <>
         <div className="dos-panel dos-panel-left">
-          <div className="dos-file-list">
-            {dosFiles.map((f, i) => (
-              <button
-                key={f.name}
-                className={`dos-file-item ${selectedButton === i ? 'dos-file-selected' : ''}`}
-                onClick={() => handleFileAction(f.action)}
-                onMouseEnter={() => setSelectedButton(i)}
-              >
-                {f.name}
-              </button>
-            ))}
-          </div>
-          <div className="dos-folder-sep" />
+          {!showMissionPreview && (
+            <>
+              <div className="dos-file-list">
+                {dosFiles.map((f, i) => (
+                  <button
+                    key={f.name}
+                    className={`dos-file-item ${selectedButton === i ? 'dos-file-selected' : ''}`}
+                    onClick={() => handleFileAction(f.action)}
+                    onMouseEnter={() => setSelectedButton(i)}
+                  >
+                    {f.name}
+                  </button>
+                ))}
+              </div>
+              <div className="dos-folder-sep" />
+            </>
+          )}
           <div className="dos-folder-list">
             {dosFolders.map((folder) => (
               <div key={folder} className="dos-folder-item">
@@ -924,7 +930,7 @@ function Home({
       {/* Barra inferior - prompt C:\ e versão, Aceitar/Recusar, ou VOLTAR */}
       <div className="dos-bottom-bar">
         {screen !== 'home' ? (
-          suspectsDbOpen ? (
+          suspectsDbOpen || witnessesViewOpen ? (
             <div className="dos-prompt" aria-hidden />
           ) : (
             <div className="dos-prompt">

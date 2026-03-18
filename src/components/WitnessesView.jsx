@@ -4,16 +4,25 @@ import './Home.css'
 import './CaseViewDos.css'
 
 /**
- * Mesmo fluxo visual que CaseView (CASO.EXE): painel esquerdo VOLTAR + pastas,
- * painel direito com o conteúdo (banco de dados dos suspeitos).
+ * Mesmo shell que SuspectsView / CaseView: painel esquerdo INVESTIGACAO.EXE,
+ * painel direito com registro das testemunhas.
  */
-function SuspectsView({ crime, suspectsWithRecords, fullDosMain = false, onBack }) {
+function WitnessesView({
+  crime,
+  witnessesViewed = [],
+  onViewWitness,
+  fullDosMain = false,
+  onBack
+}) {
   const [selectedButton, setSelectedButton] = useState(0)
   const [currentTime, setCurrentTime] = useState(() => {
     if (typeof window === 'undefined') return '00:00'
     const d = new Date()
     return `${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`
   })
+
+  const witnesses = crime.witnesses || []
+  const viewed = new Set(witnessesViewed)
 
   useEffect(() => {
     if (fullDosMain) return undefined
@@ -47,7 +56,7 @@ function SuspectsView({ crime, suspectsWithRecords, fullDosMain = false, onBack 
     if (action === 'back') onBack()
   }
 
-  const caseLine = `CASO #${crime.caseNumber || String(crime.id).slice(-4).padStart(4, '0')} · ${crime.type || 'CRIME'} · REGISTRO SUSPEITOS`
+  const caseLine = `CASO #${crime.caseNumber || String(crime.id).slice(-4).padStart(4, '0')} · ${crime.type || 'CRIME'} · REGISTRO TESTEMUNHAS · ${witnessesViewed.length}/${witnesses.length}`
 
   return (
     <div
@@ -92,26 +101,44 @@ function SuspectsView({ crime, suspectsWithRecords, fullDosMain = false, onBack 
 
         <div className="dos-panel dos-panel-right">
           <div className="dos-mission-content case-view-content suspects-view-dos">
-            <div className="dos-mission-title">BANCO DE DADOS DOS SUSPEITOS</div>
+            <div className="dos-mission-title">BANCO DE DADOS DAS TESTEMUNHAS</div>
             <div className="dos-mission-case">{caseLine}</div>
             <div className="dos-mission-description">
-              {suspectsWithRecords.map((suspect, index) => (
+              {witnesses.length === 0 && (
+                <div className="suspect-dos-line">[ NENHUM REGISTRO DE TESTEMUNHA NESTE CASO ]</div>
+              )}
+              {witnesses.map((witness, index) => (
                 <div key={index} className="suspect-dos-record">
                   <div className="suspect-dos-name">
-                    {suspect.displayName || suspect.name}
-                    {suspect.cargo && (
-                      <span className="suspect-dos-cargo"> ({suspect.cargo})</span>
+                    TESTEMUNHA #{String(index + 1).padStart(2, '0')}: {witness.name}
+                    {witness.cargo && (
+                      <span className="suspect-dos-cargo"> ({witness.cargo})</span>
                     )}
                   </div>
-                  <div className="suspect-dos-line">HISTORICO: {suspect.criminalRecord}</div>
-                  {suspect.comportamento && (
-                    <div className="suspect-dos-line">COMPORTAMENTO: {suspect.comportamento}</div>
-                  )}
-                  {suspect.caracteristica && (
-                    <div className="suspect-dos-line">CARACTERISTICA: {suspect.caracteristica}</div>
-                  )}
-                  {suspect.veiculo && (
-                    <div className="suspect-dos-line">VEICULO: {suspect.veiculo}</div>
+                  {viewed.has(index) ? (
+                    <>
+                      <div className="suspect-dos-line">DEPOIMENTO: {witness.statement}</div>
+                      <div className="suspect-dos-line">
+                        AVALIACAO:{' '}
+                        {witness.isTruthful
+                          ? '[ INFORMACAO VERIFICADA ]'
+                          : '[ POSSIVEL INCONSISTENCIA — CRUZAR COM PISTAS ]'}
+                      </div>
+                    </>
+                  ) : (
+                    <>
+                      <div className="suspect-dos-line" style={{ color: 'var(--text-secondary)', fontStyle: 'italic' }}>
+                        STATUS: [ DEPOIMENTO NAO REGISTRADO ]
+                      </div>
+                      <button
+                        type="button"
+                        className="dos-file-item witness-register-depoimento"
+                        onClick={() => onViewWitness?.(index)}
+                        style={{ marginTop: '8px', textAlign: 'left' }}
+                      >
+                        REGISTRAR_DEPOIMENTO.EXE
+                      </button>
+                    </>
                   )}
                 </div>
               ))}
@@ -123,4 +150,4 @@ function SuspectsView({ crime, suspectsWithRecords, fullDosMain = false, onBack 
   )
 }
 
-export default SuspectsView
+export default WitnessesView

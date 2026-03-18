@@ -28,7 +28,6 @@ function CaseView({ crime, onBack, fullDosMain = false }) {
         onBack()
       } else if (e.key === 'ArrowDown' || e.key === 'ArrowUp') {
         e.preventDefault()
-        setSelectedButton(prev => (prev + 1) % 2)
       }
     }
 
@@ -38,9 +37,7 @@ function CaseView({ crime, onBack, fullDosMain = false }) {
     }
   }, [onBack])
 
-  const dosFiles = [
-    { name: 'VOLTAR.EXE', action: 'back' },
-  ]
+  const dosFiles = [{ name: 'INVESTIGACAO.EXE', action: 'back' }]
   const dosFolders = ['CASOS', 'DOSSIE', 'SETTINGS']
 
   const handleFileAction = (action) => {

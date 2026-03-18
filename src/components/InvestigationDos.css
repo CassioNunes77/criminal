@@ -330,17 +330,15 @@
   color: #ff6464;
 }
 
-.dos-menu-sep-dashes {
-  font-family: 'PxPlus IBM VGA8', monospace;
-  font-size: 10px;
-  color: var(--text-secondary);
-  letter-spacing: 0;
+/* Linha simples acima/abaixo de ACUSAÇÃO.EXE */
+.dos-menu-sep-line {
+  display: block;
+  height: 0;
   margin: 10px 0 8px;
-  padding: 4px 0;
+  padding: 0;
   border: none;
+  border-top: 1px solid rgba(0, 204, 85, 0.45);
   user-select: none;
-  line-height: 1;
-  opacity: 0.85;
 }
 
 .investigation-dos .hypothesis-item {
@@ -365,6 +363,100 @@
   margin: 2px 0;
   font-family: 'PxPlus IBM VGA8', monospace;
   text-align: left !important;
+}
+
+/* Tela CASO ENCERRADO — densidade alinhada ao restante do terminal */
+.investigation-dos .investigation-case-closed {
+  align-items: flex-start !important;
+  justify-content: flex-start !important;
+  text-align: left !important;
+}
+
+.investigation-dos .investigation-case-closed .dos-mission-title {
+  margin-bottom: 4px !important;
+  line-height: 1.25;
+}
+
+.investigation-dos .investigation-case-closed .dos-mission-case {
+  margin-bottom: 6px !important;
+  font-size: 12px;
+  color: var(--text-secondary);
+  line-height: 1.3;
+}
+
+.investigation-dos .investigation-case-closed-body {
+  margin-top: 0 !important;
+  padding-top: 0 !important;
+}
+
+.investigation-dos .investigation-case-closed-body > * {
+  margin-bottom: 0;
+}
+
+.investigation-dos .case-closed-feedback {
+  font-size: 12px !important;
+  margin: 0 0 6px 0 !important;
+  padding: 3px 6px !important;
+  text-align: left !important;
+  border-radius: 0 !important;
+  line-height: 1.35;
+}
+
+.investigation-dos .case-closed-section-title {
+  font-size: 11px;
+  font-weight: bold;
+  color: var(--text-highlight);
+  margin: 4px 0 3px;
+  padding: 0;
+  text-align: left !important;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  font-family: 'PxPlus IBM VGA8', monospace;
+}
+
+.investigation-dos .case-closed-hypothesis-box {
+  border: 1px solid rgba(0, 204, 85, 0.4);
+  padding: 5px 8px 6px;
+  margin: 0 0 6px 0;
+}
+
+.investigation-dos .case-closed-box-title {
+  font-size: 10px;
+  color: var(--text-secondary);
+  margin: 0 0 4px 0;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  font-family: 'PxPlus IBM VGA8', monospace;
+}
+
+.investigation-dos .case-closed-line {
+  font-size: 11px;
+  color: var(--text-primary);
+  margin: 0;
+  padding: 1px 0;
+  line-height: 1.35;
+  font-family: 'PxPlus IBM VGA8', monospace;
+  text-align: left !important;
+}
+
+.investigation-dos .case-closed-status {
+  font-size: 11px;
+  color: var(--text-primary);
+  margin: 0;
+  padding: 2px 0 0;
+  line-height: 1.35;
+  font-family: 'PxPlus IBM VGA8', monospace;
+  text-align: left !important;
+}
+
+.investigation-dos .case-closed-actions {
+  margin-top: 8px;
+  padding-top: 4px;
+}
+
+.investigation-dos .case-closed-actions .dos-mission-btn {
+  padding: 4px 10px;
+  font-size: 13px;
 }
 
 .investigation-dos .option-button {
@@ -518,29 +610,67 @@
   .investigation-dos .investigation-content {
     max-height: 300px;
   }
-  
-  .investigation-dos .form-options {
-    gap: 0;
+
+  .investigation-dos .investigation-content.investigation-case-closed {
+    max-height: min(52vh, 400px);
   }
-  
-  .investigation-dos .form-options .option-button {
-    padding: 1px 4px;
-    margin: 0;
-    line-height: 1.2;
-    font-size: 10px;
-  }
-  
-  .investigation-dos .form-group {
-    margin-bottom: 4px;
-  }
-  
-  .investigation-dos .form-label {
-    margin-bottom: 2px;
-    font-size: 10px;
-  }
-  
+
+  /* Acusação: lista compacta, um item embaixo do outro (evita margin do .dos-mission-description div) */
+  .investigation-dos .dos-mission-description .accusation-form-dos,
   .investigation-dos .accusation-form-dos {
-    max-height: 250px;
-    gap: 4px;
+    gap: 0 !important;
+    max-height: min(72vh, 520px);
+    padding-right: 2px;
+    line-height: 1.25;
+  }
+
+  .investigation-dos .accusation-form-dos > div {
+    margin-bottom: 0 !important;
+  }
+
+  .investigation-dos .accusation-form-dos .form-group {
+    margin-bottom: 0 !important;
+    margin-top: 6px;
+  }
+
+  .investigation-dos .accusation-form-dos .form-group:first-of-type {
+    margin-top: 0;
+  }
+
+  .investigation-dos .accusation-form-dos .form-label {
+    margin-bottom: 0 !important;
+    margin-top: 0;
+    padding: 4px 0 1px;
+    font-size: 10px;
+    line-height: 1.2;
+  }
+
+  .investigation-dos .form-options {
+    gap: 0 !important;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .investigation-dos .form-options .option-button {
+    padding: 0 2px 0 0 !important;
+    margin: 0 !important;
+    line-height: 1.35 !important;
+    font-size: 10px;
+    min-height: 0;
+  }
+
+  .investigation-dos .accusation-form-dos .accusation-title {
+    margin-bottom: 2px !important;
+    line-height: 1.25;
+  }
+
+  .investigation-dos .accusation-form-dos .accusation-actions-dos {
+    margin-top: 6px !important;
+    padding-top: 6px !important;
+  }
+
+  .investigation-dos .accusation-form-dos .terminal-button {
+    margin: 1px 0 !important;
+    padding: 4px 8px !important;
   }
 }

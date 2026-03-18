@@ -3,7 +3,11 @@ import './CaseView.css'
 import './Home.css'
 import './CaseViewDos.css'
 
-function CaseView({ crime, onBack, fullDosMain = false }) {
+/**
+ * Mesmo fluxo visual que CaseView (CASO.EXE): painel esquerdo VOLTAR + pastas,
+ * painel direito com o conteúdo (banco de dados dos suspeitos).
+ */
+function SuspectsView({ crime, suspectsWithRecords, fullDosMain = false, onBack }) {
   const [selectedButton, setSelectedButton] = useState(0)
   const [currentTime, setCurrentTime] = useState(() => {
     if (typeof window === 'undefined') return '00:00'
@@ -20,37 +24,33 @@ function CaseView({ crime, onBack, fullDosMain = false }) {
     return () => clearInterval(t)
   }, [fullDosMain])
 
-  // Keyboard navigation
   useEffect(() => {
     const handleKeyPress = (e) => {
       if (e.key === 'Enter') {
         e.preventDefault()
         onBack()
+      } else if (e.key === 'Escape') {
+        e.preventDefault()
+        onBack()
       } else if (e.key === 'ArrowDown' || e.key === 'ArrowUp') {
         e.preventDefault()
-        setSelectedButton(prev => (prev + 1) % 2)
       }
     }
-
     window.addEventListener('keydown', handleKeyPress)
-    return () => {
-      window.removeEventListener('keydown', handleKeyPress)
-    }
+    return () => window.removeEventListener('keydown', handleKeyPress)
   }, [onBack])
 
-  const dosFiles = [
-    { name: 'VOLTAR.EXE', action: 'back' },
-  ]
+  const dosFiles = [{ name: 'VOLTAR.EXE', action: 'back' }]
   const dosFolders = ['CASOS', 'DOSSIE', 'SETTINGS']
 
   const handleFileAction = (action) => {
-    if (action === 'back') {
-      onBack()
-    }
+    if (action === 'back') onBack()
   }
 
+  const caseLine = `CASO #${crime.caseNumber || String(crime.id).slice(-4).padStart(4, '0')} · ${crime.type || 'CRIME'} · REGISTRO SUSPEITOS`
+
   return (
-    <div 
+    <div
       className={fullDosMain ? 'investigation-dos investigation-full-dos-main-root case-view-full-root' : 'home home-dos'}
       style={{
         fontFamily: "'PxPlus IBM VGA8', monospace",
@@ -66,12 +66,12 @@ function CaseView({ crime, onBack, fullDosMain = false }) {
       )}
 
       <div className={fullDosMain ? 'investigation-full-dos-main-row' : 'dos-main'}>
-        {/* Painel esquerdo - arquivos e pastas */}
         <div className="dos-panel dos-panel-left">
           <div className="dos-file-list">
             {dosFiles.map((f, i) => (
               <button
                 key={f.name}
+                type="button"
                 className={`dos-file-item ${selectedButton === i ? 'dos-file-selected' : ''}`}
                 onClick={() => handleFileAction(f.action)}
                 onMouseEnter={() => setSelectedButton(i)}
@@ -90,52 +90,37 @@ function CaseView({ crime, onBack, fullDosMain = false }) {
           </div>
         </div>
 
-        {/* Painel direito - CASO */}
         <div className="dos-panel dos-panel-right">
-          <div className="dos-mission-content case-view-content">
-            <div className="dos-mission-title">CASO</div>
-            <div className="dos-mission-case">
-              CASO #{crime.caseNumber || String(crime.id).slice(-4).padStart(4, '0')} · {crime.type || 'CRIME'}
-            </div>
+          <div className="dos-mission-content case-view-content suspects-view-dos">
+            <div className="dos-mission-title">BANCO DE DADOS DOS SUSPEITOS</div>
+            <div className="dos-mission-case">{caseLine}</div>
             <div className="dos-mission-description">
-              {crime.description.map((line, index) => (
-                <div key={index}>
-                  {line}
+              {suspectsWithRecords.map((suspect, index) => (
+                <div key={index} className="suspect-dos-record">
+                  <div className="suspect-dos-name">
+                    {suspect.displayName || suspect.name}
+                    {suspect.cargo && (
+                      <span className="suspect-dos-cargo"> ({suspect.cargo})</span>
+                    )}
+                  </div>
+                  <div className="suspect-dos-line">HISTORICO: {suspect.criminalRecord}</div>
+                  {suspect.comportamento && (
+                    <div className="suspect-dos-line">COMPORTAMENTO: {suspect.comportamento}</div>
+                  )}
+                  {suspect.caracteristica && (
+                    <div className="suspect-dos-line">CARACTERISTICA: {suspect.caracteristica}</div>
+                  )}
+                  {suspect.veiculo && (
+                    <div className="suspect-dos-line">VEICULO: {suspect.veiculo}</div>
+                  )}
                 </div>
               ))}
             </div>
           </div>
         </div>
       </div>
-
-      {!fullDosMain && (
-        <div className="dos-bottom-bar">
-          <button
-            className="dos-mission-btn dos-file-selected"
-            onClick={onBack}
-            onMouseEnter={() => setSelectedButton(0)}
-          >
-            VOLTAR
-          </button>
-          <div className="dos-version">
-            NEXO TERMINAL v1.0
-          </div>
-        </div>
-      )}
-      {fullDosMain && (
-        <div className="investigation-embedded-precision">
-          <button
-            type="button"
-            className="dos-mission-btn dos-file-selected"
-            onClick={onBack}
-            onMouseEnter={() => setSelectedButton(0)}
-          >
-            VOLTAR
-          </button>
-        </div>
-      )}
     </div>
   )
 }
 
-export default CaseView
+export default SuspectsView

@@ -115,12 +115,20 @@
 
 .dos-embedded-content {
   flex: 1;
-  overflow-y: auto;
-  overflow-x: hidden;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
   min-height: 0;
 }
 
-.dos-embedded-content .investigation,
+.dos-embedded-content .investigation-embedded,
+.dos-embedded-content .case-view-embedded {
+  padding: 0 !important;
+  min-height: 0 !important;
+  margin: 0;
+}
+
+.dos-embedded-content .investigation:not(.investigation-embedded),
 .dos-embedded-content .result,
 .dos-embedded-content .dossier-screen,
 .dos-embedded-content .stats-screen {

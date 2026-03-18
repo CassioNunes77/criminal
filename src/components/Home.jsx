@@ -38,6 +38,7 @@ function Home({
   const [missionDots, setMissionDots] = useState('')
   const [missionComplete, setMissionComplete] = useState(false)
   const missionTypingTimeoutRef = useRef(null)
+  const [suspectsDbOpen, setSuspectsDbOpen] = useState(false)
   const [commandInput, setCommandInput] = useState('')
   const x7ActiveRef = useRef(false)
   const [crtGlitch, setCrtGlitch] = useState(false)
@@ -151,6 +152,17 @@ function Home({
     setMissionComplete(true)
   }, [crime])
 
+  const finalizeMissionAccept = useCallback(() => {
+    window.__cancelMissionAnimation?.()
+    setShowMissionPreview(false)
+    onAcceptMission?.(x7ActiveRef.current || chk() ? { x: 1 } : undefined)
+  }, [onAcceptMission])
+
+  const handleRefuseMission = useCallback(() => {
+    window.__cancelMissionAnimation?.()
+    setShowMissionPreview(false)
+  }, [])
+
   useEffect(() => {
     const onResize = () => {
       setIsDesktop(window.innerWidth >= 768)
@@ -259,9 +271,9 @@ function Home({
           if (!missionComplete) {
             completeMissionAnimation()
           } else if (missionButtonSelected === 0) {
-            onAcceptMission?.(x7ActiveRef.current || chk() ? { x: 1 } : undefined)
+            finalizeMissionAccept()
           } else {
-            setShowMissionPreview(false)
+            handleRefuseMission()
           }
         } else if (missionComplete && (e.key === 'ArrowDown' || e.key === 'ArrowUp')) {
           e.preventDefault()
@@ -330,7 +342,7 @@ function Home({
 
     window.addEventListener('keydown', handleKeyDown)
     return () => window.removeEventListener('keydown', handleKeyDown)
-  }, [showAbout, showInfo, aboutComplete, infoComplete, showMissionPreview, missionComplete, missionButtonSelected, selectedButton, completeMissionAnimation, onAcceptMission, onShowStats, isCommandLineMode, isMobileLandscape, commandInput])
+  }, [showAbout, showInfo, aboutComplete, infoComplete, showMissionPreview, missionComplete, missionButtonSelected, selectedButton, completeMissionAnimation, finalizeMissionAccept, handleRefuseMission, onShowStats, isCommandLineMode, isMobileLandscape, commandInput])
 
   useEffect(() => {
     // Initialize typewriter sound
@@ -572,6 +584,10 @@ function Home({
   }, [showInfo])
 
   useEffect(() => {
+    if (screen !== 'investigation') setSuspectsDbOpen(false)
+  }, [screen])
+
+  useEffect(() => {
     const t = setInterval(() => {
       const d = new Date()
       setCurrentTime(`${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`)
@@ -716,13 +732,7 @@ function Home({
     } else if (action === 'stats') onShowStats?.()
   }
 
-  const handleAcceptMission = () => {
-    onAcceptMission?.(x7ActiveRef.current || chk() ? { x: 1 } : undefined)
-  }
-
-  const handleRefuseMission = () => {
-    setShowMissionPreview(false)
-  }
+  const handleAcceptMission = () => finalizeMissionAccept()
 
   return (
     <div 
@@ -741,9 +751,23 @@ function Home({
         <div className="dos-clock">{currentTime}</div>
       </div>
 
-      {/* Conteúdo principal - dois painéis */}
+      {/* Conteúdo principal: na investigação, menu do caso substitui INICIAR/ARQUIVO/INFO */}
       <div className="dos-main">
-        {/* Painel esquerdo - arquivos e pastas */}
+        {screen === 'investigation' ? (
+          <Investigation
+            fullDosMain
+            crime={crime}
+            state={investigationState}
+            x7={x7}
+            onDiscoverClue={onDiscoverClue}
+            onViewWitness={onViewWitness}
+            onMakeAccusation={onMakeAccusation}
+            onViewResult={() => setScreen('result')}
+            onBack={() => setScreen('home')}
+            onSuspectsDbOpenChange={setSuspectsDbOpen}
+          />
+        ) : (
+          <>
         <div className="dos-panel dos-panel-left">
           <div className="dos-file-list">
             {dosFiles.map((f, i) => (
@@ -766,7 +790,6 @@ function Home({
             ))}
           </div>
           
-          {/* Botões ACEITAR e RECUSAR quando em missão */}
           {showMissionPreview && (
             <>
               <div className="dos-folder-sep" />
@@ -790,22 +813,8 @@ function Home({
           )}
         </div>
 
-        {/* Painel direito - NEXO TERMINAL, Missão, ARQUIVO, INFO ou telas embutidas */}
         <div className={`dos-panel dos-panel-right ${screen !== 'home' ? 'dos-panel-embedded' : 'dos-hero-panel'}`}>
-          {screen === 'investigation' ? (
-            <div className="dos-embedded-content">
-              <Investigation
-                crime={crime}
-                state={investigationState}
-                x7={x7}
-                onDiscoverClue={onDiscoverClue}
-                onViewWitness={onViewWitness}
-                onMakeAccusation={onMakeAccusation}
-                onViewResult={() => setScreen('result')}
-                onBack={() => setScreen('home')}
-              />
-            </div>
-          ) : screen === 'result' ? (
+          {screen === 'result' ? (
             <div className="dos-embedded-content">
               <Result
                 crime={crime}
@@ -898,21 +907,28 @@ function Home({
             </div>
           )}
         </div>
+          </>
+        )}
       </div>
 
       {/* Barra inferior - prompt C:\ e versão, Aceitar/Recusar, ou VOLTAR */}
       <div className="dos-bottom-bar">
         {screen !== 'home' ? (
-          <div className="dos-prompt">
-            C:\&gt;
-            <button
-              className="dos-mission-btn"
-              onClick={() => setScreen?.('home')}
-              style={{ marginLeft: '8px', background: 'none', border: 'none', cursor: 'pointer', color: 'inherit' }}
-            >
-              [VOLTAR]
-            </button>
-          </div>
+          suspectsDbOpen ? (
+            <div className="dos-prompt" aria-hidden />
+          ) : (
+            <div className="dos-prompt">
+              C:\&gt;
+              <button
+                type="button"
+                className="dos-mission-btn"
+                onClick={() => setScreen?.('home')}
+                style={{ marginLeft: '8px', background: 'none', border: 'none', cursor: 'pointer', color: 'inherit' }}
+              >
+                [VOLTAR]
+              </button>
+            </div>
+          )
         ) : showAbout || showInfo ? (
           <button
             className="dos-mission-btn dos-file-selected"

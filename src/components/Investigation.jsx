@@ -1,11 +1,12 @@
 import { useState, useEffect, useRef } from 'react'
 import { TypewriterSound } from '../utils/typewriterSound'
 import CaseView from './CaseView'
+import SuspectsView from './SuspectsView'
 import './Investigation.css'
 import './Home.css'
 import './InvestigationDos.css'
 
-function Investigation({ crime, state, onDiscoverClue, onViewWitness, onMakeAccusation, onBack, onViewResult, x7 }) {
+function Investigation({ crime, state, onDiscoverClue, onViewWitness, onMakeAccusation, onBack, onViewResult, x7, fullDosMain = false, onSuspectsDbOpenChange }) {
   const typewriterSoundRef = useRef(null)
   const lastClueRevealTimeRef = useRef(0)
   const lastNavWasKeyboardRef = useRef(false)
@@ -41,12 +42,13 @@ function Investigation({ crime, state, onDiscoverClue, onViewWitness, onMakeAccu
   })
 
   useEffect(() => {
+    if (fullDosMain) return undefined
     const t = setInterval(() => {
       const d = new Date()
       setCurrentTime(`${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`)
     }, 1000)
     return () => clearInterval(t)
-  }, [])
+  }, [fullDosMain])
 
   // Title animation - typewriter effect like Home screen
   useEffect(() => {
@@ -133,14 +135,13 @@ function Investigation({ crime, state, onDiscoverClue, onViewWitness, onMakeAccu
     typeof s === 'object' ? s : { name: s, criminalRecord: 'Sem antecedentes' }
   )
 
-  // Main menu buttons - ordem única para cursor e teclado (testemunhas sempre visível, inclusive após caso resolvido)
+  // Menu: CASO.EXE → BANCO_SUSPEITOS.EXE (sempre visível, a qualquer momento)
   const mainButtons = [
     !showWitnesses && 'witnesses',
-    !showSuspects && 'suspects',
     'case',
+    'suspects',
     'accusation',
-    showViewResult && 'viewResult',
-    'back'
+    showViewResult && 'viewResult'
   ].filter(Boolean)
 
   // Itens focáveis: pistas (se houver) + botões do menu. Ordem visual para setas cima/baixo
@@ -300,8 +301,8 @@ function Investigation({ crime, state, onDiscoverClue, onViewWitness, onMakeAccu
           lastNavWasKeyboardRef.current = true
           if (selectedWitnessIndex >= witnessButtons.length - 1) {
             setWitnessNavActive(false)
-            const suspectsIdx = availableClues.length + 1
-            setSelectedFocusIndex(Math.min(suspectsIdx, focusableItems.length - 1))
+            const suspectsIdx = focusableItems.findIndex(item => item.type === 'button' && item.id === 'suspects')
+            if (suspectsIdx >= 0) setSelectedFocusIndex(suspectsIdx)
           } else {
             setSelectedWitnessIndex(prev => prev + 1)
           }
@@ -355,8 +356,6 @@ function Investigation({ crime, state, onDiscoverClue, onViewWitness, onMakeAccu
             setShowSuspects(true)
           } else if (item.id === 'viewResult') {
             onViewResult()
-          } else if (item.id === 'back') {
-            onBack()
           }
         }
       }
@@ -368,8 +367,26 @@ function Investigation({ crime, state, onDiscoverClue, onViewWitness, onMakeAccu
     }
   }, [showAccusation, accusationFocusIndex, selectedSuspect, selectedLocation, selectedMethod, selectedWitnessIndex, suspectsWithRecords, crime, canDiscoverMore, showWitnesses, witnessNavActive, showSuspects, isFailed, remainingAttempts, witnessesViewed, selectedFocusIndex, focusableItems, availableClues, handleAccusation, handleViewWitness, onViewWitness, onViewResult, onBack])
 
+  useEffect(() => {
+    onSuspectsDbOpenChange?.(showSuspects)
+    return () => {
+      if (showSuspects) onSuspectsDbOpenChange?.(false)
+    }
+  }, [showSuspects, onSuspectsDbOpenChange])
+
   if (showCaseView) {
-    return <CaseView crime={crime} onBack={() => setShowCaseView(false)} />
+    return <CaseView crime={crime} fullDosMain={fullDosMain} onBack={() => setShowCaseView(false)} />
+  }
+
+  if (showSuspects) {
+    return (
+      <SuspectsView
+        crime={crime}
+        suspectsWithRecords={suspectsWithRecords}
+        fullDosMain={fullDosMain}
+        onBack={() => setShowSuspects(false)}
+      />
+    )
   }
 
   const handleMouseInteraction = () => {
@@ -378,33 +395,33 @@ function Investigation({ crime, state, onDiscoverClue, onViewWitness, onMakeAccu
 
   return (
     <div 
-      className="home home-dos investigation-dos"
+      className={fullDosMain ? 'investigation investigation-dos investigation-full-dos-main-root' : 'home home-dos investigation-dos'}
       onMouseDown={handleMouseInteraction} 
       onPointerDown={handleMouseInteraction}
       style={{
         fontFamily: "'PxPlus IBM VGA8', monospace",
         color: '#00CC55',
-        background: '#000'
+        background: fullDosMain ? 'transparent' : '#000'
       }}
     >
-      {/* Top bar - linha superior + relógio */}
-      <div className="dos-top-bar">
-        <div className="dos-top-line" />
-        <div className="dos-clock">{currentTime}</div>
-      </div>
+      {!fullDosMain && (
+        <div className="dos-top-bar">
+          <div className="dos-top-line" />
+          <div className="dos-clock">{currentTime}</div>
+        </div>
+      )}
 
-      {/* Conteúdo principal - dois painéis */}
-      <div className="dos-main">
+      <div className={fullDosMain ? 'investigation-full-dos-main-row' : 'dos-main'}>
         {/* Painel esquerdo - arquivos e pastas */}
         <div className="dos-panel dos-panel-left">
           <div className="dos-file-list">
             {mainButtons.map((buttonId, index) => {
               const buttonLabels = {
                 witnesses: 'TESTEMUNHAS.EXE',
-                suspects: 'SUSPEITOS.EXE',
                 case: 'CASO.EXE',
-                viewResult: 'RESULTADO.EXE',
-                back: 'VOLTAR.EXE'
+                suspects: 'BANCO_SUSPEITOS.EXE',
+                accusation: 'ACUSAÇÃO.EXE',
+                viewResult: 'RESULTADO.EXE'
               }
               const isFocused = titleAnimationComplete && !showWitnesses && !showAccusation && focusableItems[selectedFocusIndex]?.id === buttonId
               return (
@@ -417,7 +434,6 @@ function Investigation({ crime, state, onDiscoverClue, onViewWitness, onMakeAccu
                     else if (buttonId === 'case') setShowCaseView(true)
                     else if (buttonId === 'accusation') setShowAccusation(true)
                     else if (buttonId === 'viewResult') onViewResult()
-                    else if (buttonId === 'back') onBack()
                   }}
                   data-focused={isFocused ? 'true' : undefined}
                   onMouseEnter={() => {
@@ -472,109 +488,6 @@ function Investigation({ crime, state, onDiscoverClue, onViewWitness, onMakeAccu
                     </button>
                   )
                 })}
-              </div>
-            </>
-          )}
-          
-          <div className="dos-folder-sep" />
-          <div className="dos-folder-list">
-            <div className="dos-folder-item">SYSTEM &gt;FOLDER&lt;</div>
-            <div className="dos-folder-item">SETTINGS &gt;FOLDER&lt;</div>
-          </div>
-          
-          {/* Botão ACUSAÇÃO */}
-          <div className="dos-folder-sep" />
-          <div className="dos-file-list">
-            {(() => {
-              const buttonId = 'accusation'
-              const isFocused = titleAnimationComplete && !showWitnesses && !showAccusation && focusableItems[selectedFocusIndex]?.id === buttonId
-              return (
-                <button
-                  key={buttonId}
-                  className={`dos-file-item ${isFocused ? 'dos-file-selected' : ''}`}
-                  onClick={() => {
-                    if (buttonId === 'accusation') setShowAccusation(true)
-                  }}
-                  data-focused={isFocused ? 'true' : undefined}
-                  onMouseEnter={() => {
-                    const idx = focusableItems.findIndex(item => item.id === buttonId)
-                    if (idx >= 0) setSelectedFocusIndex(idx)
-                  }}
-                  style={{
-                    opacity: buttonId === 'accusation' && remainingAttempts <= 0 ? 0.5 : 1,
-                    cursor: buttonId === 'accusation' && remainingAttempts <= 0 ? 'not-allowed' : 'pointer'
-                  }}
-                >
-                  ACUSAÇÃO.EXE
-                  {isFocused && (
-                    <span className="cursor-blink" style={{
-                      color: '#00FF66',
-                      animation: 'blink 1s step-end infinite',
-                      marginLeft: '4px'
-                    }}>█</span>
-                  )}
-                </button>
-              )
-            })()}
-          </div>
-          
-          {/* Campos de acusação quando ativo */}
-          {showAccusation && (
-            <>
-              <div className="dos-folder-sep" />
-              <div className="dos-folder-list">
-                <div className="dos-folder-item">ACUSACAO &gt;FOLDER&lt;</div>
-                <div className="accusation-item">
-                  SUSPEITO: {selectedSuspect || 'SELECIONAR'}
-                </div>
-                <div className="accusation-item">
-                  LOCAL: {selectedLocation || 'SELECIONAR'}
-                </div>
-                <div className="accusation-item">
-                  METODO: {selectedMethod || 'SELECIONAR'}
-                </div>
-                {feedback && (
-                  <div className={`accusation-feedback ${feedback.includes('CORRETA') ? 'success' : feedback.includes('PERTO') ? 'warning' : 'error'}`}>
-                    {feedback}
-                  </div>
-                )}
-              </div>
-              <div className="dos-folder-sep" />
-              <div className="dos-file-list">
-                <button
-                  className="dos-file-item"
-                  onClick={() => {
-                    if (selectedSuspect && selectedLocation && selectedMethod && remainingAttempts > 0) {
-                      const isCorrect = onMakeAccusation(selectedSuspect, selectedLocation, selectedMethod)
-                      if (!isCorrect) {
-                        const feedbackMsg = getFeedbackMessage(selectedSuspect, selectedLocation, selectedMethod)
-                        setFeedback(feedbackMsg)
-                        setTimeout(() => setFeedback(null), 3000)
-                        
-                        if (remainingAttempts <= 1) {
-                          setTimeout(() => {
-                            setFeedback('CASO ENCERRADO. VOCE FALHOU.')
-                          }, 3000)
-                        }
-                      }
-                    }
-                  }}
-                  style={{
-                    opacity: remainingAttempts <= 0 ? 0.5 : 1,
-                    cursor: remainingAttempts <= 0 ? 'not-allowed' : 'pointer'
-                  }}
-                >
-                  CONFIRMAR.EXE
-                </button>
-                <button
-                  className="dos-file-item"
-                  onClick={() => {
-                    setShowAccusation(false)
-                    setFeedback(null)
-                  }}
-                >
-                  VOLTAR.EXE
-                </button>
               </div>
             </>
           )}
@@ -659,8 +572,134 @@ function Investigation({ crime, state, onDiscoverClue, onViewWitness, onMakeAccu
               </div>
             </div>
             
-            {/* Status e tentativas */}
+            {/* Status e tentativas / formulário de acusação */}
             <div className="dos-mission-description">
+              {showAccusation ? (() => {
+                const nS = suspectsWithRecords.length
+                const nL = crime.locations.length
+                const nM = crime.methods.length
+                const iConfirm = nS + nL + nM
+                const iCancel = iConfirm + 1
+                const suspectVal = (s) => (typeof s === 'object' ? (s.name ?? s.displayName ?? '') : String(s))
+                const locVal = (l) => (typeof l === 'string' ? l : (l?.type ?? l?.name ?? l?.value ?? ''))
+                const metVal = (m) => (typeof m === 'string' ? m : (m?.type ?? m?.name ?? m?.value ?? ''))
+                return (
+                  <div className="accusation-form-dos">
+                    <div className="accusation-title">ACUSAÇÃO — SELECIONE SUSPEITO, LOCAL E MÉTODO</div>
+                    <div className="form-hint" style={{ fontSize: '10px', color: 'var(--text-secondary)', marginBottom: '8px' }}>
+                      Setas ↑↓ + Enter para escolher · ou clique nas opções
+                    </div>
+
+                    <div className="form-group">
+                      <div className="form-label">SUSPEITO</div>
+                      <div className="form-options">
+                        {suspectsWithRecords.map((s, i) => {
+                          const value = suspectVal(s)
+                          const focused = accusationFocusIndex === i
+                          const picked = (selectedSuspect ?? '').trim() === value.trim()
+                          return (
+                            <button
+                              type="button"
+                              key={`acc-s-${i}`}
+                              className={`option-button ${focused ? 'selected' : ''} ${picked ? 'accusation-picked' : ''}`}
+                              onClick={() => {
+                                setAccusationFocusIndex(i)
+                                setSelectedSuspect(value)
+                              }}
+                            >
+                              {picked ? '[*] ' : '> '}{value}
+                            </button>
+                          )
+                        })}
+                      </div>
+                    </div>
+
+                    <div className="form-group">
+                      <div className="form-label">LOCAL</div>
+                      <div className="form-options">
+                        {crime.locations.map((l, i) => {
+                          const idx = nS + i
+                          const value = locVal(l)
+                          const focused = accusationFocusIndex === idx
+                          const picked = (selectedLocation ?? '').trim() === value.trim()
+                          return (
+                            <button
+                              type="button"
+                              key={`acc-l-${i}`}
+                              className={`option-button ${focused ? 'selected' : ''} ${picked ? 'accusation-picked' : ''}`}
+                              onClick={() => {
+                                setAccusationFocusIndex(idx)
+                                setSelectedLocation(value)
+                              }}
+                            >
+                              {picked ? '[*] ' : '> '}{value}
+                            </button>
+                          )
+                        })}
+                      </div>
+                    </div>
+
+                    <div className="form-group">
+                      <div className="form-label">MÉTODO</div>
+                      <div className="form-options">
+                        {crime.methods.map((m, i) => {
+                          const idx = nS + nL + i
+                          const value = metVal(m)
+                          const focused = accusationFocusIndex === idx
+                          const picked = (selectedMethod ?? '').trim() === value.trim()
+                          return (
+                            <button
+                              type="button"
+                              key={`acc-m-${i}`}
+                              className={`option-button ${focused ? 'selected' : ''} ${picked ? 'accusation-picked' : ''}`}
+                              onClick={() => {
+                                setAccusationFocusIndex(idx)
+                                setSelectedMethod(value)
+                              }}
+                            >
+                              {picked ? '[*] ' : '> '}{value}
+                            </button>
+                          )
+                        })}
+                      </div>
+                    </div>
+
+                    <div className="form-group accusation-actions-dos">
+                      <button
+                        type="button"
+                        className={`terminal-button ${accusationFocusIndex === iConfirm ? 'highlight' : ''}`}
+                        onClick={() => {
+                          setAccusationFocusIndex(iConfirm)
+                          if (selectedSuspect && selectedLocation && selectedMethod && remainingAttempts > 0) {
+                            handleAccusation()
+                          }
+                        }}
+                        style={{ opacity: remainingAttempts <= 0 ? 0.5 : 1 }}
+                      >
+                        CONFIRMAR ACUSAÇÃO
+                      </button>
+                      <button
+                        type="button"
+                        className={`terminal-button secondary ${accusationFocusIndex === iCancel ? 'highlight' : ''}`}
+                        onClick={() => {
+                          setAccusationFocusIndex(iCancel)
+                          setShowAccusation(false)
+                          setFeedback(null)
+                        }}
+                      >
+                        CANCELAR
+                      </button>
+                    </div>
+
+                    {feedback && (
+                      <div className={`accusation-feedback ${feedback.includes('CORRETA') ? 'success' : feedback.includes('PERTO') ? 'warning' : 'error'}`}>
+                        {feedback}
+                      </div>
+                    )}
+                  </div>
+                )
+              })() : (
+              <>
               <div className="status-line">
                 TENTATIVAS: {maxAttempts > 3 ? currentAttempts : `${currentAttempts}/${maxAttempts} ${remainingAttempts > 0 ? `(${remainingAttempts} RESTANTES)` : '(ESGOTADAS)'}`}
               </div>
@@ -728,40 +767,7 @@ function Investigation({ crime, state, onDiscoverClue, onViewWitness, onMakeAccu
                   })}
                 </div>
               )}
-              
-              {/* Suspeitos */}
-              {showSuspects && (
-                <div className="suspects-content">
-                  <div className="section-title">BANCO DE DADOS DOS SUSPEITOS:</div>
-                  {suspectsWithRecords.map((suspect, index) => (
-                    <div key={index} className="suspect-record">
-                      <div className="suspect-name">
-                        {suspect.displayName || suspect.name}
-                        {suspect.cargo && (
-                          <span className="suspect-cargo"> ({suspect.cargo})</span>
-                        )}
-                      </div>
-                      <div className="suspect-record-text">
-                        HISTORICO: {suspect.criminalRecord}
-                      </div>
-                      {suspect.comportamento && (
-                        <div className="suspect-record-text">
-                          COMPORTAMENTO: {suspect.comportamento}
-                        </div>
-                      )}
-                      {suspect.caracteristica && (
-                        <div className="suspect-record-text">
-                          CARACTERISTICA: {suspect.caracteristica}
-                        </div>
-                      )}
-                      {suspect.veiculo && (
-                        <div className="suspect-record-text">
-                          VEICULO: {suspect.veiculo}
-                        </div>
-                      )}
-                    </div>
-                  ))}
-                </div>
+              </>
               )}
             </div>
           </div>
@@ -769,16 +775,22 @@ function Investigation({ crime, state, onDiscoverClue, onViewWitness, onMakeAccu
         </div>
       </div>
 
-      {/* Barra inferior - apenas versão quando não em acusação */}
-      <div className="dos-bottom-bar">
-        {!showAccusation && (
-          <div className="dos-prompt">
-            <div className="dos-version">
-              NEXO TERMINAL v1.0 · PRECISAO: {Math.max(0, 100 - (revealedClues.length * 5) - (witnessesViewed.length * 3) - (currentAttempts * 10))}%
+      {!fullDosMain && (
+        <div className="dos-bottom-bar">
+          {!showAccusation && (
+            <div className="dos-prompt">
+              <div className="dos-version">
+                NEXO TERMINAL v1.0 · PRECISAO: {Math.max(0, 100 - (revealedClues.length * 5) - (witnessesViewed.length * 3) - (currentAttempts * 10))}%
+              </div>
             </div>
-          </div>
-        )}
-      </div>
+          )}
+        </div>
+      )}
+      {fullDosMain && !showAccusation && (
+        <div className="investigation-embedded-precision">
+          PRECISAO: {Math.max(0, 100 - (revealedClues.length * 5) - (witnessesViewed.length * 3) - (currentAttempts * 10))}%
+        </div>
+      )}
     </div>
   )
 }

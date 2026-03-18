@@ -1,5 +1,131 @@
 /* Estilos adicionais para Investigation no formato DOS */
 
+/* Ocupa o dos-main inteiro: menu do caso no lugar de INICIAR/ARQUIVO/INFO */
+.investigation-full-dos-main-root {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  width: 100%;
+  align-self: stretch;
+}
+
+.investigation-full-dos-main-row {
+  flex: 1;
+  display: flex;
+  gap: 24px;
+  min-height: 0;
+  align-items: stretch;
+  width: 100%;
+}
+
+/* Mesma largura do menu lateral da Home (.dos-panel-left) */
+.investigation-full-dos-main-row > .dos-panel-left {
+  flex: 1;
+  min-width: 0;
+  max-width: 320px;
+  max-height: 100%;
+  overflow-y: auto;
+}
+
+.investigation-full-dos-main-row > .dos-panel-right {
+  flex: 1;
+  min-width: 0;
+  min-height: 0;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.investigation-full-dos-main-row .investigation-content {
+  max-height: none !important;
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+}
+
+.case-view-full-root .investigation-full-dos-main-row > .dos-panel-right {
+  overflow-y: auto;
+}
+
+@media (max-width: 768px) {
+  .investigation-full-dos-main-row {
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .investigation-full-dos-main-row > .dos-panel-left {
+    max-width: none;
+    order: 2;
+    max-height: min(40vh, 280px);
+  }
+
+  .investigation-full-dos-main-row > .dos-panel-right {
+    order: 1;
+    min-height: min(35vh, 200px);
+  }
+}
+
+/* Embutido no painel da Home: um único frame, sem duplicar CRT/relógio */
+.investigation-embedded {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+  width: 100%;
+  align-self: stretch;
+}
+
+.investigation-embedded .dos-main {
+  flex: 1;
+  min-height: 0;
+  margin-bottom: 0;
+  overflow: hidden;
+  gap: 12px;
+}
+
+.investigation-embedded .dos-panel-left {
+  max-width: min(260px, 36vw);
+}
+
+.investigation-embedded .dos-panel-right {
+  min-width: 0;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.investigation-embedded .investigation-content {
+  max-height: none !important;
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+}
+
+.investigation-embedded-precision {
+  font-size: 10px;
+  color: var(--text-secondary);
+  flex-shrink: 0;
+  padding-top: 6px;
+  margin-top: auto;
+  border-top: 1px solid rgba(0, 122, 51, 0.35);
+}
+
+.case-view-embedded {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+  width: 100%;
+}
+
+.case-view-embedded .dos-main {
+  flex: 1;
+  min-height: 0;
+  overflow: auto;
+  margin-bottom: 0;
+}
+
 .investigation-dos .investigation-content {
   overflow-y: auto;
   max-height: 500px;
@@ -254,8 +380,20 @@
   flex-direction: column;
   gap: 8px;
   width: 100%;
-  max-height: 300px;
+  max-height: min(58vh, 520px);
   overflow-y: auto;
+  padding-right: 4px;
+}
+
+.investigation-dos .option-button.accusation-picked {
+  color: var(--text-highlight);
+  font-weight: bold;
+}
+
+.investigation-dos .accusation-actions-dos {
+  margin-top: 8px;
+  padding-top: 8px;
+  border-top: 1px solid var(--text-secondary);
 }
 
 .investigation-dos .accusation-title {
@@ -345,6 +483,10 @@
 
 /* Responsivo para mobile */
 @media (max-width: 768px) {
+  .investigation-embedded .investigation-content {
+    max-height: min(48vh, 380px) !important;
+  }
+
   .investigation-dos .dos-main {
     flex-direction: column;
     gap: 12px;

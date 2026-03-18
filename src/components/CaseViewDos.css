@@ -37,3 +37,35 @@
   height: auto !important;
   overflow-y: auto !important;
 }
+
+/* SuspectsView — mesmo tratamento que caso.exe */
+.suspects-view-dos .suspect-dos-record {
+  margin-bottom: 20px;
+  padding-bottom: 14px;
+  border-bottom: 1px solid rgba(0, 122, 51, 0.4);
+}
+
+.suspects-view-dos .suspect-dos-record:last-child {
+  border-bottom: none;
+  margin-bottom: 0;
+  padding-bottom: 0;
+}
+
+.suspects-view-dos .suspect-dos-name {
+  font-size: 13px;
+  color: var(--text-highlight);
+  margin-bottom: 8px;
+  font-weight: bold;
+}
+
+.suspects-view-dos .suspect-dos-cargo {
+  color: var(--text-secondary);
+  font-weight: normal;
+}
+
+.suspects-view-dos .suspect-dos-line {
+  font-size: 12px;
+  line-height: 1.55;
+  margin-bottom: 4px;
+  text-align: left !important;
+}

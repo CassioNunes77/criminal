@@ -2,11 +2,26 @@ import { useState, useEffect, useRef } from 'react'
 import { TypewriterSound } from '../utils/typewriterSound'
 import CaseView from './CaseView'
 import SuspectsView from './SuspectsView'
+import CluesView from './CluesView'
 import './Investigation.css'
 import './Home.css'
 import './InvestigationDos.css'
 
-function Investigation({ crime, state, onDiscoverClue, onViewWitness, onMakeAccusation, onBack, onViewResult, x7, fullDosMain = false, onSuspectsDbOpenChange }) {
+function Investigation({
+  crime,
+  state,
+  onDiscoverClue,
+  onViewWitness,
+  onMakeAccusation,
+  onBack,
+  onViewResult,
+  x7,
+  fullDosMain = false,
+  onSuspectsDbOpenChange,
+  onCluesViewOpenChange,
+  skipInvestigationTitleAnimation = false,
+  onMarkInvestigationTitleIntroSeen
+}) {
   const typewriterSoundRef = useRef(null)
   const lastClueRevealTimeRef = useRef(0)
   const lastNavWasKeyboardRef = useRef(false)
@@ -20,6 +35,8 @@ function Investigation({ crime, state, onDiscoverClue, onViewWitness, onMakeAccu
   const witnessesViewed = state.witnessesViewed || []
   const [showSuspects, setShowSuspects] = useState(false)
   const [showCaseView, setShowCaseView] = useState(false)
+  const [showCluesView, setShowCluesView] = useState(false)
+  const [forceRevealClueType, setForceRevealClueType] = useState(null)
   const [selectedFocusIndex, setSelectedFocusIndex] = useState(0)
   const [selectedClueIndex, setSelectedClueIndex] = useState(0)
   const [selectedWitnessIndex, setSelectedWitnessIndex] = useState(0)
@@ -50,13 +67,15 @@ function Investigation({ crime, state, onDiscoverClue, onViewWitness, onMakeAccu
     return () => clearInterval(t)
   }, [fullDosMain])
 
-  // Title animation - typewriter effect like Home screen
+  // Ao sair da tela de investigação (voltar home, resultado, etc.), não repetir animação do título neste caso
   useEffect(() => {
-    if (!typewriterSoundRef.current) {
-      typewriterSoundRef.current = new TypewriterSound()
-      typewriterSoundRef.current.init()
+    return () => {
+      onMarkInvestigationTitleIntroSeen?.(crime.id)
     }
+  }, [crime.id, onMarkInvestigationTitleIntroSeen])
 
+  // Title animation - typewriter só na primeira entrada neste caso; depois texto completo direto
+  useEffect(() => {
     const caseNum = crime.caseNumber || String(crime.id).slice(-3)
     const line1 = `Caso #${caseNum}`
     const line2 = crime.type || crime.title || ''
@@ -64,6 +83,19 @@ function Investigation({ crime, state, onDiscoverClue, onViewWitness, onMakeAccu
     const day = String(today.getDate()).padStart(2, '0')
     const month = String(today.getMonth() + 1).padStart(2, '0')
     const line3 = `${day}/${month}/1987`
+
+    if (skipInvestigationTitleAnimation) {
+      setTitleLine1(line1)
+      setTitleLine2(line2)
+      setTitleLine3(line3)
+      setTitleAnimationComplete(true)
+      return undefined
+    }
+
+    if (!typewriterSoundRef.current) {
+      typewriterSoundRef.current = new TypewriterSound()
+      typewriterSoundRef.current.init()
+    }
 
     setTitleLine1('')
     setTitleLine2('')
@@ -76,7 +108,6 @@ function Investigation({ crime, state, onDiscoverClue, onViewWitness, onMakeAccu
 
     const typeNext = () => {
       if (phase === 0) {
-        // Line 1: Caso #XXX
         if (charIndex < line1.length) {
           if (line1[charIndex] !== ' ') typewriterSoundRef.current?.play()
           setTitleLine1(line1.slice(0, charIndex + 1))
@@ -88,7 +119,6 @@ function Investigation({ crime, state, onDiscoverClue, onViewWitness, onMakeAccu
           timeoutId = setTimeout(typeNext, 400)
         }
       } else if (phase === 1) {
-        // Line 2: FURTO EM VIDEOLOCADORA
         if (charIndex < line2.length) {
           if (line2[charIndex] !== ' ') typewriterSoundRef.current?.play()
           setTitleLine2(line2.slice(0, charIndex + 1))
@@ -100,7 +130,6 @@ function Investigation({ crime, state, onDiscoverClue, onViewWitness, onMakeAccu
           timeoutId = setTimeout(typeNext, 400)
         }
       } else if (phase === 2) {
-        // Line 3: date (dd/mm/1987)
         if (charIndex < line3.length) {
           if (line3[charIndex] !== '/') typewriterSoundRef.current?.play()
           setTitleLine3(line3.slice(0, charIndex + 1))
@@ -117,7 +146,7 @@ function Investigation({ crime, state, onDiscoverClue, onViewWitness, onMakeAccu
     return () => {
       if (timeoutId) clearTimeout(timeoutId)
     }
-  }, [crime.id, crime.type, crime.title])
+  }, [crime.id, crime.type, crime.title, skipInvestigationTitleAnimation])
 
   // Get available and revealed clues (usar state.cluesRevealed para re-render correto)
   const cluesRevealed = state.cluesRevealed || []
@@ -135,20 +164,33 @@ function Investigation({ crime, state, onDiscoverClue, onViewWitness, onMakeAccu
     typeof s === 'object' ? s : { name: s, criminalRecord: 'Sem antecedentes' }
   )
 
-  // Menu: CASO.EXE → BANCO_SUSPEITOS.EXE (sempre visível, a qualquer momento)
-  const mainButtons = [
+  const topMenuButtons = [
     !showWitnesses && 'witnesses',
     'case',
-    'suspects',
-    'accusation',
-    showViewResult && 'viewResult'
+    'suspects'
   ].filter(Boolean)
 
-  // Itens focáveis: pistas (se houver) + botões do menu. Ordem visual para setas cima/baixo
-  const focusableItems = [
-    ...(canDiscoverMore ? availableClues.map((c, i) => ({ type: 'clue', index: i })) : []),
-    ...mainButtons.map(id => ({ type: 'button', id }))
+  const actionButtons = [
+    'accusation',
+    ...(showViewResult ? ['viewResult'] : [])
   ]
+
+  const menuButtonOrder = [...topMenuButtons, ...actionButtons]
+
+  const showConsultPistas = revealedClues.length > 0
+  const focusableItems = [
+    ...availableClues.map((c) => ({ type: 'clue', clueType: c.type })),
+    ...(showConsultPistas ? [{ type: 'consultClues' }] : []),
+    ...menuButtonOrder.map(id => ({ type: 'button', id }))
+  ]
+
+  const lastClueFocusIndex = (() => {
+    for (let i = focusableItems.length - 1; i >= 0; i--) {
+      if (focusableItems[i].type === 'clue') return i
+    }
+    const consult = focusableItems.findIndex((it) => it.type === 'consultClues')
+    return consult >= 0 ? consult : 0
+  })()
 
   // Clamp selectedFocusIndex quando focusableItems muda
   useEffect(() => {
@@ -311,8 +353,7 @@ function Investigation({ crime, state, onDiscoverClue, onViewWitness, onMakeAccu
           lastNavWasKeyboardRef.current = true
           if (selectedWitnessIndex === 0) {
             setWitnessNavActive(false)
-            const cluesIdx = Math.max(0, availableClues.length - 1)
-            setSelectedFocusIndex(cluesIdx)
+            setSelectedFocusIndex(lastClueFocusIndex)
           } else {
             setSelectedWitnessIndex(prev => prev - 1)
           }
@@ -329,6 +370,12 @@ function Investigation({ crime, state, onDiscoverClue, onViewWitness, onMakeAccu
           e.preventDefault()
           setShowSuspects(false)
         }
+      } else if (showCluesView) {
+        if (e.key === 'Escape') {
+          e.preventDefault()
+          setShowCluesView(false)
+          setForceRevealClueType(null)
+        }
       } else {
         // Navegação por setas: pula entre itens focáveis (pistas + botões)
         if (e.key === 'ArrowDown') {
@@ -344,7 +391,13 @@ function Investigation({ crime, state, onDiscoverClue, onViewWitness, onMakeAccu
           const item = focusableItems[selectedFocusIndex]
           if (!item) return
           if (item.type === 'clue') {
-            handleDiscoverClue(availableClues[item.index].type)
+            const t = item.clueType
+            handleDiscoverClue(t)
+            setForceRevealClueType(t)
+            setShowCluesView(true)
+          } else if (item.type === 'consultClues') {
+            setForceRevealClueType(null)
+            setShowCluesView(true)
           } else if (item.id === 'case') {
             setShowCaseView(true)
           } else if (item.id === 'accusation') {
@@ -365,7 +418,7 @@ function Investigation({ crime, state, onDiscoverClue, onViewWitness, onMakeAccu
     return () => {
       window.removeEventListener('keydown', handleKeyPress)
     }
-  }, [showAccusation, accusationFocusIndex, selectedSuspect, selectedLocation, selectedMethod, selectedWitnessIndex, suspectsWithRecords, crime, canDiscoverMore, showWitnesses, witnessNavActive, showSuspects, isFailed, remainingAttempts, witnessesViewed, selectedFocusIndex, focusableItems, availableClues, handleAccusation, handleViewWitness, onViewWitness, onViewResult, onBack])
+  }, [showAccusation, accusationFocusIndex, selectedSuspect, selectedLocation, selectedMethod, selectedWitnessIndex, suspectsWithRecords, crime, canDiscoverMore, showWitnesses, witnessNavActive, showSuspects, showCluesView, isFailed, remainingAttempts, witnessesViewed, selectedFocusIndex, focusableItems, availableClues, lastClueFocusIndex, handleAccusation, handleViewWitness, onViewWitness, onViewResult, onBack])
 
   useEffect(() => {
     onSuspectsDbOpenChange?.(showSuspects)
@@ -373,6 +426,28 @@ function Investigation({ crime, state, onDiscoverClue, onViewWitness, onMakeAccu
       if (showSuspects) onSuspectsDbOpenChange?.(false)
     }
   }, [showSuspects, onSuspectsDbOpenChange])
+
+  useEffect(() => {
+    onCluesViewOpenChange?.(showCluesView)
+    return () => {
+      if (showCluesView) onCluesViewOpenChange?.(false)
+    }
+  }, [showCluesView, onCluesViewOpenChange])
+
+  if (showCluesView) {
+    return (
+      <CluesView
+        crime={crime}
+        cluesRevealedTypes={cluesRevealed}
+        forceRevealType={forceRevealClueType}
+        fullDosMain={fullDosMain}
+        onBack={() => {
+          setShowCluesView(false)
+          setForceRevealClueType(null)
+        }}
+      />
+    )
+  }
 
   if (showCaseView) {
     return <CaseView crime={crime} fullDosMain={fullDosMain} onBack={() => setShowCaseView(false)} />
@@ -392,6 +467,13 @@ function Investigation({ crime, state, onDiscoverClue, onViewWitness, onMakeAccu
   const handleMouseInteraction = () => {
     lastNavWasKeyboardRef.current = false
   }
+
+  const consultCluesFocusIdx = showConsultPistas ? focusableItems.findIndex((item) => item.type === 'consultClues') : -1
+  const isConsultCluesFocused =
+    titleAnimationComplete &&
+    !showWitnesses &&
+    !showAccusation &&
+    focusableItems[selectedFocusIndex]?.type === 'consultClues'
 
   return (
     <div 
@@ -415,11 +497,128 @@ function Investigation({ crime, state, onDiscoverClue, onViewWitness, onMakeAccu
         {/* Painel esquerdo - arquivos e pastas */}
         <div className="dos-panel dos-panel-left">
           <div className="dos-file-list">
-            {mainButtons.map((buttonId, index) => {
+            {topMenuButtons.map((buttonId) => {
               const buttonLabels = {
                 witnesses: 'TESTEMUNHAS.EXE',
                 case: 'CASO.EXE',
-                suspects: 'BANCO_SUSPEITOS.EXE',
+                suspects: 'BANCO_SUSPEITOS.EXE'
+              }
+              const isFocused = titleAnimationComplete && !showWitnesses && !showAccusation && focusableItems[selectedFocusIndex]?.id === buttonId
+              return (
+                <button
+                  key={buttonId}
+                  type="button"
+                  className={`dos-file-item ${isFocused ? 'dos-file-selected' : ''}`}
+                  onClick={() => {
+                    if (buttonId === 'witnesses') { setShowWitnesses(true); setWitnessNavActive(true) }
+                    else if (buttonId === 'suspects') setShowSuspects(true)
+                    else if (buttonId === 'case') setShowCaseView(true)
+                  }}
+                  data-focused={isFocused ? 'true' : undefined}
+                  onMouseEnter={() => {
+                    const idx = focusableItems.findIndex(item => item.id === buttonId)
+                    if (idx >= 0) setSelectedFocusIndex(idx)
+                  }}
+                >
+                  {buttonLabels[buttonId]}
+                  {isFocused && (
+                    <span className="cursor-blink" style={{
+                      color: '#00FF66',
+                      animation: 'blink 1s step-end infinite',
+                      marginLeft: '4px'
+                    }}>█</span>
+                  )}
+                </button>
+              )
+            })}
+          </div>
+          
+          {/* Pistas: todos os .DAT; revelados ficam visíveis e desabilitados */}
+          {(crime.clues.length > 0 || showConsultPistas) && (
+            <>
+              <div className="dos-folder-sep" />
+              <div className="dos-folder-list">
+                <div className="dos-folder-item">PISTAS &gt;FOLDER&lt;</div>
+                {crime.clues.map((clue) => {
+                  const isRevealed = cluesRevealed.includes(clue.type)
+                  const isFocused =
+                    !isRevealed &&
+                    titleAnimationComplete &&
+                    !showWitnesses &&
+                    !showAccusation &&
+                    focusableItems[selectedFocusIndex]?.type === 'clue' &&
+                    focusableItems[selectedFocusIndex]?.clueType === clue.type
+                  if (isRevealed) {
+                    return (
+                      <button
+                        key={clue.type}
+                        type="button"
+                        className="dos-file-item dos-file-clue-disabled"
+                        disabled
+                        aria-disabled="true"
+                      >
+                        {clue.type}.DAT
+                      </button>
+                    )
+                  }
+                  return (
+                    <button
+                      key={clue.type}
+                      type="button"
+                      className={`dos-file-item ${isFocused ? 'dos-file-selected' : ''}`}
+                      onClick={() => {
+                        handleDiscoverClue(clue.type)
+                        setForceRevealClueType(clue.type)
+                        setShowCluesView(true)
+                      }}
+                      data-focused={isFocused ? 'true' : undefined}
+                      onMouseEnter={() => {
+                        const idx = focusableItems.findIndex((item) => item.type === 'clue' && item.clueType === clue.type)
+                        if (idx >= 0) setSelectedFocusIndex(idx)
+                      }}
+                    >
+                      {clue.type}.DAT
+                      {isFocused && (
+                        <span className="cursor-blink" style={{
+                          color: '#00FF66',
+                          animation: 'blink 1s step-end infinite',
+                          marginLeft: '4px'
+                        }}>█</span>
+                      )}
+                    </button>
+                  )
+                })}
+                {showConsultPistas && (
+                  <button
+                    type="button"
+                    className={`dos-file-item ${isConsultCluesFocused ? 'dos-file-selected' : ''}`}
+                    onClick={() => {
+                      setForceRevealClueType(null)
+                      setShowCluesView(true)
+                    }}
+                    data-focused={isConsultCluesFocused ? 'true' : undefined}
+                    onMouseEnter={() => {
+                      if (consultCluesFocusIdx >= 0) setSelectedFocusIndex(consultCluesFocusIdx)
+                    }}
+                  >
+                    CONSULTAR_PISTAS.EXE
+                    {isConsultCluesFocused && (
+                      <span className="cursor-blink" style={{
+                        color: '#00FF66',
+                        animation: 'blink 1s step-end infinite',
+                        marginLeft: '4px'
+                      }}>█</span>
+                    )}
+                  </button>
+                )}
+              </div>
+            </>
+          )}
+
+          <div className="dos-menu-sep-dashes" aria-hidden>--------------</div>
+          <div className="dos-file-list">
+            {actionButtons.map((buttonId) => {
+              const buttonLabels = {
                 accusation: 'ACUSAÇÃO.EXE',
                 viewResult: 'RESULTADO.EXE'
               }
@@ -427,12 +626,10 @@ function Investigation({ crime, state, onDiscoverClue, onViewWitness, onMakeAccu
               return (
                 <button
                   key={buttonId}
+                  type="button"
                   className={`dos-file-item ${isFocused ? 'dos-file-selected' : ''}`}
                   onClick={() => {
-                    if (buttonId === 'witnesses') { setShowWitnesses(true); setWitnessNavActive(true) }
-                    else if (buttonId === 'suspects') setShowSuspects(true)
-                    else if (buttonId === 'case') setShowCaseView(true)
-                    else if (buttonId === 'accusation') setShowAccusation(true)
+                    if (buttonId === 'accusation') setShowAccusation(true)
                     else if (buttonId === 'viewResult') onViewResult()
                   }}
                   data-focused={isFocused ? 'true' : undefined}
@@ -457,43 +654,10 @@ function Investigation({ crime, state, onDiscoverClue, onViewWitness, onMakeAccu
               )
             })}
           </div>
-          
-          {/* Pistas disponíveis */}
-          {canDiscoverMore && (
-            <>
-              <div className="dos-folder-sep" />
-              <div className="dos-folder-list">
-                <div className="dos-folder-item">PISTAS &gt;FOLDER&lt;</div>
-                {availableClues.map((clue, index) => {
-                  const isFocused = titleAnimationComplete && !showWitnesses && !showAccusation && focusableItems[selectedFocusIndex]?.type === 'clue' && focusableItems[selectedFocusIndex]?.index === index
-                  return (
-                    <button
-                      key={index}
-                      className={`dos-file-item ${isFocused ? 'dos-file-selected' : ''}`}
-                      onClick={() => handleDiscoverClue(clue.type)}
-                      data-focused={isFocused ? 'true' : undefined}
-                      onMouseEnter={() => {
-                        const idx = focusableItems.findIndex(item => item.type === 'clue' && item.index === index)
-                        if (idx >= 0) setSelectedFocusIndex(idx)
-                      }}
-                    >
-                      {clue.type}.DAT
-                      {isFocused && (
-                        <span className="cursor-blink" style={{
-                          color: '#00FF66',
-                          animation: 'blink 1s step-end infinite',
-                          marginLeft: '4px'
-                        }}>█</span>
-                      )}
-                    </button>
-                  )
-                })}
-              </div>
-            </>
-          )}
+
+          <div className="dos-menu-sep-dashes" aria-hidden>--------------</div>
           
           {/* Hipótese atual */}
-          <div className="dos-folder-sep" />
           <div className="dos-folder-list">
             <div className="dos-folder-item">HIPOTESE &gt;FOLDER&lt;</div>
             <div className="hypothesis-item">

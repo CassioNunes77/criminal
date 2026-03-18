@@ -287,6 +287,20 @@
   text-shadow: 0 0 4px var(--glow-color);
 }
 
+.dos-file-item.dos-file-clue-disabled,
+.dos-file-item:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+  color: var(--text-secondary);
+  text-shadow: none;
+}
+
+.dos-file-item.dos-file-clue-disabled:hover,
+.dos-file-item:disabled:hover {
+  color: var(--text-secondary);
+  text-shadow: none;
+}
+
 .dos-folder-sep {
   height: 1px;
   background: var(--text-secondary);

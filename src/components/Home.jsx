@@ -39,7 +39,6 @@ function Home({
   const [missionComplete, setMissionComplete] = useState(false)
   const missionTypingTimeoutRef = useRef(null)
   const [suspectsDbOpen, setSuspectsDbOpen] = useState(false)
-  const [cluesViewOpen, setCluesViewOpen] = useState(false)
   /** Por crime.id: após sair da investigação uma vez, não repetir typewriter do título ao voltar */
   const [investigationTitleIntroSeen, setInvestigationTitleIntroSeen] = useState({})
   const markInvestigationTitleIntroSeen = useCallback((crimeId) => {
@@ -593,7 +592,6 @@ function Home({
   useEffect(() => {
     if (screen !== 'investigation') {
       setSuspectsDbOpen(false)
-      setCluesViewOpen(false)
     }
   }, [screen])
 
@@ -775,7 +773,6 @@ function Home({
             onViewResult={() => setScreen('result')}
             onBack={() => setScreen('home')}
             onSuspectsDbOpenChange={setSuspectsDbOpen}
-            onCluesViewOpenChange={setCluesViewOpen}
             skipInvestigationTitleAnimation={!!investigationTitleIntroSeen[crime?.id]}
             onMarkInvestigationTitleIntroSeen={markInvestigationTitleIntroSeen}
           />
@@ -927,7 +924,7 @@ function Home({
       {/* Barra inferior - prompt C:\ e versão, Aceitar/Recusar, ou VOLTAR */}
       <div className="dos-bottom-bar">
         {screen !== 'home' ? (
-          suspectsDbOpen || cluesViewOpen ? (
+          suspectsDbOpen ? (
             <div className="dos-prompt" aria-hidden />
           ) : (
             <div className="dos-prompt">

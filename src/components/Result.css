@@ -207,11 +207,7 @@
   padding: 0;
 }
 
-.result.result--solved .separator:not(.separator-full-width) {
-  margin: 5px 0;
-  font-size: 10px;
-  line-height: 1.2;
-}
+.result.result--solved .separator:not(.separator-full-width) {\n  margin: 3px 0;\n  font-size: 10px;\n  line-height: 1.2;\n  opacity: 0.7;\n}
 
 .result.result--solved .stats-section {
   margin: 4px 0;
@@ -221,6 +217,7 @@
   font-size: 11px;
   margin: 1px 0;
   line-height: 1.35;
+  text-transform: uppercase;
 }
 
 .result.result--solved .result-section {
@@ -232,28 +229,33 @@
   margin: 0 0 3px;
   text-transform: uppercase;
   letter-spacing: 0.05em;
+  font-weight: bold;
+  color: var(--text-highlight);
 }
 
 .result.result--solved .accuracy-bar {
   font-size: 14px;
-  margin: 4px 0;
+  margin: 3px 0 2px;
   line-height: 1.15;
+  color: var(--text-highlight);
 }
 
 .result.result--solved .accuracy-text {
   font-size: 11px;
-  margin-top: 2px;
+  margin-top: 1px;
+  text-transform: uppercase;
 }
 
 .result.result--solved .result-share-btn {
-  margin-top: 6px !important;
+  margin-top: 3px !important;
+  margin-bottom: 1px !important;
 }
 
 .result.result--solved .terminal-button {
-  margin-top: 4px;
-  margin-bottom: 2px;
-  padding: 3px 0;
-  font-size: 12px;
+  margin-top: 2px;
+  margin-bottom: 1px;
+  padding: 2px 0;
+  font-size: 11px;
   line-height: 1.3;
 }
 

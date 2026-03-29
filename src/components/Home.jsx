@@ -148,7 +148,6 @@ function Home({
     '',
     '4. Direitos do usuário',
     '• O usuário pode limpar histórico e progresso em localStorage a qualquer momento.',
-    '• O usuário pode requisitar remoção total de dados de sua conta se houver serviços remotos adicionados posteriormente.',
     '',
     '5. Contato do desenvolvedor',
     '• Para dúvidas ou incidentes de privacidade, use o canal oficial de suporte do projeto (README / suporte).',
@@ -1100,7 +1099,7 @@ function Home({
           )}
         </div>
         )}
-        <div className="dos-version">Nexo-piOS-u1.0.01p</div>
+        <div className="dos-version">NEXO-CIS.v1.0</div>
       </div>
 
     </div>

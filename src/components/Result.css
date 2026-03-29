@@ -185,10 +185,15 @@
   letter-spacing: 0.05em;
 }
 
+.result.result--solved .solution-section {
+  text-transform: uppercase;
+}
+
 .result.result--solved .solution-item {
   font-size: 11px;
   margin: 1px 0;
   line-height: 1.35;
+  text-transform: uppercase;
 }
 
 .result.result--solved .solution-item .highlight {

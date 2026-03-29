@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Política de Privacidade - Nexo Terminal</title>
+  <style>
+    body { background: #0a0a0a; color: #e5e5e5; font-family: Inter, system-ui, sans-serif; margin: 0; padding: 24px; }
+    h1 { color: #50e050; }
+    h2 { margin-top: 16px; color: #a6ffa6; }
+    p, li { line-height: 1.55; margin-bottom: 8px; }
+    nav { margin-top: 12px; }
+    a { color: #94c6ff; text-decoration: none; }
+    a:hover { text-decoration: underline; }
+    .container { max-width: 900px; margin: 0 auto; }
+    .notice { background: #142b12; border-left: 3px solid #4ec04e; padding: 12px; margin-bottom:15px; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Política de Privacidade</h1>
+    <div class="notice">Esta política é codificada no app e também disponível em <code>/privacy</code> no SPA.</div>
+    <h2>1. Resumo</h2>
+    <p>O Nexo Terminal é um jogo de investigação local. Não coletamos dados pessoais identificáveis dos jogadores em rotinas automáticas.</p>
+    <h2>2. Dados coletados</h2>
+    <ul>
+      <li><strong>LocalStorage:</strong> progresso de jogos, estado de casos e estatísticas básicas (crime_#).</li>
+      <li><strong>Firebase:</strong> casos diários são carregados via Firestore/chamada HTTP; não armazena trabalho pessoal.</li>
+      <li><strong>Sem cookies de terceiros</strong> e sem tracking de analytics por padrão.</li>
+    </ul>
+    <h2>3. Segurança</h2>
+    <ul>
+      <li>O app não envia dados de usuário ao servidor, exceto para leitura de casos diários.</li>
+      <li>Não há login ou senha exigidos.</li>
+      <li>O desenvolvedor não se responsabiliza por dados inseridos em campos de texto, pois o jogo não possui cadastros de usuário.</li>
+    </ul>
+    <h2>4. Direitos do usuário</h2>
+    <ul>
+      <li>O usuário pode limpar o histórico e o progresso via ferramentas do navegador (localStorage).</li>
+      <li>Pedido de exclusão total de dados remotos deve ser solicitado via canal de suporte se o serviço evoluir.</li>
+    </ul>
+    <h2>5. Contato</h2>
+    <p>Reportar dúvidas ou incidentes de privacidade via README do projeto ou correio do repositório.</p>
+    <h2>6. Atualizações</h2>
+    <p>Esta política é parte do código e deve ser atualizada sempre que novas funcionalidades de coleta de dados forem adicionadas. Fechação: 29/03/2026.</p>
+    <nav><a href="/">Voltar para o jogo</a></nav>
+  </div>
+</body>
+</html>

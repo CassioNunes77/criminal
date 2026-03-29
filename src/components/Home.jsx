@@ -23,6 +23,7 @@ function Home({
   const [titleAnimationComplete, setTitleAnimationComplete] = useState(false)
   const [showAbout, setShowAbout] = useState(false)
   const [showInfo, setShowInfo] = useState(false)
+  const [showPrivacy, setShowPrivacy] = useState(false)
   const bufRef = useRef([])
   const [aboutLines, setAboutLines] = useState([])
   const [infoLines, setInfoLines] = useState([])
@@ -131,6 +132,36 @@ function Home({
     'BOM TRABALHO, AGENTE.'
   ]
 
+  const PRIVACY_LINES = [
+    'POLÍTICA DE PRIVACIDADE - NEXO TERMINAL',
+    '',
+    '1. Resumo',
+    'Este jogo é uma experiência local de investigação interativa. Não coletamos nenhum dado pessoal sensível dos jogadores.',
+    '',
+    '2. Dados coletados',
+    '• LocalStorage: apenas pontos de progresso e estado de partida (crime_#) são armazenados localmente para retomar casos.',
+    '• Telemetria: não há analytics, tracking ou compartilhamento com terceiros por padrão.',
+    '',
+    '3. Segurança',
+    '• O aplicativo não envia dados de usuário para servidores remotos (exceto para casos diários via Firebase, configurado no app).',
+    '• O desenvolvedor não é responsável por dados que o usuário inclua manualmente em campos de entrada (não existem campos de login).',
+    '',
+    '4. Direitos do usuário',
+    '• O usuário pode limpar histórico e progresso em localStorage a qualquer momento.',
+    '• O usuário pode requisitar remoção total de dados de sua conta se houver serviços remotos adicionados posteriormente.',
+    '',
+    '5. Contato do desenvolvedor',
+    '• Para dúvidas ou incidentes de privacidade, use o canal oficial de suporte do projeto (README / suporte).',
+    '',
+    '6. Atualizações',
+    '• Esta política é parte do código e deve ser atualizada junto com novas funcionalidades de coleta.',
+    '',
+    '7. Página direta',
+    '• Acesse /privacy para visualizar esta política a qualquer momento.',
+    '',
+    'Aprovado em 2026. Mantemos privacidade e segurança como prioridade para o desenvolvedor e os jogadores.'
+  ]
+
   const completeInfoAnimation = () => {
     if (infoComplete) return
     if (window.__cancelInfoAnimation) {
@@ -171,6 +202,12 @@ function Home({
   }, [])
 
   useEffect(() => {
+    if (typeof window !== 'undefined' && window.location.pathname === '/privacy') {
+      setShowPrivacy(true)
+      setShowAbout(false)
+      setShowInfo(false)
+    }
+
     const onResize = () => {
       setIsDesktop(window.innerWidth >= 768)
       setIsLandscape(window.innerWidth > window.innerHeight)
@@ -307,8 +344,19 @@ function Home({
             setShowMissionPreview(true)
           } else if (cmd === 'ARQUIVO' || cmd === 'ARQUIVO.TXT') {
             setShowAbout(true)
+            setShowInfo(false)
+            setShowPrivacy(false)
+            if (window?.history?.replaceState) window.history.replaceState(null, '', '/')
           } else if (cmd === 'INFO' || cmd === 'INFO.TXT') {
             setShowInfo(true)
+            setShowAbout(false)
+            setShowPrivacy(false)
+            if (window?.history?.replaceState) window.history.replaceState(null, '', '/')
+          } else if (cmd === 'PRIVACY' || cmd === 'PRIVACY.TXT') {
+            setShowPrivacy(true)
+            setShowAbout(false)
+            setShowInfo(false)
+            if (window?.history?.replaceState) window.history.replaceState(null, '', '/privacy')
           } else if (cmd === '#*NEXO77') {
             x7ActiveRef.current = true
           } else if (onShowStats && cmdLower === (typeof atob !== 'undefined' ? atob('c3RhdHM3Nw==') : 'stats77')) {
@@ -718,6 +766,7 @@ function Home({
     { name: 'INICIAR.EXE', action: 'start' },
     { name: 'ARQUIVO.TXT', action: 'about' },
     { name: 'INFO.TXT', action: 'info' },
+    { name: 'PRIVACY.TXT', action: 'privacy' },
   ]
   if (onShowStats) dosFiles.push({ name: 'STATS.EXE', action: 'stats' })
   const dosFolders = ['CASOS', 'DOSSIE', 'SETTINGS']
@@ -728,16 +777,29 @@ function Home({
       setShowMissionPreview(true)
       setShowAbout(false)
       setShowInfo(false)
+      setShowPrivacy(false)
+      if (window?.history?.replaceState) window.history.replaceState(null, '', '/')
     } else if (action === 'about') {
       setScreen?.('home')
       setShowAbout(true)
       setShowInfo(false)
+      setShowPrivacy(false)
       setShowMissionPreview(false)
+      if (window?.history?.replaceState) window.history.replaceState(null, '', '/')
     } else if (action === 'info') {
       setScreen?.('home')
       setShowInfo(true)
       setShowAbout(false)
+      setShowPrivacy(false)
       setShowMissionPreview(false)
+      if (window?.history?.replaceState) window.history.replaceState(null, '', '/')
+    } else if (action === 'privacy') {
+      setScreen?.('home')
+      setShowPrivacy(true)
+      setShowAbout(false)
+      setShowInfo(false)
+      setShowMissionPreview(false)
+      if (window?.history?.replaceState) window.history.replaceState(null, '', '/privacy')
     } else if (action === 'stats') onShowStats?.()
   }
 
@@ -891,6 +953,15 @@ function Home({
                 {dots && <span style={{ color: '#00CC55' }}>{dots}</span>}
               </div>
             </div>
+          ) : showPrivacy ? (
+            <div className="dos-mission-content">
+              <div className="dos-mission-title">PRIVACY</div>
+              <div className="dos-mission-description">
+                {PRIVACY_LINES.map((line, index) => (
+                  <div key={index}>{line}</div>
+                ))}
+              </div>
+            </div>
           ) : showMissionPreview && crime ? (
             <div
               className="dos-mission-content"
@@ -945,10 +1016,15 @@ function Home({
               </button>
             </div>
           )
-        ) : showAbout || showInfo ? (
+        ) : showAbout || showInfo || showPrivacy ? (
           <button
             className="dos-mission-btn dos-file-selected"
-            onClick={() => { setShowAbout(false); setShowInfo(false) }}
+            onClick={() => {
+              setShowAbout(false)
+              setShowInfo(false)
+              setShowPrivacy(false)
+              if (window?.history?.replaceState) window.history.replaceState(null, '', '/')
+            }}
           >
             VOLTAR
           </button>
@@ -974,8 +1050,24 @@ function Home({
                       e.preventDefault()
                       const cmd = commandInput.trim().toUpperCase()
                       if (cmd === 'INICIAR' || cmd === 'INICIAR.EXE') setShowMissionPreview(true)
-                      else if (cmd === 'ARQUIVO' || cmd === 'ARQUIVO.TXT') setShowAbout(true)
-                      else if (cmd === 'INFO' || cmd === 'INFO.TXT') setShowInfo(true)
+                      else if (cmd === 'ARQUIVO' || cmd === 'ARQUIVO.TXT') {
+                        setShowAbout(true)
+                        setShowInfo(false)
+                        setShowPrivacy(false)
+                        if (window?.history?.replaceState) window.history.replaceState(null, '', '/')
+                      }
+                      else if (cmd === 'INFO' || cmd === 'INFO.TXT') {
+                        setShowInfo(true)
+                        setShowAbout(false)
+                        setShowPrivacy(false)
+                        if (window?.history?.replaceState) window.history.replaceState(null, '', '/')
+                      }
+                      else if (cmd === 'PRIVACY' || cmd === 'PRIVACY.TXT') {
+                        setShowPrivacy(true)
+                        setShowAbout(false)
+                        setShowInfo(false)
+                        if (window?.history?.replaceState) window.history.replaceState(null, '', '/privacy')
+                      }
                       else if (cmd === '#*NEXO77') x7ActiveRef.current = true
                       else if (onShowStats && (cmd === 'STATS' || cmd === (typeof atob !== 'undefined' ? atob('c3RhdHM3Nw==') : 'stats77'))) onShowStats()
                       prevCommandRef.current = ''

@@ -145,16 +145,16 @@
 
   .dossier-screen .terminal-header .title {
     font-size: 15px !important;
-    text-align: center;
+    text-align: left;
   }
 
   .dossier-meta-item,
   .dossier-content,
   .dossier-screen > .separator {
-    text-align: center;
+    text-align: left;
   }
 
   .dossier-back-btn {
-    text-align: center;
+    text-align: left;
   }
 }

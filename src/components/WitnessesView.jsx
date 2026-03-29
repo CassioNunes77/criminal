@@ -136,7 +136,7 @@ function WitnessesView({
                         onClick={() => onViewWitness?.(index)}
                         style={{ marginTop: '8px', textAlign: 'left' }}
                       >
-                        REGISTRAR_DEPOIMENTO.EXE
+                        VER
                       </button>
                     </>
                   )}

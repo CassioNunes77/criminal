@@ -890,7 +890,15 @@ function Home({
           )}
         </div>
 
-        <div className={`dos-panel dos-panel-right ${screen !== 'home' ? 'dos-panel-embedded' : 'dos-hero-panel'}`}>
+        <div 
+          className={`dos-panel dos-panel-right ${screen !== 'home' ? 'dos-panel-embedded' : 'dos-hero-panel'}`}
+          onClick={(e) => {
+            // Complete animation if clicking on panel and animation is incomplete
+            if (showAbout && !aboutComplete && e.target.closest('.dos-mission-content')) completeAboutAnimation()
+            else if (showInfo && !infoComplete && e.target.closest('.dos-mission-content')) completeInfoAnimation()
+            else if (showMissionPreview && !missionComplete && e.target.closest('.dos-mission-content')) completeMissionAnimation()
+          }}
+        >
           {screen === 'result' ? (
             <div className="dos-embedded-content">
               <Result
@@ -915,8 +923,6 @@ function Home({
           ) : showAbout ? (
             <div
               className="dos-mission-content"
-              onClick={!aboutComplete ? completeAboutAnimation : undefined}
-              onTouchStart={!aboutComplete ? (e) => { e.preventDefault(); completeAboutAnimation() } : undefined}
               style={{ cursor: !aboutComplete ? 'pointer' : 'default', touchAction: 'manipulation' }}
             >
               <div className="dos-mission-title">ARQUIVO</div>
@@ -935,8 +941,6 @@ function Home({
           ) : showInfo ? (
             <div
               className="dos-mission-content"
-              onClick={!infoComplete ? completeInfoAnimation : undefined}
-              onTouchStart={!infoComplete ? (e) => { e.preventDefault(); completeInfoAnimation() } : undefined}
               style={{ cursor: !infoComplete ? 'pointer' : 'default', touchAction: 'manipulation' }}
             >
               <div className="dos-mission-title">INFO</div>

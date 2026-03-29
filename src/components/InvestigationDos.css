@@ -472,6 +472,7 @@
   transition: color 0.15s ease;
   display: block;
   width: 100%;
+  text-transform: uppercase;
 }
 
 .investigation-dos .option-button:hover,

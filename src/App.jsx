@@ -183,22 +183,24 @@ function App() {
   }
 
   return (
-    <div className="app app-crt-dos">
-      <Home
-        screen={screen}
-        setScreen={setScreen}
-        crime={currentCrime}
-        investigationState={investigationState}
-        x7={x7}
-        onAcceptMission={(opts) => {
-          setX7(!!(opts?.x))
-          setScreen('investigation')
-        }}
-        onDiscoverClue={discoverClue}
-        onViewWitness={viewWitness}
-        onMakeAccusation={makeAccusation}
-        onShowStats={() => setScreen('stats')}
-      />
+    <div className="app app-crt-dos app-superhot-mode">
+      <div className="crt-viewport">
+        <Home
+          screen={screen}
+          setScreen={setScreen}
+          crime={currentCrime}
+          investigationState={investigationState}
+          x7={x7}
+          onAcceptMission={(opts) => {
+            setX7(!!(opts?.x))
+            setScreen('investigation')
+          }}
+          onDiscoverClue={discoverClue}
+          onViewWitness={viewWitness}
+          onMakeAccusation={makeAccusation}
+          onShowStats={() => setScreen('stats')}
+        />
+      </div>
     </div>
   )
 }

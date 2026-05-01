@@ -16,6 +16,7 @@
     0 0 0 2px rgba(0, 255, 100, 0.12),
     inset 0 0 0 1px rgba(0, 0, 0, 0.5);
   position: relative;
+  isolation: isolate;
 }
 
 @media (max-width: 768px) {
@@ -56,4 +57,270 @@
   content: '█';
   animation: blink 1s step-end infinite;
   margin-left: 4px;
+}
+
+/* ========== SUPERHOT CRT global (aplica nas outras telas) ========== */
+.app.app-superhot-mode {
+  box-shadow:
+    inset 0 0 0 1px rgba(0, 255, 102, 0.32),
+    inset 0 0 60px rgba(0, 255, 102, 0.05),
+    0 0 34px rgba(0, 255, 102, 0.08),
+    inset 0 0 0 1px rgba(0, 0, 0, 0.45);
+  filter: saturate(0.92) contrast(1.06);
+}
+
+.app.app-superhot-mode::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 9997;
+  background:
+    repeating-linear-gradient(
+      0deg,
+      rgba(0, 0, 0, 0) 0px,
+      rgba(0, 0, 0, 0) 1px,
+      rgba(0, 255, 102, 0.045) 2px,
+      rgba(0, 0, 0, 0.16) 3px
+    ),
+    repeating-linear-gradient(
+      180deg,
+      rgba(0, 255, 102, 0.045) 0px,
+      rgba(0, 255, 102, 0) 88px,
+      rgba(0, 255, 102, 0.075) 118px,
+      rgba(0, 255, 102, 0.035) 146px,
+      rgba(0, 255, 102, 0) 206px
+    );
+  opacity: 0.86;
+  animation: superhotGlobalScan 7.2s linear infinite;
+}
+
+.app.app-superhot-mode.app-crt-dos::after {
+  background:
+    radial-gradient(
+      ellipse at center,
+      transparent 55%,
+      rgba(0, 0, 0, 0.26) 84%,
+      rgba(0, 0, 0, 0.45) 100%
+    ),
+    repeating-linear-gradient(
+      180deg,
+      rgba(0, 255, 102, 0) 0px,
+      rgba(0, 255, 102, 0) 154px,
+      rgba(0, 255, 102, 0.19) 190px,
+      rgba(0, 255, 102, 0.11) 226px,
+      rgba(0, 255, 102, 0) 284px
+    );
+  mix-blend-mode: screen;
+  opacity: 0.62;
+  animation: superhotGlobalBloom 4.4s linear infinite;
+}
+
+.app-superhot-mode .dos-panel,
+.app-superhot-mode .stats-summary,
+.app-superhot-mode .stats-table {
+  border-color: rgba(0, 255, 102, 0.42) !important;
+  box-shadow: inset 0 0 18px rgba(0, 255, 102, 0.05);
+}
+
+.app-superhot-mode .separator,
+.app-superhot-mode .separator-full-width {
+  text-shadow: 0 0 2px rgba(0, 255, 102, 0.18);
+}
+
+.app-superhot-mode .title,
+.app-superhot-mode .dos-mission-title {
+  text-shadow:
+    0 0 5px rgba(0, 255, 102, 0.24),
+    1px 0 rgba(0, 255, 102, 0.08),
+    -1px 0 rgba(0, 122, 51, 0.08);
+}
+
+.app-superhot-mode .terminal-button,
+.app-superhot-mode .dos-file-item,
+.app-superhot-mode .dos-mission-btn,
+.app-superhot-mode .stats-back {
+  text-shadow: 0 0 4px rgba(0, 255, 102, 0.18);
+}
+
+.app-superhot-mode .terminal-button:hover,
+.app-superhot-mode .dos-file-item:hover,
+.app-superhot-mode .dos-mission-btn:hover,
+.app-superhot-mode .stats-back:hover {
+  filter: brightness(1.1);
+}
+
+/* Linhas de desfoque horizontal nas telas principais */
+.app-superhot-mode .result,
+.app-superhot-mode .dossier-screen,
+.app-superhot-mode .stats-screen,
+.app-superhot-mode .investigation-dos {
+  position: relative;
+}
+
+.app-superhot-mode .result::before,
+.app-superhot-mode .dossier-screen::before,
+.app-superhot-mode .stats-screen::before,
+.app-superhot-mode .investigation-dos::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: repeating-linear-gradient(
+    180deg,
+    rgba(0, 255, 102, 0) 0px,
+    rgba(0, 255, 102, 0) 112px,
+    rgba(0, 255, 102, 0.24) 148px,
+    rgba(0, 255, 102, 0.1) 186px,
+    rgba(0, 255, 102, 0) 246px
+  );
+  filter: blur(7px);
+  opacity: 0.26;
+  animation: superhotBandTravel 5.2s linear infinite;
+}
+
+@keyframes superhotGlobalScan {
+  0% { background-position: 0 0, 0 0; opacity: 0.88; }
+  100% { background-position: 0 6px, 0 206px; opacity: 0.88; }
+}
+
+@keyframes superhotGlobalBloom {
+  0% { background-position: 0 0, 0 0; opacity: 0.62; }
+  100% { background-position: 0 0, 0 284px; opacity: 0.62; }
+}
+
+@keyframes superhotBandTravel {
+  0% { background-position: 0 0; opacity: 0.26; }
+  100% { background-position: 0 246px; opacity: 0.26; }
+}
+
+/* ===== CRT físico: tela curva, foco central e perda de nitidez nas bordas ===== */
+.app-superhot-mode .crt-viewport {
+  position: relative;
+  min-height: calc(100vh - 32px);
+  border-radius: 22px / 34px;
+  overflow: hidden;
+  background: #000;
+  transform-origin: center center;
+  transform:
+    perspective(1300px)
+    rotateX(0.75deg)
+    rotateY(-0.2deg)
+    scale(0.995);
+  box-shadow:
+    inset 0 0 0 1px rgba(0, 255, 102, 0.25),
+    inset 0 0 24px rgba(0, 255, 102, 0.08),
+    inset 0 0 120px rgba(0, 0, 0, 0.35);
+  animation: crtFrameFloat 7.5s ease-in-out infinite;
+}
+
+/* Warp/barrel: emula curvatura de vidro CRT sem deformar interações */
+.app-superhot-mode .crt-viewport::before {
+  content: '';
+  position: absolute;
+  inset: -4% -2%;
+  pointer-events: none;
+  z-index: 3;
+  border-radius: 28px / 44px;
+  background:
+    radial-gradient(
+      ellipse at center,
+      rgba(0, 0, 0, 0) 50%,
+      rgba(0, 0, 0, 0.18) 72%,
+      rgba(0, 0, 0, 0.34) 100%
+    ),
+    radial-gradient(
+      ellipse at center,
+      rgba(0, 255, 102, 0.055) 0%,
+      rgba(0, 255, 102, 0.02) 44%,
+      rgba(0, 255, 102, 0) 75%
+    );
+  filter: blur(0.6px);
+  mix-blend-mode: screen;
+}
+
+/* Defocus periférico + vinheta óptica */
+.app-superhot-mode .crt-viewport::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 4;
+  background:
+    radial-gradient(
+      ellipse at center,
+      rgba(0, 0, 0, 0) 42%,
+      rgba(0, 0, 0, 0.12) 60%,
+      rgba(0, 0, 0, 0.26) 76%,
+      rgba(0, 0, 0, 0.38) 100%
+    ),
+    radial-gradient(
+      ellipse at center,
+      rgba(0, 255, 102, 0) 35%,
+      rgba(0, 255, 102, 0.09) 100%
+    );
+  filter: blur(1.6px);
+  opacity: 0.86;
+}
+
+/* Leve "respiração" analógica da imagem (não invasiva) */
+.app-superhot-mode .crt-viewport > * {
+  position: relative;
+  z-index: 2;
+  animation: crtImageInstability 5.8s ease-in-out infinite;
+}
+
+/* Aberração cromática/ghosting lateral suave no conteúdo */
+.app-superhot-mode .crt-viewport .home,
+.app-superhot-mode .crt-viewport .investigation-dos,
+.app-superhot-mode .crt-viewport .result,
+.app-superhot-mode .crt-viewport .dossier-screen,
+.app-superhot-mode .crt-viewport .stats-screen {
+  text-shadow:
+    0 0 3px rgba(0, 255, 102, 0.18),
+    0 0 8px rgba(0, 255, 102, 0.08),
+    0.35px 0 rgba(0, 255, 102, 0.22),
+    -0.35px 0 rgba(0, 122, 51, 0.18);
+}
+
+@keyframes crtFrameFloat {
+  0%, 100% {
+    transform:
+      perspective(1300px)
+      rotateX(0.75deg)
+      rotateY(-0.2deg)
+      scale(0.995);
+  }
+  50% {
+    transform:
+      perspective(1300px)
+      rotateX(0.95deg)
+      rotateY(0.18deg)
+      scale(1);
+  }
+}
+
+@keyframes crtImageInstability {
+  0%, 100% { transform: translateX(0) translateY(0); filter: blur(0); }
+  21% { transform: translateX(0.18px) translateY(-0.08px); filter: blur(0.08px); }
+  47% { transform: translateX(-0.2px) translateY(0.1px); filter: blur(0.05px); }
+  68% { transform: translateX(0.14px) translateY(-0.05px); filter: blur(0.06px); }
+  84% { transform: translateX(-0.1px) translateY(0.04px); filter: blur(0.04px); }
+}
+
+@media (max-width: 768px) {
+  .app-superhot-mode .crt-viewport {
+    min-height: calc(100vh - 24px);
+    border-radius: 14px / 24px;
+    transform:
+      perspective(1000px)
+      rotateX(0.55deg)
+      rotateY(0deg)
+      scale(0.998);
+  }
+
+  .app-superhot-mode .crt-viewport::after {
+    filter: blur(1.2px);
+    opacity: 0.8;
+  }
 }

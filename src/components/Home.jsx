@@ -804,9 +804,17 @@ function Home({
 
   const handleAcceptMission = () => finalizeMissionAccept()
 
+  const isInitialHomeScreen =
+    screen === 'home' &&
+    !showAbout &&
+    !showInfo &&
+    !showPrivacy &&
+    !showMissionPreview
+  const hideLeftMenuPanel = showAbout || showInfo
+
   return (
     <div 
-      className={`home home-dos ${crtGlitch ? 'crt-glitch' : ''} ${crtFlicker ? 'crt-flicker' : ''}`}
+      className={`home home-dos ${isInitialHomeScreen ? 'superhot-home-mode' : ''} ${crtGlitch ? 'crt-glitch' : ''} ${crtFlicker ? 'crt-flicker' : ''}`}
       style={{
         fontFamily: "'PxPlus IBM VGA8', monospace",
         color: '#00CC55',
@@ -822,7 +830,7 @@ function Home({
       </div>
 
       {/* Conteúdo principal: na investigação, menu do caso substitui INICIAR/ARQUIVO/INFO */}
-      <div className="dos-main">
+      <div className={`dos-main ${isInitialHomeScreen ? 'superhot-shell-main' : ''} ${hideLeftMenuPanel ? 'dos-main-single-panel' : ''}`}>
         {screen === 'investigation' ? (
           <Investigation
             fullDosMain
@@ -841,7 +849,8 @@ function Home({
           />
         ) : (
           <>
-        <div className="dos-panel dos-panel-left">
+        {!hideLeftMenuPanel && (
+        <div className={`dos-panel dos-panel-left ${isInitialHomeScreen ? 'superhot-left-panel' : ''}`}>
           {!showMissionPreview && (
             <>
               <div className="dos-file-list">
@@ -889,9 +898,10 @@ function Home({
             </>
           )}
         </div>
+        )}
 
         <div 
-          className={`dos-panel dos-panel-right ${screen !== 'home' ? 'dos-panel-embedded' : 'dos-hero-panel'}`}
+          className={`dos-panel dos-panel-right ${screen !== 'home' ? 'dos-panel-embedded' : 'dos-hero-panel'} ${isInitialHomeScreen ? 'superhot-right-panel' : ''} ${showMissionPreview ? 'dos-mission-preview-active' : ''} ${hideLeftMenuPanel ? 'dos-panel-right-full' : ''} ${(showAbout || showInfo) ? 'dos-panel-reading-top' : ''}`}
           onClick={(e) => {
             // Complete animation if clicking on panel and animation is incomplete
             if (showAbout && !aboutComplete && e.target.closest('.dos-mission-content')) completeAboutAnimation()
@@ -967,7 +977,7 @@ function Home({
             </div>
           ) : showMissionPreview && crime ? (
             <div
-              className="dos-mission-content"
+              className="dos-mission-content dos-mission-preview-content"
               onClick={!missionComplete ? completeMissionAnimation : undefined}
               onTouchStart={!missionComplete ? (e) => { e.preventDefault(); completeMissionAnimation() } : undefined}
               style={{ cursor: !missionComplete ? 'pointer' : 'default', touchAction: 'manipulation' }}
@@ -989,7 +999,7 @@ function Home({
               </div>
             </div>
           ) : (
-            <div className="dos-hero-content">
+            <div className={`dos-hero-content ${isInitialHomeScreen ? 'superhot-hero-content' : ''}`}>
               <div className="dos-hero-line dos-hero-line-1">NEXO</div>
               <div className="dos-hero-line dos-hero-line-2">TERMINAL</div>
               <div className="dos-hero-subtitle dos-hero-subtitle-2">Full Version of Nexo Terminal</div>
